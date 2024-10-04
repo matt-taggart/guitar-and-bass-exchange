@@ -231,7 +231,7 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
+        "w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none",
         "text-sm font-semibold leading-6 text-white active:text-white/80",
         @class
       ]}
