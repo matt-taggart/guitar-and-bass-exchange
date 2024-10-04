@@ -1,0 +1,75 @@
+<section class="bg-white">
+  <div class="lg:grid lg:min-h-screen lg:grid-cols-12">
+    <section class="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
+      <img
+        alt="Electric Jazz Guitar"
+        src="https://images.unsplash.com/photo-1541991961-c16157c6f0e6?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        class="absolute inset-0 h-full w-full object-cover opacity-80"
+      />
+
+      <div class="hidden lg:relative lg:block lg:p-12">
+        <h2 class="mt-6 text-3xl font-bold text-white sm:text-3xl md:text-5xl">
+          Welcome to Guitar and Bass Exchange
+        </h2>
+
+        <p class="mt-4 text-lg leading-relaxed text-white/90">
+          Join now to start buying, selling, and trading in our trusted community of guitar and bass enthusiasts.
+        </p>
+      </div>
+    </section>
+
+    <main class="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
+      <div class="w-[calc(100%-8rem)]">
+        <div class="relative block lg:hidden">
+          <h1 class="my-2 text-2xl font-bold text-brand sm:text-3xl md:text-4xl">
+            Welcome to Guitar and Bass Exchange
+          </h1>
+
+          <p class="mb-4 leading-relaxed text-gray-500 dark:text-gray-400">
+            Join now to start buying, selling, and trading in our trusted community of guitar and bass enthusiasts.
+          </p>
+        </div>
+
+        <form class="input-validation-type mb-5">
+          <sl-input type="email" label="Email" placeholder="you@example.com" required></sl-input>
+          <br />
+          <sl-input type="username" label="Name" placeholder="John Smith" required></sl-input>
+          <br />
+          <sl-button type="submit" variant="primary" class="w-full">Sign Up</sl-button>
+        </form>
+
+        <div class="flex flex-col gap-12">
+          <div>
+            Already have an account?
+            <a class="text-blue-500 hover:underline" href="/login">Login</a>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <hr class="border-t border-gray-300" />
+
+            <div class="text-gray-500 text-sm">
+              By signing up, you agree to our
+              <a class="text-blue-500 hover:underline" href="/terms">Terms of Service</a>
+              and <a class="text-blue-500 hover:underline" href="/privacy">Privacy Policy</a>.
+            </div>
+          </div>
+        </div>
+
+        <script type="module">
+          const form = document.querySelector('.input-validation-type');
+
+          // Wait for controls to be defined before attaching form listeners
+          await Promise.all([
+            customElements.whenDefined('sl-button'),
+            customElements.whenDefined('sl-input')
+          ]).then(() => {
+            form.addEventListener('submit', event => {
+              event.preventDefault();
+              alert('All fields are valid!');
+            });
+          });
+        </script>
+      </div>
+    </main>
+  </div>
+</section>

@@ -1,0 +1,346 @@
+<.flash_group flash={@flash} />
+
+<!-- Top Navigation (Fixed at the top of the viewport) -->
+<nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 fixed top-0 left-0 right-0 bg-white z-50">
+  <div class="flex items-center gap-4">
+    <h1 class="text-brand text-xl">Guitar And Bass Exchange</h1>
+    <sl-input size="medium" pill placeholder="Search...">
+      <sl-icon name="search" slot="prefix"></sl-icon>
+    </sl-input>
+  </div>
+  <div class="flex items-center">
+    <sl-button variant="text" size="large">Login</sl-button>
+    <sl-button size="medium" href="/signup">Sign Up</sl-button>
+  </div>
+</nav>
+
+<!-- Main Layout Wrapper (occupies full height of the viewport, adjusted for fixed navbar) -->
+<div class="flex h-screen pt-16">
+  <!-- Adjust 64px above to match the height of your top navigation bar -->
+
+  <!-- Side Navigation (left) -->
+  <div class="min-w-2/12 h-full border-r border-gray-100 overflow-y-auto">
+    <div class="mt-4 p-4">
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Electric Guitars</h3>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Solid Body</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Hollow Body</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Semi-Hollow Body</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Extended Range</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Left Hand</a>
+    </div>
+
+    <div class="mt-4 p-4">
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Acoustic Guitars</h3>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">6-String</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">12-String</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Classical & Nylon</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Left Hand</a>
+    </div>
+
+    <div class="mt-4 p-4">
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Bass Guitars</h3>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">4-String</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">5-String</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">6-String</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Extended Range</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Left Hand</a>
+    </div>
+  </div>
+
+  <!-- Main Content Area (right) -->
+  <div class="flex-1 p-12 overflow-y-auto h-full">
+    <h1 class="text-3xl text-brand mb-6">Featured Guitars & Basses</h1>
+
+    <div class="grid gap-8 grid-cols-[repeat(auto-fill,minmax(275px,1fr))]">
+
+      
+      <!-- Card 1 -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/2_Body_Straight_Front_NA-0dc40717dff429856458abde61307541.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Fender Stratocaster</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Additional Cards -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://img.audiofanzine.com/images/u/product/normal/gibson-les-paul-deluxe-1978-176649.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Gibson Les Paul</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Repeat additional cards as needed -->
+
+      <!-- Card 1 -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/2_Body_Straight_Front_NA-0dc40717dff429856458abde61307541.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Fender Stratocaster</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Additional Cards -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://img.audiofanzine.com/images/u/product/normal/gibson-les-paul-deluxe-1978-176649.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Gibson Les Paul</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Repeat additional cards as needed -->
+
+      <!-- Card 1 -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/2_Body_Straight_Front_NA-0dc40717dff429856458abde61307541.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Fender Stratocaster</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Additional Cards -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://img.audiofanzine.com/images/u/product/normal/gibson-les-paul-deluxe-1978-176649.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Gibson Les Paul</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Repeat additional cards as needed -->
+
+      <!-- Card 1 -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/2_Body_Straight_Front_NA-0dc40717dff429856458abde61307541.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Fender Stratocaster</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Additional Cards -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://img.audiofanzine.com/images/u/product/normal/gibson-les-paul-deluxe-1978-176649.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Gibson Les Paul</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Repeat additional cards as needed -->
+
+      <!-- Card 1 -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/2_Body_Straight_Front_NA-0dc40717dff429856458abde61307541.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Fender Stratocaster</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Additional Cards -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://img.audiofanzine.com/images/u/product/normal/gibson-les-paul-deluxe-1978-176649.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Gibson Les Paul</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Repeat additional cards as needed -->
+
+      <!-- Card 1 -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/2_Body_Straight_Front_NA-0dc40717dff429856458abde61307541.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Fender Stratocaster</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Additional Cards -->
+      <sl-card class="card-image">
+        <img
+          slot="image"
+          src="https://img.audiofanzine.com/images/u/product/normal/gibson-les-paul-deluxe-1978-176649.jpg"
+          alt="Gibson Les Paul Deluxe 1978 guitar"
+          class="w-full h-auto max-h-64 object-cover"
+        />
+        <strong>Gibson Les Paul</strong><br />
+        <div class="flex items-center gap-3 h-5 mt-2">
+          <small class="text-gray-500">Posted 2 days ago</small>
+          <div class="w-px h-full bg-gray-300"></div>
+          <small class="text-gray-500">Phoenix, AZ</small>
+        </div>
+        <div slot="footer" class="flex items-center gap-6">
+          <sl-button variant="primary" pill>More Info</sl-button>
+          <div class="text-xl flex items-center gap-1.5">
+            <sl-icon name="hand-thumbs-up" class="text-gray-500"></sl-icon>
+            <div class="text-gray-500">10</div>
+          </div>
+        </div>
+      </sl-card>
+
+      <!-- Repeat additional cards as needed -->
+    </div>
+  </div>
+</div>
