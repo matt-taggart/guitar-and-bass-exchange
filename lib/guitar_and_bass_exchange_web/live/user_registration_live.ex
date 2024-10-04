@@ -55,16 +55,19 @@ defmodule GuitarAndBassExchangeWeb.UserRegistrationLive do
               <.input field={@form[:password]} type="password" label="Password" required />
 
               <:actions>
-                <.button phx-disable-with="Creating account..." class="w-full">
+                <.button
+                  phx-disable-with="Creating account..."
+                  class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
+                >
                   Create an account
                 </.button>
               </:actions>
             </.simple_form>
 
-            <div class="flex flex-col gap-12">
+            <div class="flex flex-col gap-12 mt-5">
               <div>
                 Already have an account?
-                <a class="text-blue-500 hover:underline" href="/login">Login</a>
+                <.link class="text-blue-500 hover:underline" href={~p"/users/log_in"}>Login</.link>
               </div>
 
               <div class="flex flex-col gap-2">
