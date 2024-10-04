@@ -21,7 +21,6 @@ defmodule GuitarAndBassExchangeWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    get "/signup", PageController, :signup
   end
 
   # Other scopes may use custom stacks.
