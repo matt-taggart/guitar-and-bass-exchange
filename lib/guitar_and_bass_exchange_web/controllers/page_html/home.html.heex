@@ -1,5 +1,6 @@
-<.flash_group flash={@flash} /> Top Navigation (Fixed at the top of the viewport)
-<nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 fixed top-0 left-0 right-0 bg-white z-50">
+<.flash_group flash={@flash} />
+<!-- Top Navigation (Fixed at the top of the viewport) -->
+<nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8  bg-white">
   <div class="flex items-center gap-4">
     <h1 class="text-brand text-xl">Guitar And Bass Exchange</h1>
     <div class="mx-10">
@@ -12,11 +13,9 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-            >
-            </path>
+            />
           </svg>
         </span>
-
         <input
           type="text"
           class="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-md focus:border-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-blue-300"
@@ -37,15 +36,18 @@
     </a>
   </div>
 </nav>
-<div class="flex h-screen pt-16">
+<!-- Main Container: Flex layout for sidenav and content -->
+<div class="flex-1 flex overflow-hidden">
   <!-- Side Navigation (left) -->
-  <div class="min-w-2/12 h-full border-r border-gray-100 overflow-y-auto">
+  <aside class="w-1/6 border-r border-gray-100 overflow-y-auto">
     <div class="mt-4 p-4">
       <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
         Electric Guitars
       </h3>
       <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Solid Body</a>
-      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Hollow Body</a>
+      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
+        Hollow Body
+      </a>
       <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
         Semi-Hollow Body
       </a>
@@ -74,14 +76,11 @@
       <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">4-String</a>
       <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">5-String</a>
       <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">6-String</a>
-      <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
-        Extended Range
-      </a>
       <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Left Hand</a>
     </div>
-  </div>
+  </aside>
   <!-- Main Content Area (right) -->
-  <div class="flex-1 p-12 overflow-y-auto h-full">
+  <main class="flex-1 p-12 overflow-y-auto h-[calc(100vh - 73px)]">
     <h1 class="text-3xl text-brand mb-6">Featured Guitars & Basses</h1>
 
     <div class="grid gap-8 grid-cols-[repeat(auto-fill,minmax(275px,1fr))]">
@@ -134,55 +133,7 @@
             </div>
           </div>
         </sl-card>
-        <sl-card class="card-image">
-          <img
-            slot="image"
-            src="https://img.audiofanzine.com/images/u/product/normal/gibson-les-paul-deluxe-1978-176649.jpg"
-            alt="Gibson Les Paul Deluxe 1978 guitar"
-            class="w-full h-auto max-h-64 object-cover"
-          />
-          <div class="flex gap-2">
-            <strong>Gibson Les Paul</strong>
-            <div>$2200</div>
-          </div>
-          <div class="flex items-center gap-3 h-5 mt-2">
-            <small class="text-gray-500">Posted 2 days ago</small>
-            <div class="w-px h-full bg-gray-300"></div>
-            <small class="text-gray-500">Phoenix, AZ</small>
-          </div>
-          <div class="flex items-center mt-4 gap-4">
-            <button
-              type="button"
-              class="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
-            >
-              See More
-            </button>
-            <div class="text-xl flex items-center gap-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1"
-                stroke="currentColor"
-                class="size-5 text-gray-500 mt-0.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-              <span class="sr-only">Likes</span>
-              <div class="text-gray-500 text-sm">12 views</div>
-            </div>
-          </div>
-        </sl-card>
       <% end %>
     </div>
-  </div>
+  </main>
 </div>

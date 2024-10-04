@@ -42,7 +42,7 @@ defmodule GuitarAndBassExchangeWeb.UserLoginLive do
               </.button>
             </:actions>
           </.simple_form>
-          <div>
+          <div class="px-4 text-gray-500">
             Don't have an account?
             <.link class="text-blue-500 hover:underline" href={~p"/users/register"}>Sign Up</.link>
           </div>

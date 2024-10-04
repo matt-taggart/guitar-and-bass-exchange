@@ -20,7 +20,7 @@
     >
     </script>
   </head>
-  <body class="bg-white">
+  <body class="bg-white flex flex-col h-screen">
     <%= if @conn.request_path != "/users/log_in" and @conn.request_path != "/users/register" do %>
       <nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 fixed top-0 left-0 right-0 bg-white z-50">
         <div class="flex items-center gap-4">
