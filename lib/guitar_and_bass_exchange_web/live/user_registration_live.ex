@@ -38,36 +38,39 @@ defmodule GuitarAndBassExchangeWeb.UserRegistrationLive do
               </p>
             </div>
 
-            <.simple_form
-              for={@form}
-              id="registration_form"
-              phx-submit="save"
-              phx-change="validate"
-              phx-trigger-action={@trigger_submit}
-              action={~p"/users/log_in?_action=registered"}
-              method="post"
-            >
-              <.error :if={@check_errors}>
-                Oops, something went wrong! Please check the errors below.
-              </.error>
+            <div>
+              <h1 class="text-3xl text-center">Sign Up</h1>
+              <.simple_form
+                for={@form}
+                id="registration_form"
+                phx-submit="save"
+                phx-change="validate"
+                phx-trigger-action={@trigger_submit}
+                action={~p"/users/log_in?_action=registered"}
+                method="post"
+              >
+                <.error :if={@check_errors}>
+                  Oops, something went wrong! Please check the errors below.
+                </.error>
 
-              <.input field={@form[:email]} type="email" label="Email" required />
-              <.input field={@form[:password]} type="password" label="Password" required />
+                <.input field={@form[:email]} type="email" label="Email" required />
+                <.input field={@form[:password]} type="password" label="Password" required />
 
-              <:actions>
-                <.button
-                  phx-disable-with="Creating account..."
-                  class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
-                >
-                  Create an account
-                </.button>
-              </:actions>
-            </.simple_form>
+                <:actions>
+                  <.button
+                    phx-disable-with="Creating account..."
+                    class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
+                  >
+                    Create an account
+                  </.button>
+                </:actions>
+              </.simple_form>
+            </div>
 
             <div class="flex flex-col gap-12 mt-5">
               <div>
                 Already have an account?
-                <.link class="text-blue-500 hover:underline" href={~p"/users/log_in"}>Login</.link>
+                <.link class="text-blue-500 hover:underline" href={~p"/users/log_in"}>Sign In</.link>
               </div>
 
               <div class="flex flex-col gap-2">

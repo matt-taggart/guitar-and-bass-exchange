@@ -21,13 +21,13 @@
     </script>
   </head>
   <body class="bg-white">
-    <nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 fixed top-0 left-0 right-0 bg-white z-50">
-      <div class="flex items-center gap-4">
-        <a href="/">
-          <h1 class="text-brand text-xl">Guitar And Bass Exchange</h1>
-        </a>
-        <div class="mx-10">
-          <%= if @conn.request_path != "/users/log_in" and @conn.request_path != "/users/register" do %>
+    <%= if @conn.request_path != "/users/log_in" and @conn.request_path != "/users/register" do %>
+      <nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 fixed top-0 left-0 right-0 bg-white z-50">
+        <div class="flex items-center gap-4">
+          <a href="/">
+            <h1 class="text-brand text-xl">Guitar And Bass Exchange</h1>
+          </a>
+          <div class="mx-10">
             <div class="relative">
               <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                 <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none">
@@ -47,44 +47,44 @@
                 placeholder="Search"
               />
             </div>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-4">
+          <%= if @current_user do %>
+            <li class="text-[0.8125rem] leading-6 text-zinc-900">
+              <%= @current_user.email %>
+            </li>
+            <li>
+              <.link
+                href={~p"/users/settings"}
+                class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              >
+                Settings
+              </.link>
+            </li>
+            <li>
+              <.link
+                href={~p"/users/log_out"}
+                method="delete"
+                class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              >
+                Log out
+              </.link>
+            </li>
+          <% else %>
+            <a href="/users/log_in" class="text-blue-500 hover:text-blue-700">Sign In</a>
+            <a href="/users/register">
+              <button
+                type="button"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
+              >
+                Sign Up
+              </button>
+            </a>
           <% end %>
         </div>
-      </div>
-      <div class="flex items-baseline gap-4">
-        <%= if @current_user do %>
-          <li class="text-[0.8125rem] leading-6 text-zinc-900">
-            <%= @current_user.email %>
-          </li>
-          <li>
-            <.link
-              href={~p"/users/settings"}
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-            >
-              Settings
-            </.link>
-          </li>
-          <li>
-            <.link
-              href={~p"/users/log_out"}
-              method="delete"
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-            >
-              Log out
-            </.link>
-          </li>
-        <% else %>
-          <a href="/users/log_in" class="text-blue-500 hover:text-blue-700">Sign In</a>
-          <a href="/users/register">
-            <button
-              type="button"
-              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
-            >
-              Sign Up
-            </button>
-          </a>
-        <% end %>
-      </div>
-    </nav>
+      </nav>
+    <% end %>
     <%= @inner_content %>
   </body>
 </html>
