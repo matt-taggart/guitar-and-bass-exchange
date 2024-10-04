@@ -24,6 +24,9 @@ module.exports = {
     //
     //     <div class="phx-click-loading:animate-ping">
     //
+
+    require("@tailwindcss/forms"),
+
     plugin(({ addVariant }) =>
       addVariant("phx-click-loading", [
         ".phx-click-loading&",
