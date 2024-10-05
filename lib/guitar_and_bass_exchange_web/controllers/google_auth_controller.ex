@@ -10,7 +10,7 @@ defmodule GuitarAndBassExchangeWeb.GoogleAuthController do
     Phoenix.Controller.redirect(conn, to: Ueberauth.Strategy.Helpers.callback_url(conn))
   end
 
-  def callback(%{assigns: %{ueberauth_auth: auth}} = conn, params) do
+  def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     email = auth.info.email
 
     case Accounts.get_user_by_email(email) do
