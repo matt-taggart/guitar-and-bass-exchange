@@ -52,7 +52,7 @@ defmodule GuitarAndBassExchangeWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {GuitarAndBassExchangeWeb.Layouts, :app}
+        layout: {GuitarAndBassExchangeWeb.Layouts, :root}
 
       unquote(html_helpers())
     end

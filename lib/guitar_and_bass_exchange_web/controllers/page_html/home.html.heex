@@ -1,6 +1,6 @@
 <.flash_group flash={@flash} />
 <!-- Top Navigation (Fixed at the top of the viewport) -->
-<nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8  bg-white z-50">
+<nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8  bg-white z-10">
   <div class="flex items-center gap-4">
     <h1 class="text-brand text-xl">Guitar And Bass Exchange</h1>
     <div class="mx-10">
@@ -23,17 +23,47 @@
         />
       </div>
     </div>
+    <div class="flex items-center gap-2">
+      <.icon name="hero-map-pin-solid" class="h-7.5 w-7.5 text-blue-500" />
+      <div class="text-blue-500">Phoenix, AZ + 30 miles</div>
+    </div>
+    <div class="text-gray-500 text-[0.85rem] text-md hover:underline hover:text-gray-700 cursor-pointer">
+      update
+    </div>
   </div>
   <div class="flex items-baseline gap-4">
-    <a href="/users/log_in" class="text-blue-500 hover:text-blue-700">Sign In</a>
-    <a href="/users/register">
-      <button
-        type="button"
-        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
-      >
-        Sign Up
-      </button>
-    </a>
+    <%= if @current_user do %>
+      <li class="text-[0.8125rem] leading-6 text-zinc-900">
+        <%= @current_user.email %>
+      </li>
+      <li>
+        <.link
+          href={~p"/users/settings"}
+          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+        >
+          Settings
+        </.link>
+      </li>
+      <li>
+        <.link
+          href={~p"/users/log_out"}
+          method="delete"
+          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+        >
+          Log out
+        </.link>
+      </li>
+    <% else %>
+      <a href="/users/log_in" class="text-blue-700 hover:text-blue-900">Sign In</a>
+      <a href="/users/register">
+        <button
+          type="button"
+          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
+        >
+          Sign Up
+        </button>
+      </a>
+    <% end %>
   </div>
 </nav>
 <!-- Main Container: Flex layout for sidenav and content -->
@@ -83,7 +113,7 @@
   <main class="flex-1 p-12 overflow-y-auto h-[calc(100vh - 73px)]">
     <h1 class="text-3xl text-brand mb-6">Featured Guitars & Basses</h1>
 
-    <div class="grid gap-8 grid-cols-[repeat(auto-fill,minmax(275px,1fr))]">
+    <div class="grid gap-12 grid-cols-[repeat(auto-fill,minmax(235px,1fr))]">
       <%= for number <- 1..10 do %>
         <sl-card class="card-image">
           <img
