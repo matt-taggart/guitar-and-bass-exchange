@@ -1,21 +1,33 @@
 defmodule GuitarAndBassExchangeWeb.GoogleAuthController do
+  use GuitarAndBassExchangeWeb, :controller
+
   alias GuitarAndBassExchangeWeb.UserAuth
   alias GuitarAndBassExchange.Accounts
-  use GuitarAndBassExchangeWeb, :controller
   require Logger
 
+  # Ensure Ueberauth plug is invoked
   plug Ueberauth
 
+  @doc """
+  Handles the OAuth request. Let Ueberauth handle the redirection to the provider.
+  """
   def request(conn, _params) do
-    Phoenix.Controller.redirect(conn, to: Ueberauth.Strategy.Helpers.callback_url(conn))
+    # Ueberauth handles the redirection, so no need to manually redirect here.
+    # You can provide a custom response or simply do nothing.
+    # For example, you might render a "Redirecting..." page or handle errors.
+    # Here, we'll leave it empty.
+    conn
   end
 
+  @doc """
+  Handles the OAuth callback. Authenticates the user and updates the session.
+  """
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     email = auth.info.email
 
     case Accounts.get_user_by_email(email) do
       nil ->
-        # User does not exist, so create a new user
+        # User does not exist, create a new one
         user_params = %{
           email: email,
           first_name: auth.info.first_name,
@@ -35,8 +47,17 @@ defmodule GuitarAndBassExchangeWeb.GoogleAuthController do
         end
 
       user ->
-        # User exists, update session or other details if necessary
+        # User exists, log them in
         UserAuth.log_in_user(conn, user)
     end
+  end
+
+  @doc """
+  Handles OAuth failures.
+  """
+  def callback(%{assigns: %{ueberauth_failure: _fails}} = conn, _params) do
+    conn
+    |> put_flash(:error, "Authentication failed.")
+    |> redirect(to: ~p"/")
   end
 end

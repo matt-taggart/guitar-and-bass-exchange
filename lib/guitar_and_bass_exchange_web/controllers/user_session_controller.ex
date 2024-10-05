@@ -21,6 +21,13 @@ defmodule GuitarAndBassExchangeWeb.UserSessionController do
   defp create(conn, %{"user" => user_params}, info) do
     %{"email" => email, "password" => password} = user_params
 
+    if Map.has_key?(user_params, "password") do
+      %{"password" => password} = user_params
+      Accounts.get_user_by_email_and_password(email, password)
+    else
+      Accounts.get_user_by_email(email)
+    end
+
     if user = Accounts.get_user_by_email_and_password(email, password) do
       conn
       |> put_flash(:info, info)

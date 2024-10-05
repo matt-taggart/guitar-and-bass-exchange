@@ -83,7 +83,11 @@ defmodule GuitarAndBassExchangeWeb.Router do
     end
   end
 
+  # OAuth Routes
   scope "/auth", GuitarAndBassExchangeWeb do
+    pipe_through :browser
+
+    # These routes are handled by Ueberauth
     get "/:provider", GoogleAuthController, :request
     get "/:provider/callback", GoogleAuthController, :callback
   end
