@@ -350,4 +350,10 @@ defmodule GuitarAndBassExchange.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+  def register_oauth_user(attrs) do
+    %User{}
+    |> User.oauth_registration_changeset(attrs)
+    |> Repo.insert()
+  end
 end

@@ -82,4 +82,9 @@ defmodule GuitarAndBassExchangeWeb.Router do
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
   end
+
+  scope "/auth", GuitarAndBassExchangeWeb do
+    get "/:provider", GoogleAuthController, :request
+    get "/:provider/callback", GoogleAuthController, :callback
+  end
 end

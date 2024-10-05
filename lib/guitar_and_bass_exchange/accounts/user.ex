@@ -8,6 +8,7 @@ defmodule GuitarAndBassExchange.Accounts.User do
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+    field :is_oauth_user, :boolean, default: false
 
     timestamps(type: :utc_datetime)
   end
@@ -136,7 +137,10 @@ defmodule GuitarAndBassExchange.Accounts.User do
   If there is no user or the user doesn't have a password, we call
   `Bcrypt.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%GuitarAndBassExchange.Accounts.User{hashed_password: hashed_password}, password)
+  def valid_password?(
+        %GuitarAndBassExchange.Accounts.User{hashed_password: hashed_password},
+        password
+      )
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Bcrypt.verify_pass(password, hashed_password)
   end
@@ -157,5 +161,13 @@ defmodule GuitarAndBassExchange.Accounts.User do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  def oauth_registration_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :first_name, :last_name])
+    |> validate_required([:first_name, :last_name, :email])
+    |> validate_email(opts)
+    |> put_change(:is_oauth_user, true)
   end
 end
