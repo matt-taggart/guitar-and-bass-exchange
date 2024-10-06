@@ -52,9 +52,6 @@ defmodule GuitarAndBassExchangeWeb.GoogleAuthController do
     end
   end
 
-  @doc """
-  Handles OAuth failures.
-  """
   def callback(%{assigns: %{ueberauth_failure: _fails}} = conn, _params) do
     conn
     |> put_flash(:error, "Authentication failed.")
