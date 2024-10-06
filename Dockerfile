@@ -12,6 +12,7 @@ ENV LC_ALL=C.UTF-8
 # Set environment variables for Phoenix
 ENV MIX_ENV=prod
 ENV PORT=4000
+ENV PHX_SERVER=true
 
 # Install Hex and Rebar
 RUN mix local.hex --force && mix local.rebar --force
@@ -50,6 +51,7 @@ ENV LC_ALL=C.UTF-8
 # Set environment variables for Phoenix
 ENV MIX_ENV=prod
 ENV PORT=4000
+ENV PHX_SERVER=true
 
 # Set the working directory
 WORKDIR /app
