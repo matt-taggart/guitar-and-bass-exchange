@@ -13,6 +13,7 @@ ENV LC_ALL=C.UTF-8
 ENV MIX_ENV=prod
 ENV PORT=4000
 ENV PHX_SERVER=true
+ENV DATABASE_URL=${DATABASE_URL}
 
 # Install Hex and Rebar
 RUN mix local.hex --force && mix local.rebar --force
