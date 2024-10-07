@@ -41,7 +41,7 @@ RUN mix release
 FROM alpine:3.18 AS app
 
 # Install runtime dependencies
-RUN apk add --no-cache libstdc++ openssl ncurses-libs
+RUN apk add --no-cache libstdc++ openssl ncurses-libs postgresql-client
 
 # Set environment variables for UTF-8 encoding
 ENV LANG=C.UTF-8
