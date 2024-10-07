@@ -59,8 +59,15 @@ WORKDIR /app
 # Copy the release from the build stage
 COPY --from=build /app/_build/prod/rel/guitar_and_bass_exchange ./
 
+# Copy the entrypoint script
+COPY ./entrypoint.sh .
+
+# Ensure the entrypoint script is executable
+RUN chmod +x ./entrypoint.sh
+
 # Expose the port Phoenix runs on
 EXPOSE 4000
 
-# Start the Phoenix server
-CMD ["bin/guitar_and_bass_exchange", "start"]
+# Use the entrypoint script to start the app and run migrations
+ENTRYPOINT ["./entrypoint.sh"]
+
