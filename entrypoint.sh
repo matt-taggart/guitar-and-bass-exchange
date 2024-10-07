@@ -10,7 +10,7 @@ do
 done
 
 # Run migrations
-./bin/guitar_and_bass_exchange eval "GuitarAndBassExchangeWeb.Release.migrate"
+./bin/guitar_and_bass_exchange eval "GuitarAndBassExchange.Release.migrate"
 
 # Start the Phoenix app
 exec ./bin/server
