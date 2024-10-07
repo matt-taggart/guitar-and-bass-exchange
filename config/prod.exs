@@ -19,3 +19,5 @@ config :logger, level: :info
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
+
+# config :guitar_and_bass_exchange, GuitarAndBassExchangeWeb.Endpoint, force_ssl: [hsts: true]
