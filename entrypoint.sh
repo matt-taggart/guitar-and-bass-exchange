@@ -3,7 +3,7 @@
 cd -P -- "$(dirname -- "$0")"
 
 # Wait until Postgres is ready
-until pg_isready -U ${POSTGRES_USERNAME} -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}
+until pg_isready -d ${DATABASE_URL}
 do
   echo "$(date) - waiting for database to start"
   sleep 2
