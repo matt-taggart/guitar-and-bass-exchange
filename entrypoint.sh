@@ -13,4 +13,4 @@ done
 ./bin/guitar_and_bass_exchange eval "GuitarAndBassExchange.Release.migrate"
 
 # Start the Phoenix app
-exec ./bin/server
+exec ./bin/guitar_and_bass_exchange start
