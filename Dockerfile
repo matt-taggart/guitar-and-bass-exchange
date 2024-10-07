@@ -13,7 +13,6 @@ ENV LC_ALL=C.UTF-8
 ENV MIX_ENV=prod
 ENV PORT=4000
 ENV PHX_SERVER=true
-ENV DATABASE_URL=${DATABASE_URL}
 
 # Install Hex and Rebar
 RUN mix local.hex --force && mix local.rebar --force
@@ -37,9 +36,6 @@ RUN mix compile
 
 # Generate the release
 RUN mix release
-
-# Run migrations
-RUN mix ecto.setup
 
 # Stage 2: Release the application
 FROM alpine:3.18 AS app
