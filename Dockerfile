@@ -37,6 +37,9 @@ RUN mix compile
 # Generate the release
 RUN mix release
 
+# Run migrations
+RUN ecto.setup
+
 # Stage 2: Release the application
 FROM alpine:3.18 AS app
 
