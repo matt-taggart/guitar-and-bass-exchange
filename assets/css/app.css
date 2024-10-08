@@ -3,3 +3,56 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+
+.unstyled-menu-item {
+	/* Reset all custom properties */
+	--sl-font-size-medium: inherit;
+	--sl-font-weight-semibold: inherit;
+	--sl-color-neutral-700: inherit;
+	--sl-color-primary-600: inherit;
+	--sl-spacing-x-small: 0;
+	--sl-spacing-x-large: 0;
+
+	/* Remove background, border, and padding */
+	background: none;
+	border: none;
+	padding: 0;
+
+	/* Change cursor to default */
+	cursor: default;
+
+	/* Enable pointer events on the content */
+	.unstyled-menu-item>div {
+		pointer-events: auto;
+	}
+
+
+	/* Remove any transitions */
+	transition: none;
+
+	/* Ensure text is aligned as desired */
+	text-align: inherit;
+
+	/* Remove any hover effects */
+	--sl-color-neutral-100: transparent;
+	--sl-color-primary-100: transparent;
+}
+
+.unstyled-menu-item::part(base) {
+	/* Remove any specific styling on the base part */
+	background: none;
+	color: inherit;
+}
+
+.unstyled-menu-item::part(label) {
+	/* Ensure label inherits styles */
+	color: inherit;
+	font-weight: inherit;
+}
+
+.unstyled-menu-item::part(prefix),
+.unstyled-menu-item::part(suffix) {
+	/* Remove any spacing for prefix and suffix */
+	margin: 0;
+
+}

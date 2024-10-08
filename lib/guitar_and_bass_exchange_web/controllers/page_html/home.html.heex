@@ -35,26 +35,30 @@
   </div>
   <div class="flex items-baseline gap-4">
     <%= if @current_user do %>
-      <li class="text-[0.8125rem] leading-6 text-zinc-900">
-        <%= @current_user.email %>
-      </li>
-      <li>
-        <.link
-          href={~p"/users/settings"}
-          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-        >
-          Settings
-        </.link>
-      </li>
-      <li>
-        <.link
-          href={~p"/users/log_out"}
-          method="delete"
-          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-        >
-          Log out
-        </.link>
-      </li>
+      <sl-dropdown>
+        <button slot="trigger" class="cursor-pointer">
+          <sl-avatar label="User avatar" style="--size: 2.5rem;"></sl-avatar>
+        </button>
+        <sl-menu style="max-width: 200px;">
+          <sl-menu-item value="email" role="none" class="unstyled-menu-item">
+            <%= @current_user.email %>
+          </sl-menu-item>
+          <div class="h-px w-full bg-gray-200"></div>
+          <.link
+            href={~p"/users/settings"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            <sl-menu-item value="Logout">Settings</sl-menu-item>
+          </.link>
+          <.link
+            href={~p"/users/log_out"}
+            method="delete"
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            <sl-menu-item value="delete">Logout</sl-menu-item>
+          </.link>
+        </sl-menu>
+      </sl-dropdown>
     <% else %>
       <a href="/users/log_in" class="text-blue-700 hover:text-blue-900">Sign In</a>
       <a href="/users/register">
