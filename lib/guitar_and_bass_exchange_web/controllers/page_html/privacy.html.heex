@@ -1,0 +1,161 @@
+<.flash_group flash={@flash} />
+<!-- Top Navigation (Fixed at the top of the viewport) -->
+<nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 bg-white z-10 fixed top-0 w-full">
+  <div class="flex items-center gap-4">
+    <h1 class="text-brand text-xl">Guitar And Bass Exchange</h1>
+    <div class="mx-10">
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+          <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <input
+          type="text"
+          class="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-md focus:border-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-blue-300"
+          placeholder="Search"
+        />
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
+        <.icon name="hero-map-pin-solid" class="h-7.5 w-7.5 text-blue-500" />
+        <div class="text-blue-500">Phoenix, AZ + 30 miles</div>
+      </div>
+      <div class="text-gray-500 text-[0.85rem] text-md hover:underline hover:text-gray-700 cursor-pointer">
+        update
+      </div>
+    </div>
+  </div>
+  <div class="flex items-baseline gap-4">
+    <%= if @current_user do %>
+      <sl-dropdown>
+        <button slot="trigger" class="cursor-pointer">
+          <sl-avatar label="User avatar" style="--size: 2.5rem;"></sl-avatar>
+        </button>
+        <sl-menu style="max-width: 200px;">
+          <sl-menu-item value="email" role="none" class="unstyled-menu-item">
+            <%= @current_user.email %>
+          </sl-menu-item>
+          <div class="h-px w-full bg-gray-200"></div>
+          <.link
+            href={~p"/users/settings"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            <sl-menu-item value="Logout">Settings</sl-menu-item>
+          </.link>
+          <.link
+            href={~p"/users/log_out"}
+            method="delete"
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            <sl-menu-item value="delete">Logout</sl-menu-item>
+          </.link>
+        </sl-menu>
+      </sl-dropdown>
+    <% else %>
+      <a href="/users/log_in" class="text-blue-700 hover:text-blue-900">Sign In</a>
+      <a href="/users/register">
+        <button
+          type="button"
+          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
+        >
+          Sign Up
+        </button>
+      </a>
+    <% end %>
+  </div>
+</nav>
+<div class="flex flex-col gap-6 mx-auto max-w-3xl pt-28 pb-16 px-8">
+  <h1 class="border-b border-color-[#2c3e50] pb-4 text-[#2c3e50] text-3xl">
+    Guitar and Bass Exchange - Privacy Policy
+  </h1>
+
+  <p class="leading-7 font-bold">Last Updated: [Current Date]</p>
+
+  <p class="leading-7">
+    Guitar and Bass Exchange ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services (collectively, the "Service").
+  </p>
+
+  <p class="leading-7">
+    Please read this Privacy Policy carefully. By using our Service, you agree to the collection and use of information in accordance with this policy.
+  </p>
+
+  <h2 class="text-[#2c3e50] text-2xl">1. Information We Collect</h2>
+
+  <h3 class="text-[#2c3e50] text-xl">1.1 Personal Information</h3>
+  <p class="leading-7">We may collect personally identifiable information, such as:</p>
+  <ul class="leading-7 list-disc ml-5">
+    <li>Name</li>
+    <li>Email address</li>
+    <li>Phone number</li>
+    <li>Postal address</li>
+    <li>Payment information</li>
+  </ul>
+
+  <h3 class="text-[#2c3e50] text-xl">1.2 Non-Personal Information</h3>
+  <p class="leading-7">We may also collect non-personal information, such as:</p>
+  <ul class="leading-7 list-disc ml-5">
+    <li>Browser type</li>
+    <li>IP address</li>
+    <li>Operating system</li>
+    <li>Usage data</li>
+  </ul>
+
+  <h2 class="text-[#2c3e50] text-2xl">2. How We Use Your Information</h2>
+  <p class="leading-7">We use the collected information for various purposes, including:</p>
+  <ul class="leading-7 list-disc ml-5">
+    <li>Providing and maintaining our Service</li>
+    <li>Notifying you about changes to our Service</li>
+    <li>Allowing you to participate in interactive features of our Service</li>
+    <li>Providing customer support</li>
+    <li>Gathering analysis or valuable information to improve our Service</li>
+    <li>Monitoring the usage of our Service</li>
+    <li>Detecting, preventing, and addressing technical issues</li>
+    <li>Processing transactions</li>
+    <li>Sending you marketing and promotional communications</li>
+  </ul>
+
+  <h2 class="text-[#2c3e50] text-2xl">3. Disclosure of Your Information</h2>
+  <p class="leading-7">We may disclose your personal information in the following situations:</p>
+  <ul class="leading-7 list-disc ml-5">
+    <li>To comply with a legal obligation</li>
+    <li>To protect and defend the rights or property of Guitar and Bass Exchange</li>
+    <li>To prevent or investigate possible wrongdoing in connection with the Service</li>
+    <li>To protect the personal safety of users of the Service or the public</li>
+    <li>To protect against legal liability</li>
+  </ul>
+
+  <h2 class="text-[#2c3e50] text-2xl">4. Security of Your Information</h2>
+  <p class="leading-7">
+    We take reasonable precautions to protect your information. However, no method of transmission over the Internet or electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your personal information, we cannot guarantee its absolute security.
+  </p>
+
+  <h2 class="text-[#2c3e50] text-2xl">5. Your Data Protection Rights</h2>
+  <p class="leading-7">
+    We aim to take reasonable steps to allow you to correct, amend, delete, or limit the use of your personal information. If you wish to be informed what personal information we hold about you and if you want it to be removed from our systems, please contact us.
+  </p>
+
+  <h2 class="text-[#2c3e50] text-2xl">6. Children's Privacy</h2>
+  <p class="leading-7">
+    Our Service does not address anyone under the age of 16 ("Children"). We do not knowingly collect personally identifiable information from children under 16. If you are a parent or guardian and you are aware that your Children have provided us with personal information, please contact us.
+  </p>
+
+  <h2 class="text-[#2c3e50] text-2xl">7. Changes to This Privacy Policy</h2>
+  <p class="leading-7">
+    We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.
+  </p>
+
+  <h2 class="text-[#2c3e50] text-2xl">8. Contact Us</h2>
+  <p class="leading-7">If you have any questions about this Privacy Policy, please contact us:</p>
+  <p class="leading-7">
+    Guitar and Bass Exchange<br /> [Your Company Address]<br />
+    Email: privacy@guitarandbassexchange.com<br /> Phone: [Your Phone Number]
+  </p>
+</div>

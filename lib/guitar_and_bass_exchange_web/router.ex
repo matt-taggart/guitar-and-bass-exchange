@@ -22,6 +22,7 @@ defmodule GuitarAndBassExchangeWeb.Router do
 
     get "/", PageController, :home
     get "/terms", PageController, :terms
+    get "/privacy", PageController, :privacy
   end
 
   # Other scopes may use custom stacks.
