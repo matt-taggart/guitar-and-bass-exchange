@@ -118,58 +118,64 @@
   <!-- Main Content Area (right) -->
   <main class="flex-1 p-12 overflow-y-auto h-[calc(100vh - 73px)]">
     <h1 class="text-3xl text-brand mb-6">Featured Guitars & Basses</h1>
-
-    <div class="grid gap-12 grid-cols-[repeat(auto-fill,minmax(235px,1fr))]">
+    <ul class="grid gap-x-6 gap-y-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 list-none pl-0">
       <%= for number <- 1..10 do %>
-        <sl-card class="card-image">
-          <img
-            slot="image"
-            src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/2_Body_Straight_Front_NA-0dc40717dff429856458abde61307541.jpg"
-            alt="Gibson Les Paul Deluxe 1978 guitar"
-            class="w-full h-auto max-h-64 object-cover"
-          />
-          <div class="flex gap-2">
-            <strong>Fender Stratocaster</strong>
-            <div>$1800</div>
-          </div>
-          <div class="flex items-center gap-3 h-5 mt-2">
-            <small class="text-gray-500">Posted 2 days ago</small>
-            <div class="w-px h-full bg-gray-300"></div>
-            <small class="text-gray-500">Phoenix, AZ</small>
-          </div>
-          <div class="flex items-center mt-4 gap-4">
-            <button
-              type="button"
-              class="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
-            >
-              See More
-            </button>
-            <div class="text-xl flex items-center gap-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1"
-                stroke="currentColor"
-                class="size-5 text-gray-500 mt-0.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-              <span class="sr-only">Likes</span>
-              <div class="text-gray-500 text-sm">10 views</div>
+        <li class="bg-white shadow-lg rounded-lg overflow-hidden transform transition hover:scale-105">
+          <a href="/" class="block w-full h-full">
+            <!-- Image Section -->
+            <div class="relative w-full pt-[100%] overflow-hidden">
+              <img
+                src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/2_Body_Straight_Front_NA-0dc40717dff429856458abde61307541.jpg"
+                alt="Guitar"
+                class="absolute inset-0 w-full h-full object-cover"
+              />
             </div>
-          </div>
-        </sl-card>
+            <!-- Content Section -->
+            <div class="p-4">
+              <div class="flex gap-2">
+                <strong>Fender Stratocaster</strong>
+                <div>$1800</div>
+              </div>
+              <div class="flex items-center gap-3 h-5 mt-2">
+                <small class="text-gray-500">Posted 2 days ago</small>
+                <div class="w-px h-full bg-gray-300"></div>
+                <small class="text-gray-500">Phoenix, AZ</small>
+              </div>
+              <div class="flex items-center mt-4 gap-4">
+                <button
+                  type="button"
+                  class="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                >
+                  See More
+                </button>
+                <div class="text-xl flex items-center gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1"
+                    stroke="currentColor"
+                    class="size-5 text-gray-500 mt-0.5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                  </svg>
+                  <span class="sr-only">Likes</span>
+                  <div class="text-gray-500 text-sm">10 views</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </li>
       <% end %>
-    </div>
+    </ul>
   </main>
 </div>
