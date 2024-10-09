@@ -35,6 +35,18 @@
   </div>
   <div class="flex items-baseline gap-4">
     <%= if @current_user do %>
+      <sl-button variant="default" size="small">
+        <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
+        Messages
+      </sl-button>
+      <sl-button variant="default" size="small">
+        <sl-icon slot="prefix" name="file-earmark-plus"></sl-icon>
+        Posts
+      </sl-button>
+      <sl-button variant="default" size="small">
+        <sl-icon slot="prefix" name="bookmark"></sl-icon>
+        Favorites
+      </sl-button>
       <sl-dropdown>
         <button slot="trigger" class="cursor-pointer">
           <sl-avatar label="User avatar" style="--size: 2.5rem;"></sl-avatar>
@@ -119,8 +131,8 @@
   <main class="flex-1 p-12 overflow-y-auto h-[calc(100vh - 73px)]">
     <h1 class="text-3xl text-brand mb-6">Featured Guitars & Basses</h1>
     <ul class="grid gap-x-6 gap-y-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 list-none pl-0">
-      <%= for number <- 1..10 do %>
-        <li class="bg-white shadow-lg rounded-lg overflow-hidden transform transition hover:scale-105">
+      <%= for number <- 1..20 do %>
+        <li class="bg-white shadow-lg rounded-lg overflow-hidden transform transition hover:scale-[101%]">
           <a href="/" class="block w-full h-full">
             <!-- Image Section -->
             <div class="relative w-full pt-[100%] overflow-hidden">
