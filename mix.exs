@@ -54,7 +54,8 @@ defmodule GuitarAndBassExchange.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:ueberauth_google, "~> 0.10"},
-      {:dotenv_parser, "~> 2.0.1"}
+      {:dotenv_parser, "~> 2.0.1"},
+      {:faker, "~> 0.17", only: [:dev, :test]}
     ]
   end
 
