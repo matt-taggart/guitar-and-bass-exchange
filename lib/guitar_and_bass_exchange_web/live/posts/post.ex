@@ -1,4 +1,4 @@
-defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
+defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   use GuitarAndBassExchangeWeb, :live_view
 
   def render(assigns) do
@@ -92,37 +92,60 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
       </div>
     </nav>
     <main class="flex flex-col items-center my-16 mx-8">
-      <div
-        id="alert-additional-content-1"
-        class="p-8 mb-4 text-blue-800 border border-blue-300 rounded-lg bg-blue-50 max-w-2xl w-full mx-auto mb-24"
-        role="alert"
-      >
-        <div class="flex items-center">
-          <svg
-            class="flex-shrink-0 w-4 h-4 me-2"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
+      <div class="max-w-2xl w-full mx-auto">
+        <.header class="text-center mb-8">
+          Post Instrument
+          <:subtitle>
+            List your guitar, bass, or pedal on our exchange.
+          </:subtitle>
+        </.header>
+
+        <sl-card class="w-full">
+          <.simple_form
+            for={@form}
+            id="post_instrument_form"
+            phx-submit="post_instrument"
+            phx-change="validate"
           >
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-          </svg>
-          <span class="sr-only">Info</span>
-          <h3 class="text-lg font-medium">Ready to sell your instrument?</h3>
-        </div>
-        <div class="mt-2 mb-4 text-sm">
-          You haven't listed any instruments yet. Create a listing to showcase your musical equipment to our extensive network of buyers. Our streamlined process helps you reach a broader audience, potentially accelerating your sale and maximizing your instrument's value.
-        </div>
-        <div class="flex">
-          <.link href={~p"/users/post"}>
-            <button
-              type="button"
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Create a new listing
-            </button>
-          </.link>
-        </div>
+            <.error :if={@form.errors != []}>
+              Oops, something went wrong! Please check the errors below.
+            </.error>
+
+            <.input field={@form[:title]} label="Title" required />
+            <.input field={@form[:brand]} label="Brand" required />
+            <.input field={@form[:model]} label="Model" required />
+            <.input field={@form[:year]} label="Year" required />
+            <.input field={@form[:color]} label="Color" required />
+            <.input field={@form[:country_buiilt]} label="Country Built" required />
+            <.input field={@form[:number_of_strings]} label="Number of Strings" required />
+            <.input
+              type="select"
+              options={
+                %{
+                  "New" => "New",
+                  "Excellent" => "Excellent",
+                  "Good" => "Good",
+                  "Fair" => "Fair",
+                  "Poor" => "Poor"
+                }
+              }
+              field={@form[:condition]}
+              label="Condition"
+              required
+            />
+            <.input field={@form[:cost]} label="Cost" required />
+            <.input
+              type="checkbox"
+              field={@form[:shipping_available]}
+              label="Shipping Available?"
+              required
+            />
+            <.input field={@form[:shipping_cost]} label="Shipping Cost" required />
+            <:actions>
+              <.button phx-disable-with="Resetting..." class="w-full">Post Listing</.button>
+            </:actions>
+          </.simple_form>
+        </sl-card>
       </div>
     </main>
     """
