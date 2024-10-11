@@ -120,15 +120,13 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
             <.input field={@form[:number_of_strings]} label="Number of Strings" required />
             <.input
               type="select"
-              options={
-                %{
-                  "New" => "New",
-                  "Excellent" => "Excellent",
-                  "Good" => "Good",
-                  "Fair" => "Fair",
-                  "Poor" => "Poor"
-                }
-              }
+              options={[
+                "New",
+                "Excellent",
+                "Good",
+                "Fair",
+                "Poor"
+              ]}
               field={@form[:condition]}
               label="Condition"
               required
@@ -142,7 +140,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
             />
             <.input field={@form[:shipping_cost]} label="Shipping Cost" required />
             <:actions>
-              <.button phx-disable-with="Resetting..." class="w-full">Post Listing</.button>
+              <.button phx-disable-with="Resetting..." class="w-full">
+                Post Listing
+              </.button>
             </:actions>
           </.simple_form>
         </sl-card>
@@ -151,9 +151,35 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     """
   end
 
-  def mount(_params, _session, socket) do
-    email = Phoenix.Flash.get(socket.assigns.flash, :email)
-    form = to_form(%{"email" => email}, as: "user")
-    {:ok, assign(socket, form: form), temporary_assigns: [form: form]}
+  def mount(_params, %{"current_user" => current_user}, socket) do
+    # Initialize the form and assign the current user
+    form = to_form(%{}, as: "post")
+    {:ok, assign(socket, form: form, current_user: current_user)}
+  end
+
+  def handle_event("validate", %{"user" => user_params}, socket) do
+    form = to_form(user_params, as: "user")
+    {:noreply, assign(socket, form: form)}
+  end
+
+  def handle_event("post_instrument", %{"post" => post_params}, socket) do
+    # Assume the current user is stored in the socket assigns
+    user = socket.assigns.current_user
+
+    # Add the user_id to the post parameters
+    post_params = Map.put(post_params, "user_id", user.id)
+
+    case GuitarAndBassExchange.Posts.create_post(post_params) do
+      {:ok, post} ->
+        # If successful, redirect to the post's show page and display a flash message
+        {:noreply,
+         socket
+         |> put_flash(:info, "Post created successfully!")
+         |> push_redirect(to: Routes.post_show_path(socket, :show, post))}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        # If there's an error, re-render the form with the changeset errors
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
   end
 end
