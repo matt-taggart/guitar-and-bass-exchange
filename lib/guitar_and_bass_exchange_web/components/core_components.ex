@@ -318,7 +318,7 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
           name={@name}
           value="true"
           checked={@checked}
-          class="rounded border-zinc-300 text-zinc-900 focus:ring-0"
+          class="rounded border-zinc-300 text-blue-900 focus:ring-0"
           {@rest}
         />
         <%= @label %>
@@ -335,7 +335,11 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
       <select
         id={@id}
         name={@name}
-        class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm"
+        class={[
+          "bg-gray-50 mt-2 block w-full rounded-lg border text-zinc-900 text-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 focus:outline-none",
+          @errors == [] && "border-zinc-300 focus:border-zinc-400",
+          @errors != [] && "border-rose-400 focus:border-rose-400"
+        ]}
         multiple={@multiple}
         {@rest}
       >
