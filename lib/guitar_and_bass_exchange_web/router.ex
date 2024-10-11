@@ -72,8 +72,9 @@ defmodule GuitarAndBassExchangeWeb.Router do
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
       live "/rooms", ChatLive.Root, :index
       live "/rooms/:id", ChatLive.Root, :show
-      live "/users/posts", UserGetPostsLive, :show
-      live "/users/post", UserPostInstrumentLive, :show
+      live "/users/:user_id/posts", UserGetPostsLive, :show
+      live "/users/:user_id/post/new", UserPostInstrumentLive, :new
+      get "/users/:user_id/posts/:id", PageController, :show
     end
   end
 

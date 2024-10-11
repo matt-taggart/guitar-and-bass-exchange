@@ -47,7 +47,7 @@ defmodule GuitarAndBassExchangeWeb.UserSettingsLive do
               <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
               Messages
             </sl-button>
-            <.link href={~p"/users/posts"}>
+            <.link href={~p"/users/#{@current_user.id}/posts"}>
               <sl-button variant="default" size="small">
                 <sl-icon slot="prefix" name="file-earmark-plus"></sl-icon>
                 Posts

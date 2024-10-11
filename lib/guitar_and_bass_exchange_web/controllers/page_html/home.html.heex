@@ -39,7 +39,7 @@
         <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
         Messages
       </sl-button>
-      <.link href={~p"/users/posts"}>
+      <.link href={~p"/users/#{@current_user.id}/posts"}>
         <sl-button variant="default" size="small">
           <sl-icon slot="prefix" name="file-earmark-plus"></sl-icon>
           Posts
@@ -171,7 +171,7 @@
       </p>
 
       <%= if @current_user do %>
-        <.link navigate={~p"/users/posts"}>
+        <.link navigate={~p"/users/#{@current_user.id}/posts"}>
           <button
             type="button"
             class="flex items-center px-6 py-3 text-lg font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 transition duration-200 hover:scale-[102%]"

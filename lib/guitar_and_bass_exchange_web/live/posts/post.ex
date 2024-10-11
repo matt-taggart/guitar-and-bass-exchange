@@ -44,7 +44,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
             <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
             Messages
           </sl-button>
-          <.link href={~p"/users/posts"}>
+          <.link href={~p"/users/#{@current_user.id}/posts"}>
             <sl-button variant="default" size="small">
               <sl-icon slot="prefix" name="file-earmark-plus"></sl-icon>
               Posts
@@ -151,34 +151,35 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     """
   end
 
-  def mount(_params, %{"current_user" => current_user}, socket) do
+  def mount(_params, _session, socket) do
+    # Retrieve the current user from socket.assigns
+    current_user = socket.assigns.current_user
+
     # Initialize the form and assign the current user
     form = to_form(%{}, as: "post")
     {:ok, assign(socket, form: form, current_user: current_user)}
   end
 
-  def handle_event("validate", %{"user" => user_params}, socket) do
-    form = to_form(user_params, as: "user")
+  def handle_event("validate", %{"post" => post_params}, socket) do
+    form = to_form(post_params, as: "post")
     {:noreply, assign(socket, form: form)}
   end
 
   def handle_event("post_instrument", %{"post" => post_params}, socket) do
-    # Assume the current user is stored in the socket assigns
     user = socket.assigns.current_user
 
     # Add the user_id to the post parameters
     post_params = Map.put(post_params, "user_id", user.id)
 
-    case GuitarAndBassExchange.Posts.create_post(post_params) do
+    case GuitarAndBassExchange.Post.Query.create_post(post_params) do
       {:ok, post} ->
-        # If successful, redirect to the post's show page and display a flash message
+        # Redirect to the post's show page
         {:noreply,
          socket
          |> put_flash(:info, "Post created successfully!")
-         |> push_redirect(to: Routes.post_show_path(socket, :show, post))}
+         |> push_navigate(to: "/users/#{user.id}/posts/#{post.id}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        # If there's an error, re-render the form with the changeset errors
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end

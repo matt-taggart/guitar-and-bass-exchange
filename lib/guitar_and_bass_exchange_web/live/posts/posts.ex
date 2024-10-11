@@ -44,7 +44,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
             <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
             Messages
           </sl-button>
-          <.link href={~p"/users/posts"}>
+          <.link href={~p"/users/#{@current_user.id}/posts"}>
             <sl-button variant="default" size="small">
               <sl-icon slot="prefix" name="file-earmark-plus"></sl-icon>
               Posts
@@ -114,7 +114,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
           You haven't listed any instruments yet. Create a listing to showcase your musical equipment to our extensive network of buyers. Our streamlined process helps you reach a broader audience, potentially accelerating your sale and maximizing your instrument's value.
         </div>
         <div class="flex">
-          <.link href={~p"/users/post"}>
+          <.link href={~p"/users/#{@current_user.id}/post/new"}>
             <button
               type="button"
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
