@@ -110,11 +110,14 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         <li class="flex md:w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
           <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
             <span class="me-2">2</span>
-            Payment <span class="hidden sm:inline-flex sm:ms-2">Details</span>
+            Upload <span class="hidden sm:inline-flex sm:ms-2">Photos</span>
           </span>
         </li>
         <li class="flex items-center">
-          <span class="me-2">3</span> Confirmation
+          <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
+            <span class="me-2">3</span>
+            Payment <span class="hidden sm:inline-flex sm:ms-2">Info</span>
+          </span>
         </li>
       </ol>
 
@@ -140,10 +143,22 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
             <.input field={@form[:title]} label="Title" required />
             <.input field={@form[:brand]} label="Brand" required />
             <.input field={@form[:model]} label="Model" required />
-            <.input field={@form[:year]} label="Year" required />
+            <.input
+              type="select"
+              options={Enum.to_list(1950..Date.utc_today().year) |> Enum.reverse()}
+              field={@form[:year]}
+              label="Year"
+              required
+            />
             <.input field={@form[:color]} label="Color" required />
-            <.input field={@form[:country_buiilt]} label="Country Built" required />
-            <.input field={@form[:number_of_strings]} label="Number of Strings" required />
+            <.input field={@form[:country_built]} label="Country Built" required />
+            <.input
+              type="number"
+              min="1"
+              field={@form[:number_of_strings]}
+              label="Number of Strings"
+              required
+            />
             <.input
               type="select"
               options={[
@@ -157,14 +172,16 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
               label="Condition"
               required
             />
-            <.input field={@form[:cost]} label="Cost" required />
+            <.input field={@form[:price]} label="Price" required />
             <.input
               type="checkbox"
               field={@form[:shipping_available]}
               label="Shipping Available?"
               required
             />
-            <.input field={@form[:shipping_cost]} label="Shipping Cost" required />
+            <%= if @form[:shipping_available].value == "true" do %>
+              <.input field={@form[:shipping_cost]} label="Shipping Cost" required />
+            <% end %>
             <:actions>
               <.button phx-disable-with="Resetting..." class="w-full">
                 Post Listing

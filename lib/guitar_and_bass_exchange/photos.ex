@@ -4,7 +4,6 @@ defmodule GuitarAndBassExchange.Photo do
 
   schema "photos" do
     field :url, :string
-    field :description, :string
 
     belongs_to :post, GuitarAndBassExchange.Post
 
@@ -14,7 +13,7 @@ defmodule GuitarAndBassExchange.Photo do
   @doc false
   def changeset(photo, attrs) do
     photo
-    |> cast(attrs, [:url, :description])
+    |> cast(attrs, [:url])
     |> validate_required([:url])
   end
 end
