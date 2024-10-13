@@ -1,5 +1,34 @@
 defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   use GuitarAndBassExchangeWeb, :live_view
+  alias GuitarAndBassExchange.Post
+  alias GuitarAndBassExchange.Post.Query
+
+  def render_list_heading(assigns) do
+    ~H"""
+    <li class={[
+      "flex md:w-full items-center",
+      @is_active && "text-blue-600 dark:text-blue-500",
+      "after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700"
+    ]}>
+      <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
+        <%= if @is_active do %>
+          <svg
+            class="w-3.5 h-3.5 sm:w-4 sm:h-4 me-2.5"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+          </svg>
+        <% else %>
+          <span class="me-2"><%= @step_number %></span>
+        <% end %>
+        <%= @heading_start %> <span class="hidden sm:inline-flex sm:ms-2"><%= @heading_end %></span>
+      </span>
+    </li>
+    """
+  end
 
   def render(assigns) do
     ~H"""
@@ -93,32 +122,24 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     </nav>
     <main class="flex flex-col items-center my-16 mx-8">
       <ol class="flex items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base max-w-2xl w-full mx-auto mb-16">
-        <li class="flex md:w-full items-center text-blue-600 dark:text-blue-500 sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
-          <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5 sm:w-4 sm:h-4 me-2.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-            </svg>
-            Listing <span class="hidden sm:inline-flex sm:ms-2">Info</span>
-          </span>
-        </li>
-        <li class="flex md:w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
-          <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
-            <span class="me-2">2</span>
-            Upload <span class="hidden sm:inline-flex sm:ms-2">Photos</span>
-          </span>
-        </li>
-        <li class="flex items-center">
-          <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
-            <span class="me-2">3</span>
-            Payment <span class="hidden sm:inline-flex sm:ms-2">Info</span>
-          </span>
-        </li>
+        <%= render_list_heading(%{
+          is_active: @current_step == 1,
+          step_number: 1,
+          heading_start: "Listing",
+          heading_end: "Info"
+        }) %>
+        <%= render_list_heading(%{
+          is_active: @current_step == 2,
+          step_number: 2,
+          heading_start: "Upload",
+          heading_end: "Photos"
+        }) %>
+        <%= render_list_heading(%{
+          is_active: @current_step == 3,
+          step_number: 3,
+          heading_start: "Payment",
+          heading_end: "Info"
+        }) %>
       </ol>
 
       <div class="max-w-2xl w-full mx-auto">
@@ -128,66 +149,67 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
             List your guitar, bass, or pedal on our exchange.
           </:subtitle>
         </.header>
-
         <sl-card class="w-full">
-          <.simple_form
-            for={@form}
-            id="post_instrument_form"
-            phx-submit="post_instrument"
-            phx-change="validate"
-          >
-            <.error :if={@form.errors != []}>
-              Oops, something went wrong! Please check the errors below.
-            </.error>
+          <%= case @current_step do %>
+            <% 1 -> %>
+              <.simple_form
+                for={@form}
+                id="post_instrument_form"
+                phx-submit="post_instrument"
+                phx-change="validate"
+              >
+                <.error :if={@form.errors != []}>
+                  Oops, something went wrong! Please check the errors below.
+                </.error>
 
-            <.input field={@form[:title]} label="Title" required />
-            <.input field={@form[:brand]} label="Brand" required />
-            <.input field={@form[:model]} label="Model" required />
-            <.input
-              type="select"
-              options={Enum.to_list(1950..Date.utc_today().year) |> Enum.reverse()}
-              field={@form[:year]}
-              label="Year"
-              required
-            />
-            <.input field={@form[:color]} label="Color" required />
-            <.input field={@form[:country_built]} label="Country Built" required />
-            <.input
-              type="number"
-              min="1"
-              field={@form[:number_of_strings]}
-              label="Number of Strings"
-              required
-            />
-            <.input
-              type="select"
-              options={[
-                "New",
-                "Excellent",
-                "Good",
-                "Fair",
-                "Poor"
-              ]}
-              field={@form[:condition]}
-              label="Condition"
-              required
-            />
-            <.input field={@form[:price]} label="Price" required />
-            <.input
-              type="checkbox"
-              field={@form[:shipping_available]}
-              label="Shipping Available?"
-              required
-            />
-            <%= if @form[:shipping_available].value == "true" do %>
-              <.input field={@form[:shipping_cost]} label="Shipping Cost" required />
-            <% end %>
-            <:actions>
-              <.button phx-disable-with="Resetting..." class="w-full">
-                Post Listing
-              </.button>
-            </:actions>
-          </.simple_form>
+                <.input field={@form[:title]} label="Title" required />
+                <.input field={@form[:brand]} label="Brand" required />
+                <.input field={@form[:model]} label="Model" required />
+                <.input
+                  type="select"
+                  options={Enum.to_list(1950..Date.utc_today().year) |> Enum.reverse()}
+                  field={@form[:year]}
+                  label="Year"
+                  required
+                />
+                <.input field={@form[:color]} label="Color" required />
+                <.input field={@form[:country_built]} label="Country Built" required />
+                <.input
+                  type="number"
+                  min="1"
+                  field={@form[:number_of_strings]}
+                  label="Number of Strings"
+                  required
+                />
+                <.input
+                  type="select"
+                  options={[
+                    "New",
+                    "Excellent",
+                    "Good",
+                    "Fair",
+                    "Poor"
+                  ]}
+                  field={@form[:condition]}
+                  label="Condition"
+                  required
+                />
+                <.input field={@form[:price]} label="Price" required />
+                <.input type="checkbox" field={@form[:shipping]} label="Shipping Available?" required />
+                <%= if @form[:shipping].value == "true" do %>
+                  <.input field={@form[:shipping_cost]} label="Shipping Cost" required />
+                <% end %>
+                <:actions>
+                  <.button phx-disable-with="Resetting..." class="w-full">
+                    Post Listing
+                  </.button>
+                </:actions>
+              </.simple_form>
+            <% 2 -> %>
+              <div>Step 2</div>
+            <% 3 -> %>
+              <div>Step 3</div>
+          <% end %>
         </sl-card>
       </div>
     </main>
@@ -195,17 +217,37 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   def mount(_params, _session, socket) do
-    # Retrieve the current user from socket.assigns
     current_user = socket.assigns.current_user
 
-    # Initialize the form and assign the current user
-    form = to_form(%{}, as: "post")
-    {:ok, assign(socket, form: form, current_user: current_user)}
+    if current_user do
+      draft_post = Post.Query.get_draft_post_for_user(current_user.id)
+
+      changeset =
+        if draft_post do
+          Post.changeset(draft_post, %{})
+        else
+          Post.changeset(%Post{}, %{})
+        end
+
+      socket =
+        socket
+        |> assign(:form, to_form(changeset, as: "post"))
+        |> assign(:current_user, current_user)
+        |> assign(:current_step, 1)
+
+      {:ok, socket}
+    else
+      {:ok, socket}
+    end
   end
 
   def handle_event("validate", %{"post" => post_params}, socket) do
-    form = to_form(post_params, as: "post")
-    {:noreply, assign(socket, form: form)}
+    changeset =
+      socket.assigns.form.source
+      |> Post.changeset(post_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
   end
 
   def handle_event("post_instrument", %{"post" => post_params}, socket) do
@@ -214,14 +256,16 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     # Add the user_id to the post parameters
     post_params = Map.put(post_params, "user_id", user.id)
 
-    case GuitarAndBassExchange.Post.Query.create_post(post_params) do
-      {:ok, post} ->
+    case Post.Query.create_post(post_params) do
+      {:ok, _post} ->
         # Redirect to the post's show page
         {:noreply,
          socket
-         |> put_flash(:info, "Post created successfully!")
-         |> push_navigate(to: "/users/#{user.id}/posts/#{post.id}")}
+         |> assign(:current_step, 2)}
 
+      #  socket
+      # |> put_flash(:info, "Post created successfully!")
+      # |> push_navigate(to: "/users/#{user.id}/posts/#{post.id}")
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end

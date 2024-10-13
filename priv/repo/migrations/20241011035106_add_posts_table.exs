@@ -15,6 +15,7 @@ defmodule GuitarAndBassExchange.Repo.Migrations.CreatePosts do
       add :shipping_cost, :float
       add :price, :float
       add :status, :string, default: "draft"
+      add :current_step, :integer, default: 1
 
       # Add the user_id column with a foreign key constraint
       add :user_id, references(:users, on_delete: :delete_all), null: false

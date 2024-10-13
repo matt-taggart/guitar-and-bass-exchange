@@ -16,7 +16,11 @@ defmodule GuitarAndBassExchange.Post do
     field :price, :float
 
     # Status to track the progress of the post
-    field :status, Ecto.Enum, values: [:draft, :in_progress, :completed], default: :draft
+    field :status, Ecto.Enum,
+      values: [:draft, :completed],
+      default: :draft
+
+    field :current_step, :integer, default: 1
 
     # Association to photos
     has_many :photos, GuitarAndBassExchange.Photo, on_delete: :delete_all
@@ -54,14 +58,11 @@ defmodule GuitarAndBassExchange.Post do
 
   # Custom validation based on the post's status
   defp validate_required_for_step(changeset) do
-    status = get_field(changeset, :status)
+    step = get_field(changeset, :current_step)
 
     required_fields =
-      case status do
-        :draft ->
-          []
-
-        :in_progress ->
+      case step do
+        1 ->
           [
             :title,
             :brand,
@@ -76,24 +77,15 @@ defmodule GuitarAndBassExchange.Post do
             :price
           ]
 
-        :completed ->
+        2 ->
           [
-            :title,
-            :brand,
-            :model,
-            :year,
-            :color,
-            :country_built,
-            :number_of_strings,
-            :condition,
-            :shipping,
-            :shipping_cost,
-            :price,
             :photos
           ]
+
+        _ ->
+          []
       end
 
-    changeset
-    |> validate_required(required_fields)
+    changeset |> validate_required(required_fields)
   end
 end
