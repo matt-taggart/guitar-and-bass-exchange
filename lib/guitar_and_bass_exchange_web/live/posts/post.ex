@@ -6,9 +6,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   def render_list_heading(assigns) do
     ~H"""
     <li class={[
-      "flex md:w-full items-center",
-      @is_active && "text-blue-600 dark:text-blue-500",
-      "after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700"
+      "flex items-center",
+      @is_active && "text-blue-600 dark:text-blue-500"
     ]}>
       <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
         <%= if @is_active do %>
@@ -27,12 +26,17 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         <%= @heading_start %> <span class="hidden sm:inline-flex sm:ms-2"><%= @heading_end %></span>
       </span>
     </li>
+    <%= if !@is_last do %>
+      <div class="sm:w-[5rem] h-px bg-gray-400 sm:mx-[2rem] border-solid border-1px border-gray-200">
+      </div>
+    <% end %>
     """
   end
 
   def render(assigns) do
     ~H"""
     <nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 bg-white z-10">
+      <!-- Navigation Content -->
       <div class="flex items-center gap-4">
         <.link href={~p"/"}>
           <h1 class="text-brand text-xl font-semibold">Guitar And Bass Exchange</h1>
@@ -120,25 +124,32 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         <% end %>
       </div>
     </nav>
+
     <main class="flex flex-col items-center my-16 mx-8">
-      <ol class="flex items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base max-w-2xl w-full mx-auto mb-16">
+      <ol class="flex items-center justify-center text-sm font-medium text-center text-gray-500 sm:text-base max-w-2xl mx-auto mb-16">
+        <!-- Step 1: Listing Info -->
         <%= render_list_heading(%{
           is_active: @current_step == 1,
           step_number: 1,
           heading_start: "Listing",
-          heading_end: "Info"
+          heading_end: "Info",
+          is_last: false
         }) %>
+        <!-- Step 2: Upload Photos -->
         <%= render_list_heading(%{
           is_active: @current_step == 2,
           step_number: 2,
           heading_start: "Upload",
-          heading_end: "Photos"
+          heading_end: "Photos",
+          is_last: false
         }) %>
+        <!-- Step 3: Payment Info -->
         <%= render_list_heading(%{
           is_active: @current_step == 3,
           step_number: 3,
           heading_start: "Payment",
-          heading_end: "Info"
+          heading_end: "Info",
+          is_last: true
         }) %>
       </ol>
 
@@ -155,7 +166,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
               <.simple_form
                 for={@form}
                 id="post_instrument_form"
-                phx-submit="post_instrument"
+                phx-submit="move_to_step_2"
                 phx-change="validate"
               >
                 <.error :if={@form.errors != []}>
@@ -196,19 +207,19 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 />
                 <.input field={@form[:price]} label="Price" required />
                 <.input type="checkbox" field={@form[:shipping]} label="Shipping Available?" required />
-                <%= if @form[:shipping].value == "true" do %>
+                <%= if @form[:shipping].value do %>
                   <.input field={@form[:shipping_cost]} label="Shipping Cost" required />
                 <% end %>
                 <:actions>
-                  <.button phx-disable-with="Resetting..." class="w-full">
+                  <.button phx-disable-with="Posting..." class="w-full">
                     Post Listing
                   </.button>
                 </:actions>
               </.simple_form>
             <% 2 -> %>
-              <div>Step 2</div>
+              <div>Step 2: Upload Photos</div>
             <% 3 -> %>
-              <div>Step 3</div>
+              <div>Step 3: Payment Info</div>
           <% end %>
         </sl-card>
       </div>
@@ -250,7 +261,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
   end
 
-  def handle_event("post_instrument", %{"post" => post_params}, socket) do
+  def handle_event("move_to_step_2", %{"post" => post_params}, socket) do
     user = socket.assigns.current_user
 
     # Add the user_id to the post parameters
