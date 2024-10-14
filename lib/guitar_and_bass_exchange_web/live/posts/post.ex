@@ -1,7 +1,6 @@
 defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   use GuitarAndBassExchangeWeb, :live_view
   alias GuitarAndBassExchange.Post
-  alias GuitarAndBassExchange.Post.Query
 
   def render_list_heading(assigns) do
     ~H"""
@@ -127,7 +126,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
     <main class="flex flex-col items-center my-16 mx-8">
       <ol class="flex items-center justify-center text-sm font-medium text-center text-gray-500 sm:text-base max-w-2xl mx-auto mb-16">
-        <!-- Step 1: Listing Info -->
+        <!-- Step Headings -->
         <%= render_list_heading(%{
           is_active: @current_step == 1,
           step_number: 1,
@@ -135,7 +134,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
           heading_end: "Info",
           is_last: false
         }) %>
-        <!-- Step 2: Upload Photos -->
         <%= render_list_heading(%{
           is_active: @current_step == 2,
           step_number: 2,
@@ -143,7 +141,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
           heading_end: "Photos",
           is_last: false
         }) %>
-        <!-- Step 3: Payment Info -->
         <%= render_list_heading(%{
           is_active: @current_step == 3,
           step_number: 3,
@@ -166,13 +163,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
               <.simple_form
                 for={@form}
                 id="post_instrument_form"
-                phx-submit="move_to_step_2"
+                phx-submit="advance_to_step_2"
                 phx-change="validate"
               >
-                <.error :if={@form.errors != []}>
-                  Oops, something went wrong! Please check the errors below.
-                </.error>
-
                 <.input field={@form[:title]} label="Title" required />
                 <.input field={@form[:brand]} label="Brand" required />
                 <.input field={@form[:model]} label="Model" required />
@@ -194,20 +187,14 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 />
                 <.input
                   type="select"
-                  options={[
-                    "New",
-                    "Excellent",
-                    "Good",
-                    "Fair",
-                    "Poor"
-                  ]}
+                  options={["New", "Excellent", "Good", "Fair", "Poor"]}
                   field={@form[:condition]}
                   label="Condition"
                   required
                 />
                 <.input field={@form[:price]} label="Price" required />
-                <.input type="checkbox" field={@form[:shipping]} label="Shipping Available?" required />
-                <%= if @form[:shipping].value do %>
+                <.input type="checkbox" field={@form[:shipping]} label="Shipping Available?" />
+                <%= if @form[:shipping].value == true do %>
                   <.input field={@form[:shipping_cost]} label="Shipping Cost" required />
                 <% end %>
                 <:actions>
@@ -233,18 +220,18 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     if current_user do
       draft_post = Post.Query.get_draft_post_for_user(current_user.id)
 
-      changeset =
+      {changeset, current_step} =
         if draft_post do
-          Post.changeset(draft_post, %{})
+          {Post.changeset(draft_post, %{}), draft_post.current_step}
         else
-          Post.changeset(%Post{}, %{})
+          {Post.changeset(%Post{user_id: current_user.id}, %{}), 1}
         end
 
       socket =
         socket
         |> assign(:form, to_form(changeset, as: "post"))
         |> assign(:current_user, current_user)
-        |> assign(:current_step, 1)
+        |> assign(:current_step, current_step)
 
       {:ok, socket}
     else
@@ -252,33 +239,60 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
+  # Handle real-time form changes without triggering validation errors
   def handle_event("validate", %{"post" => post_params}, socket) do
     changeset =
       socket.assigns.form.source
       |> Post.changeset(post_params)
-      |> Map.put(:action, :validate)
+      # Do NOT set action here to prevent validation errors from displaying
+      |> Ecto.Changeset.change()
 
     {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
   end
 
-  def handle_event("move_to_step_2", %{"post" => post_params}, socket) do
+  # Handle form submission and validation
+  # Handle form submission and validation
+  def handle_event("advance_to_step_2", %{"post" => post_params}, socket) do
     user = socket.assigns.current_user
+    current_step = socket.assigns.current_step
 
-    # Add the user_id to the post parameters
-    post_params = Map.put(post_params, "user_id", user.id)
+    # Get the existing draft post (if any)
+    draft_post = socket.assigns.form.source.data
 
-    case Post.Query.create_post(post_params) do
-      {:ok, _post} ->
-        # Redirect to the post's show page
-        {:noreply,
-         socket
-         |> assign(:current_step, 2)}
+    # Update the post parameters to include user_id and current_step
+    post_params =
+      post_params
+      |> Map.put("user_id", user.id)
+      |> Map.put("current_step", current_step + 1)
 
-      #  socket
-      # |> put_flash(:info, "Post created successfully!")
-      # |> push_navigate(to: "/users/#{user.id}/posts/#{post.id}")
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
+    # Create the changeset
+    changeset =
+      Post.changeset(draft_post, post_params)
+      |> Map.put(:action, :insert)
+
+    # If the changeset is valid, update or create the post
+    if changeset.valid? do
+      result =
+        if draft_post.id do
+          Post.Query.update_post(changeset)
+        else
+          Post.Query.create_post(post_params)
+        end
+
+      # Handle the result
+      case result do
+        {:ok, post} ->
+          {:noreply,
+           socket
+           |> assign(:current_step, post.current_step)
+           |> assign(:form, to_form(Post.changeset(post, %{}), as: "post"))}
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
+      end
+    else
+      # If changeset is invalid, return the form with errors
+      {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
     end
   end
 end

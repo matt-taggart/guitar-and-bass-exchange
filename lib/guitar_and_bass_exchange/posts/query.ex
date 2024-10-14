@@ -3,6 +3,11 @@ defmodule GuitarAndBassExchange.Post.Query do
   alias GuitarAndBassExchange.Repo
   alias GuitarAndBassExchange.Post
 
+  def update_post(%Ecto.Changeset{} = changeset) do
+    # Update the post using the changeset
+    Repo.update(changeset)
+  end
+
   def create_post(attrs \\ %{}) do
     %Post{}
     |> Post.changeset(attrs)
@@ -21,5 +26,7 @@ defmodule GuitarAndBassExchange.Post.Query do
     |> order_by([p], desc: p.updated_at)
     |> limit(1)
     |> Repo.one()
+    # Add this line to preload photos
+    |> Repo.preload(:photos)
   end
 end

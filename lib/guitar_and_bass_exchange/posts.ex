@@ -47,14 +47,22 @@ defmodule GuitarAndBassExchange.Post do
       :shipping_cost,
       :price,
       :status,
-      :user_id
+      :user_id,
+      :current_step
     ])
     |> validate_required([
       :user_id
     ])
     |> validate_required_for_step()
-    |> cast_assoc(:photos, with: &GuitarAndBassExchange.Photo.changeset/2, required: false)
+    |> maybe_cast_photos(attrs)
   end
+
+  defp maybe_cast_photos(changeset, %{"photos" => photos}) when is_list(photos) do
+    changeset
+    |> put_assoc(:photos, photos)
+  end
+
+  defp maybe_cast_photos(changeset, _), do: changeset
 
   # Custom validation based on the post's status
   defp validate_required_for_step(changeset) do
@@ -63,7 +71,7 @@ defmodule GuitarAndBassExchange.Post do
     required_fields =
       case step do
         1 ->
-          [
+          base_fields = [
             :title,
             :brand,
             :model,
@@ -73,9 +81,15 @@ defmodule GuitarAndBassExchange.Post do
             :number_of_strings,
             :condition,
             :shipping,
-            :shipping_cost,
             :price
           ]
+
+          # Conditionally require :shipping_cost if :shipping is true
+          if get_field(changeset, :shipping) do
+            base_fields ++ [:shipping_cost]
+          else
+            base_fields
+          end
 
         2 ->
           [
