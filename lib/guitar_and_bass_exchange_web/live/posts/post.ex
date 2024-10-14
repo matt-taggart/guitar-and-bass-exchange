@@ -259,88 +259,47 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                     </div>
                   </div>
                   <!-- Display Upload Entries with Progress Bars -->
-                  <%= for entry <- @uploads.images.entries do %>
-                    <figure>
-                      <.live_img_preview entry={entry} />
-                    </figure>
-                    <div class="w-full grid gap-1">
-                      <!-- Uploaded File Info -->
-                      <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2">
-                          <!-- Use a placeholder image -->
-                          <div class="grid gap-1">
-                            <h4 class="text-gray-900 text-sm font-normal leading-snug">
-                              <%= entry.client_name %>
-                            </h4>
-                            <h5 class="text-gray-400 text-xs font-normal leading-4">
-                              <%= if entry.done? do %>
-                                Upload complete
-                              <% else %>
-                                Uploading...
-                              <% end %>
-                            </h5>
-                          </div>
-                        </div>
-                        <!-- Upload Status Icon -->
-                        <%= if entry.done? do %>
-                          <!-- Complete Icon -->
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <g id="Upload 3">
-                              <path
-                                id="icon"
-                                d="M15 9L12 12M12 12L9 15M12 12L9 9M12 12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <%= for entry <- @uploads.images.entries do %>
+                      <div class="relative">
+                        <figure class="aspect-square overflow-hidden rounded-lg">
+                          <.live_img_preview entry={entry} class="w-full h-full object-cover" />
+                        </figure>
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                          <div class="w-16 h-16 relative">
+                            <svg
+                              class="w-full h-full"
+                              viewBox="0 0 36 36"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <circle
+                                cx="18"
+                                cy="18"
+                                r="16"
+                                fill="none"
+                                stroke="#fff"
+                                stroke-width="2"
+                              />
+                              <circle
+                                cx="18"
+                                cy="18"
+                                r="16"
+                                fill="none"
                                 stroke="#4CAF50"
-                                stroke-width="1.6"
-                                stroke-linecap="round"
+                                stroke-width="2"
+                                stroke-dasharray="100"
+                                stroke-dashoffset={100 - entry.progress}
+                                transform="rotate(-90 18 18)"
                               />
-                            </g>
-                          </svg>
-                        <% else %>
-                          <!-- In-progress Icon -->
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <g id="Upload 3">
-                              <path
-                                id="icon"
-                                d="M15 9L12 12M12 12L9 15M12 12L9 9M12 12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                                stroke="#D1D5DB"
-                                stroke-width="1.6"
-                                stroke-linecap="round"
-                              />
-                            </g>
-                          </svg>
-                        <% end %>
-                      </div>
-                      <!-- Progress Bar -->
-                      <div class="relative flex items-center gap-2.5 py-1.5">
-                        <div class="relative w-full h-2.5 overflow-hidden rounded-3xl bg-gray-100">
-                          <div
-                            role="progressbar"
-                            aria-valuenow={entry.progress}
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                            style={"width: #{entry.progress}%"}
-                            class="flex h-full items-center justify-center bg-indigo-600 text-white rounded-3xl"
-                          >
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center text-white font-bold">
+                              <%= entry.progress %>%
+                            </div>
                           </div>
                         </div>
-                        <span class="ml-2 bg-white rounded-full text-gray-800 text-xs font-medium flex justify-center items-center">
-                          <%= entry.progress %>%
-                        </span>
                       </div>
-                    </div>
-                  <% end %>
+                    <% end %>
+                  </div>
                   <!-- Display Uploaded Files -->
                   <%= for url <- @uploaded_files do %>
                     <div class="w-full grid gap-1">
