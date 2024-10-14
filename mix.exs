@@ -55,7 +55,9 @@ defmodule GuitarAndBassExchange.MixProject do
       {:bandit, "~> 1.5"},
       {:ueberauth_google, "~> 0.10"},
       {:dotenv_parser, "~> 2.0.1"},
-      {:faker, "~> 0.17", only: [:dev, :test]}
+      {:faker, "~> 0.17", only: [:dev, :test]},
+      {:ex_aws, "~> 2.2"},
+      {:ex_aws_s3, "~> 2.0"}
     ]
   end
 

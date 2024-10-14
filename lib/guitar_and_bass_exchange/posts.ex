@@ -54,15 +54,8 @@ defmodule GuitarAndBassExchange.Post do
       :user_id
     ])
     |> validate_required_for_step()
-    |> maybe_cast_photos(attrs)
+    |> cast_assoc(:photos, with: &GuitarAndBassExchange.Photo.changeset/2)
   end
-
-  defp maybe_cast_photos(changeset, %{"photos" => photos}) when is_list(photos) do
-    changeset
-    |> put_assoc(:photos, photos)
-  end
-
-  defp maybe_cast_photos(changeset, _), do: changeset
 
   # Custom validation based on the post's status
   defp validate_required_for_step(changeset) do
@@ -92,9 +85,7 @@ defmodule GuitarAndBassExchange.Post do
           end
 
         2 ->
-          [
-            :photos
-          ]
+          []
 
         _ ->
           []
