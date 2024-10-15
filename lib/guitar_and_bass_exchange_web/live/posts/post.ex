@@ -215,10 +215,18 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
               </:subtitle>
             </.header>
             <sl-card class="w-full">
-              <form phx-submit="save" phx-change="validate" class="w-full">
+              <form
+                id="upload-form"
+                phx-submit="save"
+                phx-change="validate"
+                class="flex flex-col gap-2"
+              >
                 <div class="w-full grid gap-5">
                   <!-- Upload Container -->
-                  <div class="w-full py-9 bg-gray-50 rounded-2xl border border-gray-300 border-dashed">
+                  <div
+                    class="w-full py-9 bg-gray-50 rounded-2xl border border-gray-300 border-dashed"
+                    phx-drop-target={@uploads.photos.ref}
+                  >
                     <div class="grid gap-3">
                       <!-- Upload Instructions -->
                       <div>
@@ -249,7 +257,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                         </h4>
                         <div class="flex items-center justify-center">
                           <label>
-                            <.live_file_input upload={@uploads.images} class="hidden" />
+                            <.live_file_input upload={@uploads.photos} hidden />
                             <div class="flex w-28 h-9 px-2 flex-col bg-blue-600 rounded-full shadow text-white text-xs font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">
                               Choose File
                             </div>
@@ -258,110 +266,104 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                       </div>
                     </div>
                   </div>
-                  <!-- Display Upload Entries with Progress Bars -->
-                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    <%= for entry <- @uploads.images.entries do %>
-                      <div class="relative">
-                        <figure class="aspect-square overflow-hidden rounded-lg">
-                          <.live_img_preview entry={entry} class="w-full h-full object-cover" />
-                        </figure>
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                          <div class="w-16 h-16 relative">
-                            <svg
-                              class="w-full h-full"
-                              viewBox="0 0 36 36"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <circle
-                                cx="18"
-                                cy="18"
-                                r="16"
-                                fill="none"
-                                stroke="#fff"
-                                stroke-width="2"
-                              />
-                              <circle
-                                cx="18"
-                                cy="18"
-                                r="16"
-                                fill="none"
-                                stroke="#4CAF50"
-                                stroke-width="2"
-                                stroke-dasharray="100"
-                                stroke-dashoffset={100 - entry.progress}
-                                transform="rotate(-90 18 18)"
-                              />
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center text-white font-bold">
-                              <%= entry.progress %>%
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    <% end %>
-                  </div>
-                  <!-- Display Uploaded Files -->
-                  <%= for url <- @uploaded_files do %>
-                    <div class="w-full grid gap-1">
-                      <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2">
-                          <!-- Display Uploaded Image Thumbnail with Correct URL -->
-                          <img src={url} alt="Uploaded Photo" class="w-10 h-10 rounded-md" />
-                          <div class="grid gap-1">
-                            <h4 class="text-gray-900 text-sm font-normal leading-snug">
-                              <%= Path.basename(url) %>
-                            </h4>
-                            <h5 class="text-gray-400 text-xs font-normal leading-4">
-                              Upload complete
-                            </h5>
-                          </div>
-                        </div>
-                        <!-- Checkmark Icon -->
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <g id="Upload 3">
-                            <path
-                              id="icon"
-                              d="M15 9L12 12M12 12L9 15M12 12L9 9M12 12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                              stroke="#4CAF50"
-                              stroke-width="1.6"
-                              stroke-linecap="round"
-                            />
-                          </g>
-                        </svg>
-                      </div>
-                      <!-- Static Progress Bar for Completed Uploads -->
-                      <div class="relative flex items-center gap-2.5 py-1.5">
-                        <div class="relative w-full h-2.5 overflow-hidden rounded-3xl bg-gray-100">
-                          <div
-                            role="progressbar"
-                            aria-valuenow="100"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                            style="width: 100%"
-                            class="flex h-full items-center justify-center bg-indigo-600 text-white rounded-3xl"
+                </div>
+                <!-- Display Upload Entries with Progress Bars -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  <%= for entry <- @uploads.photos.entries do %>
+                    <div class="relative">
+                      <figure class="aspect-square overflow-hidden rounded-lg">
+                        <.live_img_preview entry={entry} class="w-full h-full object-cover" />
+                      </figure>
+
+                      <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                        <div class="w-16 h-16 relative">
+                          <svg
+                            class="w-full h-full"
+                            viewBox="0 0 36 36"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
+                            <circle cx="18" cy="18" r="16" fill="none" stroke="#fff" stroke-width="2" />
+                            <circle
+                              cx="18"
+                              cy="18"
+                              r="16"
+                              fill="none"
+                              stroke="#4CAF50"
+                              stroke-width="2"
+                              stroke-dasharray="100"
+                              stroke-dashoffset={100 - entry.progress}
+                              transform="rotate(-90 18 18)"
+                            />
+                          </svg>
+                          <div class="absolute inset-0 flex items-center justify-center text-white font-bold">
+                            <%= entry.progress %>%
                           </div>
                         </div>
-                        <span class="ml-2 bg-white rounded-full text-gray-800 text-xs font-medium flex justify-center items-center">
-                          100%
-                        </span>
                       </div>
                     </div>
                   <% end %>
-                  <!-- Submit Button -->
-                  <button
-                    type="submit"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Upload Photos
-                  </button>
                 </div>
+                <!-- Display Uploaded Files -->
+                <%= for url <- @uploaded_files do %>
+                  <div class="w-full grid gap-1">
+                    <div class="flex items-center justify-between gap-2">
+                      <div class="flex items-center gap-2">
+                        <!-- Display Uploaded Image Thumbnail with Correct URL -->
+                        <img src={url} alt="Uploaded Photo" class="w-10 h-10 rounded-md" />
+                        <div class="grid gap-1">
+                          <h4 class="text-gray-900 text-sm font-normal leading-snug">
+                            <%= Path.basename(url) %>
+                          </h4>
+                          <h5 class="text-gray-400 text-xs font-normal leading-4">
+                            Upload complete
+                          </h5>
+                        </div>
+                      </div>
+                      <!-- Checkmark Icon -->
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <g id="Upload 3">
+                          <path
+                            id="icon"
+                            d="M15 9L12 12M12 12L9 15M12 12L9 9M12 12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                            stroke="#4CAF50"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                          />
+                        </g>
+                      </svg>
+                    </div>
+                    <!-- Static Progress Bar for Completed Uploads -->
+                    <div class="relative flex items-center gap-2.5 py-1.5">
+                      <div class="relative w-full h-2.5 overflow-hidden rounded-3xl bg-gray-100">
+                        <div
+                          role="progressbar"
+                          aria-valuenow="100"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          style="width: 100%"
+                          class="flex h-full items-center justify-center bg-indigo-600 text-white rounded-3xl"
+                        >
+                        </div>
+                      </div>
+                      <span class="ml-2 bg-white rounded-full text-gray-800 text-xs font-medium flex justify-center items-center">
+                        100%
+                      </span>
+                    </div>
+                  </div>
+                <% end %>
+                <!-- Submit Button -->
+                <button
+                  type="submit"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Upload Photos
+                </button>
               </form>
             </sl-card>
           <% 3 -> %>
@@ -422,7 +424,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         |> assign(:current_user, current_user)
         |> assign(:current_step, current_step)
         |> assign(:uploaded_files, [])
-        |> allow_upload(:images,
+        |> allow_upload(:photos,
           accept: ~w(.jpg .jpeg .png .webp),
           max_entries: 8
         )
@@ -445,7 +447,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
   end
 
-  def handle_event("validate", %{"_target" => ["images"]}, socket) do
+  def handle_event("validate", %{"_target" => ["photos"]}, socket) do
     {:noreply, socket}
   end
 
@@ -494,7 +496,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   def handle_event("save", _params, socket) do
     post = socket.assigns.form.source.data
 
-    case consume_uploaded_entries(socket, :images, fn %{path: path} = _entry, _entry ->
+    case consume_uploaded_entries(socket, :photos, fn %{path: path} = _entry, _entry ->
            bucket = System.get_env("SPACES_NAME")
            region = System.get_env("SPACES_REGION")
 
@@ -524,7 +526,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
       {:error, reason} ->
         Logger.error("Failed to consume uploaded entries: #{inspect(reason)}")
-        {:noreply, put_flash(socket, :error, "Failed to upload images")}
+        {:noreply, put_flash(socket, :error, "Failed to upload photos")}
     end
   end
 end
