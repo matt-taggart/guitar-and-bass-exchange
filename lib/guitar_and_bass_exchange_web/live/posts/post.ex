@@ -2,6 +2,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   use GuitarAndBassExchangeWeb, :live_view
   alias GuitarAndBassExchange.Post
   require Logger
+  require ExAws.S3
 
   def render_list_heading(assigns) do
     ~H"""
@@ -341,34 +342,13 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
   defp error_to_string(:too_many_files), do: "You have selected too many files"
 
-  defp presign_upload(entry, socket) do
-    uploads = socket.assigns.uploads
-
+  defp presign_upload() do
     bucket = System.get_env("SPACES_NAME")
-    key = "uploads/#{entry.client_name}"
+    key = "uploads"
 
-    config = %{
-      access_key_id: System.get_env("SPACES_ACCESS_KEY_ID"),
-      secret_access_key: System.get_env("SPACES_SECRET_ACCESS_KEY"),
-      region: System.get_env("SPACES_REGION")
-    }
+    opts = [virtual_host: true, bucket_as_host: true]
 
-    {:ok, fields} =
-      SimpleS3Upload.sign_form_upload(config, bucket,
-        key: key,
-        content_type: entry.client_type,
-        max_file_size: uploads[entry.upload_config].max_file_size,
-        expires_in: :timer.hours(1)
-      )
-
-    meta = %{
-      uploader: "S3",
-      key: key,
-      url: "https://#{bucket}.#{config.region}.digitaloceanspaces.com",
-      fields: fields
-    }
-
-    {:ok, meta, socket}
+    {:ok, ExAws.Config.new(:s3) |> ExAws.S3.presigned_url(:put, bucket, key, opts)}
   end
 
   def mount(_params, _session, socket) do
@@ -394,10 +374,11 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         |> assign(:show_preview, false)
         |> allow_upload(:photos,
           accept: ~w(.jpg .jpeg .png .webp),
-          max_entries: 8
+          max_entries: 8,
+          temporary_assigns: [photos: []],
+          # Add this line to use your presign_upload function
+          presign_upload: &presign_upload/0
         )
-
-      # external: &presign_upload/2
 
       {:ok, socket}
     else
@@ -473,19 +454,45 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   def handle_event("save", _params, socket) do
     post = socket.assigns.form.source.data
 
-    case consume_uploaded_entries(socket, :photos, fn %{path: path} = _entry, _entry ->
-           bucket = System.get_env("SPACES_NAME")
-           region = System.get_env("SPACES_REGION")
+    uploaded_urls =
+      consume_uploaded_entries(socket, :photos, fn %{path: src_path}, entry ->
+        dest_path = "uploads/#{entry.client_name}"
+        bucket = System.get_env("SPACES_NAME")
+        region = System.get_env("SPACES_REGION")
+        host = "#{bucket}.#{region}.digitaloceanspaces.com"
 
-           url =
-             "https://#{bucket}.#{region}.digitaloceanspaces.com/uploads/#{Path.basename(path)}"
+        Logger.debug("Attempting to upload to host: #{host}")
 
-           {:ok, url}
-         end) do
-      {:ok, uploaded_urls} ->
+        case File.read(src_path) do
+          {:ok, content} ->
+            operation = ExAws.S3.put_object(bucket, dest_path, content)
+
+            case ExAws.request(operation) do
+              {:ok, %{status_code: 200}} ->
+                url = "https://#{host}/#{dest_path}"
+                Logger.debug("Uploaded URL: #{url}")
+                {:ok, url}
+
+              {:error, reason} ->
+                Logger.error("Failed to upload #{dest_path}: #{inspect(reason)}")
+                # Changed to {:ok, nil}
+                {:ok, nil}
+            end
+
+          {:error, reason} ->
+            Logger.error("Failed to read file #{src_path}: #{inspect(reason)}")
+            # Changed to {:ok, nil}
+            {:ok, nil}
+        end
+      end)
+
+    IO.inspect(uploaded_urls, label: "Uploaded URLs")
+
+    case process_upload_results(uploaded_urls) do
+      {:ok, successful_urls} ->
         changeset =
           post
-          |> Post.changeset(%{photos: Enum.map(uploaded_urls, &%{url: &1})})
+          |> Post.changeset(%{photos: Enum.map(successful_urls, &%{url: &1})})
           |> Map.put(:action, :update)
 
         case GuitarAndBassExchange.Post.Query.update_post(changeset) do
@@ -494,16 +501,36 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
              socket
              |> assign(:current_step, updated_post.current_step)
              |> assign(:form, to_form(Post.changeset(updated_post, %{}), as: "post"))
-             |> assign(:uploaded_files, uploaded_urls)}
+             |> assign(:uploaded_files, successful_urls)
+             |> put_flash(
+               :info,
+               "Successfully uploaded photos"
+             )}
 
           {:error, changeset} ->
             Logger.error("Failed to update post: #{inspect(changeset.errors)}")
             {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
         end
 
-      {:error, reason} ->
-        Logger.error("Failed to consume uploaded entries: #{inspect(reason)}")
-        {:noreply, put_flash(socket, :error, "Failed to upload photos")}
+      {:error, _reason} ->
+        {:noreply,
+         put_flash(socket, :error, "Failed to upload one or more photos. Please try again.")}
     end
+  end
+
+  # Updated process_upload_results to handle {:ok, nil} cases
+  defp process_upload_results(upload_results) do
+    Enum.reduce_while(upload_results, {:ok, []}, fn
+      nil, _acc ->
+        # Halt on first failure
+        {:halt, {:error, :upload_failed}}
+
+      url, {:ok, acc} ->
+        {:cont, {:ok, [url | acc]}}
+
+      unexpected, _acc ->
+        Logger.error("Unexpected upload result: #{inspect(unexpected)}")
+        {:halt, {:error, :unexpected_result}}
+    end)
   end
 end

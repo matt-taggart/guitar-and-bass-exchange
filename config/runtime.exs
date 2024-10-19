@@ -122,3 +122,16 @@ end
 config :ueberauth, Ueberauth.Strategy.Google.OAuth,
   client_id: System.get_env("GOOGLE_CLIENT_ID"),
   client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+
+# ExAws Configuration
+config :ex_aws,
+  access_key_id: System.get_env("SPACES_ACCESS_KEY_ID"),
+  secret_access_key: System.get_env("SPACES_SECRET_ACCESS_KEY"),
+  json_codec: Jason
+
+config :ex_aws, :s3,
+  scheme: "https://",
+  host:
+    "#{System.get_env("SPACES_NAME")}.#{System.get_env("SPACES_REGION")}.digitaloceanspaces.com",
+  # Ensure no trailing slash
+  region: System.get_env("SPACES_REGION")

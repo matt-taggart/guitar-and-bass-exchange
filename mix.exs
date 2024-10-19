@@ -57,7 +57,9 @@ defmodule GuitarAndBassExchange.MixProject do
       {:dotenv_parser, "~> 2.0.1"},
       {:faker, "~> 0.17", only: [:dev, :test]},
       {:ex_aws, "~> 2.2"},
-      {:ex_aws_s3, "~> 2.0"}
+      {:ex_aws_s3, "~> 2.0"},
+      {:hackney, "~> 1.9"},
+      {:sweet_xml, "~> 0.6"}
     ]
   end
 

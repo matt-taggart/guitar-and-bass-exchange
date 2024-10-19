@@ -66,7 +66,7 @@ config :ueberauth, Ueberauth,
     google: {Ueberauth.Strategy.Google, [default_scope: "email profile"]}
   ]
 
-config :guitar_and_bass_exchange, YourApp.Mailer,
+config :guitar_and_bass_exchange, GuitarAndBassExchange.Mailer,
   adapter: Swoosh.Adapters.SMTP,
   relay: "mail.privateemail.com",
   port: 465,
@@ -75,14 +75,6 @@ config :guitar_and_bass_exchange, YourApp.Mailer,
   auth: :always,
   username: "support@guitarandbassexchange.com",
   password: System.get_env("SMTP_PASSWORD")
-
-config :ex_aws,
-  region: "nyc3"
-
-config :ex_aws, :s3,
-  scheme: "https://",
-  host:
-    "#{System.get_env("SPACES_NAME")}.#{System.get_env("SPACES_REGION")}.digitaloceanspaces.com"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
