@@ -3,10 +3,16 @@ defmodule GuitarAndBassExchange.Chat.Room do
   import Ecto.Changeset
   alias GuitarAndBassExchange.Chat.Message
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "rooms" do
     field :description, :string
     field :name, :string
-    has_many :messages, Message
+
+    has_many :messages, Message,
+      foreign_key: :room_id,
+      on_delete: :delete_all
+
     timestamps()
   end
 

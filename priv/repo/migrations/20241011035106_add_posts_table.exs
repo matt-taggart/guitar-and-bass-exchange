@@ -2,7 +2,8 @@ defmodule GuitarAndBassExchange.Repo.Migrations.CreatePosts do
   use Ecto.Migration
 
   def change do
-    create table(:posts) do
+    create table(:posts, primary_key: false) do
+      add :id, :binary_id, primary_key: true
       add :title, :string
       add :brand, :string
       add :model, :string
@@ -16,9 +17,10 @@ defmodule GuitarAndBassExchange.Repo.Migrations.CreatePosts do
       add :price, :float
       add :status, :string, default: "draft"
       add :current_step, :integer, default: 1
+      add :featured, :boolean, default: false
 
       # Add the user_id column with a foreign key constraint
-      add :user_id, references(:users, on_delete: :delete_all), null: false
+      add :user_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
 
       timestamps()
     end

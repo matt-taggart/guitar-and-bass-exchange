@@ -2,6 +2,8 @@ defmodule GuitarAndBassExchange.Post do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "posts" do
     field :title, :string
     field :brand, :string
@@ -15,17 +17,17 @@ defmodule GuitarAndBassExchange.Post do
     field :shipping_cost, :float
     field :price, :float
 
-    # Status to track the progress of the post
     field :status, Ecto.Enum,
       values: [:draft, :completed],
       default: :draft
 
     field :current_step, :integer, default: 1
+    field :featured, :boolean, default: false
 
-    # Association to photos
-    has_many :photos, GuitarAndBassExchange.Photo, on_replace: :delete_if_exists
+    has_many :photos, GuitarAndBassExchange.Photo,
+      on_replace: :delete_if_exists,
+      on_delete: :delete_all
 
-    # Association to the user
     belongs_to :user, GuitarAndBassExchange.Accounts.User
 
     timestamps()
@@ -48,11 +50,10 @@ defmodule GuitarAndBassExchange.Post do
       :price,
       :status,
       :user_id,
-      :current_step
+      :current_step,
+      :featured
     ])
-    |> validate_required([
-      :user_id
-    ])
+    |> validate_required([:user_id])
     |> validate_required_for_step()
     |> cast_assoc(:photos, with: &GuitarAndBassExchange.Photo.changeset/2)
   end

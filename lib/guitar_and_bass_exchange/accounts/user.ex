@@ -2,6 +2,8 @@ defmodule GuitarAndBassExchange.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "users" do
     field :email, :string
     field :first_name, :string
@@ -11,6 +13,10 @@ defmodule GuitarAndBassExchange.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
     field :is_oauth_user, :boolean, default: false
+
+    has_many :posts, GuitarAndBassExchange.Post
+    has_many :users_tokens, GuitarAndBassExchange.Accounts.UserToken
+    has_many :messages, GuitarAndBassExchange.Chat.Message, foreign_key: :sender_id
 
     timestamps(type: :utc_datetime)
   end
