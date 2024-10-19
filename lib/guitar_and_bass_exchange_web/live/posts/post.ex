@@ -279,9 +279,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                   <% end %>
                 <% end %>
               </div>
-
-              <div>Total Upload Progress: <%= @total_progress %>%</div>
-              <progress value={@total_progress} max="100"></progress>
+              <%= if @show_progress do %>
+                <div>Total Upload Progress: <%= @total_progress %>%</div>
+                <progress value={@total_progress} max="100"></progress>
+              <% end %>
               <!-- Submit Button -->
               <div class="flex justify-end">
                 <button
@@ -329,6 +330,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   defp handle_progress(:photos, entry, socket) do
+    socket = assign(socket, :show_progress, true)
+
     if entry.done? do
       total_entries = length(socket.assigns.uploads.photos.entries)
       completed_entries = Enum.count(socket.assigns.uploads.photos.entries, & &1.done?)
@@ -360,6 +363,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         |> assign(:uploaded_files, [])
         |> assign(:preview_upload, nil)
         |> assign(:show_preview, false)
+        |> assign(:show_progress, false)
         |> assign(:total_progress, 0)
         |> allow_upload(:photos,
           accept: ~w(.jpg .jpeg .png .webp),
