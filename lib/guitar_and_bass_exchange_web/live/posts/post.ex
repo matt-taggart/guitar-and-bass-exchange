@@ -272,32 +272,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                     <figure class="aspect-square overflow-hidden rounded-lg">
                       <.live_img_preview entry={entry} class="w-full h-full object-cover" />
                     </figure>
-
-                    <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                      <div class="w-16 h-16 relative">
-                        <svg
-                          class="w-full h-full"
-                          viewBox="0 0 36 36"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <circle cx="18" cy="18" r="16" fill="none" stroke="#fff" stroke-width="2" />
-                          <circle
-                            cx="18"
-                            cy="18"
-                            r="16"
-                            fill="none"
-                            stroke="#4CAF50"
-                            stroke-width="2"
-                            stroke-dasharray="100"
-                            stroke-dashoffset={100 - entry.progress}
-                            transform="rotate(-90 18 18)"
-                          />
-                        </svg>
-                        <div class="absolute inset-0 flex items-center justify-center text-white font-bold">
-                          <%= entry.progress %>%
-                        </div>
-                      </div>
-                    </div>
                   </div>
                   <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
                   <%= for err <- upload_errors(@uploads.photos, entry) do %>
@@ -305,6 +279,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                   <% end %>
                 <% end %>
               </div>
+
+              <div>Total Upload Progress: <%= @total_progress %>%</div>
+              <progress value={@total_progress} max="100"></progress>
               <!-- Submit Button -->
               <div class="flex justify-end">
                 <button
@@ -351,6 +328,17 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:ok, ExAws.Config.new(:s3) |> ExAws.S3.presigned_url(:put, bucket, key, opts)}
   end
 
+  defp handle_progress(:photos, entry, socket) do
+    if entry.done? do
+      total_entries = length(socket.assigns.uploads.photos.entries)
+      completed_entries = Enum.count(socket.assigns.uploads.photos.entries, & &1.done?)
+      total_progress = floor(completed_entries / total_entries * 100)
+      {:noreply, assign(socket, total_progress: total_progress)}
+    else
+      {:noreply, socket}
+    end
+  end
+
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
 
@@ -372,12 +360,15 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         |> assign(:uploaded_files, [])
         |> assign(:preview_upload, nil)
         |> assign(:show_preview, false)
+        |> assign(:total_progress, 0)
         |> allow_upload(:photos,
           accept: ~w(.jpg .jpeg .png .webp),
           max_entries: 8,
           temporary_assigns: [photos: []],
           # Add this line to use your presign_upload function
-          presign_upload: &presign_upload/0
+          presign_upload: &presign_upload/0,
+          # Add this line
+          progress: &handle_progress/3
         )
 
       {:ok, socket}
@@ -497,6 +488,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
         case GuitarAndBassExchange.Post.Query.update_post(changeset) do
           {:ok, updated_post} ->
+            Logger.info("Successfully updated post: #{inspect(updated_post)}")
+
             {:noreply,
              socket
              |> assign(:current_step, updated_post.current_step)
