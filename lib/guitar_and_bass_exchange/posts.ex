@@ -23,7 +23,7 @@ defmodule GuitarAndBassExchange.Post do
     field :current_step, :integer, default: 1
 
     # Association to photos
-    has_many :photos, GuitarAndBassExchange.Photo, on_delete: :delete_all
+    has_many :photos, GuitarAndBassExchange.Photo, on_replace: :delete_if_exists
 
     # Association to the user
     belongs_to :user, GuitarAndBassExchange.Accounts.User

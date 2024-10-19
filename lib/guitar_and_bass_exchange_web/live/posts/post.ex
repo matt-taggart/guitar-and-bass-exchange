@@ -36,6 +36,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
   def render(assigns) do
     ~H"""
+    <.flash_group flash={@flash} />
     <nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 bg-white z-10">
       <!-- Navigation Content -->
       <div class="flex items-center gap-4">
@@ -268,10 +269,27 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 length(@uploads.photos.entries) > 0 && "mb-5"
               ]}>
                 <%= for entry <- @uploads.photos.entries do %>
-                  <div class="relative" phx-click="show_preview" phx-value-entry={entry.ref}>
-                    <figure class="aspect-square overflow-hidden rounded-lg">
-                      <.live_img_preview entry={entry} class="w-full h-full object-cover" />
-                    </figure>
+                  <div class="flex flex-col gap-1 relative">
+                    <div
+                      class="relative cursor-pointer"
+                      phx-click="show_preview"
+                      phx-value-ref={entry.ref}
+                    >
+                      <figure class="aspect-square overflow-hidden rounded-lg">
+                        <.live_img_preview entry={entry} class="w-full h-full object-cover" />
+                      </figure>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label="remove photo"
+                      phx-submit="prevent_default"
+                      phx-click="remove_photo"
+                      phx-value-ref={entry.ref}
+                      disabled={@uploads.photos.entries == [] || @show_progress}
+                      class="flex items-center justify-center p-1 text-xs font-medium rounded-full text-red-400 bg-transparent focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-red-500 hover:text-red-500 hover:border-red-500 w-[28px] h-[28px] absolute right-px top-px z-50 transition-all duration-200 ease-in-out"
+                    >
+                      <.icon name="hero-trash-solid" class="h-4 w-4" />
+                    </button>
                   </div>
                   <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
                   <%= for err <- upload_errors(@uploads.photos, entry) do %>
@@ -280,14 +298,48 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 <% end %>
               </div>
               <%= if @show_progress do %>
-                <div>Total Upload Progress: <%= @total_progress %>%</div>
-                <progress value={@total_progress} max="100"></progress>
+                <div class="w-full grid gap-5">
+                  <div class="w-full grid gap-4">
+                    <div class="w-full grid gap-1">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                          <div class="grid gap-1">
+                            <h5 class="text-gray-400 text-sm font-normal font-['Inter'] leading-[18px]">
+                              <%= if length(@uploads.photos.entries) > 0 && @show_progress == false do %>
+                                Uploaded
+                              <% else %>
+                                Uploading...
+                              <% end %>
+                            </h5>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="relative flex items-center gap-2.5 py-1.5">
+                        <div class="relative  w-full h-2.5  overflow-hidden rounded-3xl bg-gray-100">
+                          <div
+                            role="progressbar"
+                            aria-valuenow="100"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            style="width: 100%"
+                            class="flex h-full items-center justify-center bg-indigo-600  text-white rounded-3xl"
+                          >
+                          </div>
+                        </div>
+                        <span class="ml-2 bg-white  rounded-full  text-gray-800 text-xs font-medium flex justify-center items-center ">
+                          100%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               <% end %>
               <!-- Submit Button -->
               <div class="flex justify-end">
                 <button
                   type="submit"
-                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  disabled={@uploads.photos.entries == [] || @show_progress}
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   Upload Photos
                 </button>
@@ -408,6 +460,13 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:noreply, socket}
   end
 
+  def handle_event("remove_photo", %{"ref" => ref}, socket) do
+    Logger.debug("Removing photo: #{ref}")
+
+    # Call your remove_photo utility function here with the id
+    {:noreply, cancel_upload(socket, :photos, ref)}
+  end
+
   def handle_event("advance_to_step_2", %{"post" => post_params}, socket) do
     user = socket.assigns.current_user
     current_step = socket.assigns.current_step
@@ -494,10 +553,16 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
           {:ok, updated_post} ->
             Logger.info("Successfully updated post: #{inspect(updated_post)}")
 
+            next_step = updated_post.current_step + 1
+            updated_changeset = Post.changeset(updated_post, %{current_step: next_step})
+
             {:noreply,
              socket
-             |> assign(:current_step, updated_post.current_step)
-             |> assign(:form, to_form(Post.changeset(updated_post, %{}), as: "post"))
+             |> assign(
+               :form,
+               to_form(updated_changeset, as: "post")
+             )
+             |> assign(:current_step, next_step)
              |> assign(:uploaded_files, successful_urls)
              |> put_flash(
                :info,
