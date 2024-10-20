@@ -210,16 +210,18 @@
               <div class="flex gap-2">
                 <!-- Truncate the title with ellipsis -->
                 <strong class="truncate max-w-full"><%= post.title %></strong>
-                <div>
+              </div>
+              <div class="flex gap-2 items-center h-4 mt-1.5">
+                <div class="semibold text-lg">
                   $<%= :erlang.float_to_binary(post.price, decimals: 2) %>
                 </div>
+                <div class="w-px h-full bg-gray-400"></div>
+                <div class="text-[0.9rem]">Phoenix, AZ</div>
               </div>
-              <div class="flex items-center gap-3 h-5 mt-2">
+              <div class="flex flex-col mt-2">
                 <small class="text-gray-500">
                   Posted <%= Timex.from_now(post.inserted_at) %>
                 </small>
-                <div class="w-px h-full bg-gray-300"></div>
-                <small class="text-gray-500">Phoenix, AZ</small>
               </div>
               <div class="flex items-center mt-4 gap-4">
                 <button
