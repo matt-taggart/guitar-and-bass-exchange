@@ -60,7 +60,8 @@ defmodule GuitarAndBassExchange.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
-      {:timex, "~> 3.7"}
+      {:timex, "~> 3.7"},
+      {:httpoison, "~> 1.8"}
     ]
   end
 

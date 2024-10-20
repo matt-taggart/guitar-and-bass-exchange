@@ -1,5 +1,7 @@
 defmodule GuitarAndBassExchangeWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :guitar_and_bass_exchange
+  use Phoenix.Endpoint,
+    otp_app: :guitar_and_bass_exchange,
+    proxy_header: {:x_forwarded_for, "CF-Connecting-IP,X-Forwarded-For"}
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
