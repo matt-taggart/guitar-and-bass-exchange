@@ -36,7 +36,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
   def render(assigns) do
     ~H"""
-    <.flash_group flash={@flash} />
     <nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 bg-white z-10">
       <!-- Navigation Content -->
       <div class="flex items-center gap-4">
