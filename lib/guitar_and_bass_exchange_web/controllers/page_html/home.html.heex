@@ -209,43 +209,25 @@
             <div class="p-4">
               <div class="flex gap-2">
                 <!-- Truncate the title with ellipsis -->
-                <strong class="truncate max-w-full text-lg"><%= post.title %></strong>
+                <div class="truncate max-w-full text-xl"><%= post.title %></div>
               </div>
               <div class="flex gap-2 items-center h-4 mt-1.5">
-                <div class="semibold text-lg">
+                <div class="text-xl">
                   $<%= :erlang.float_to_binary(post.price, decimals: 2) %>
                 </div>
-                <div class="w-px h-full bg-gray-400"></div>
-                <div class="text-[0.9rem]">Phoenix, AZ</div>
               </div>
-              <div class="flex flex-col mt-2">
-                <small class="text-gray-500">
-                  Posted <%= Timex.from_now(post.inserted_at) %>
-                </small>
-              </div>
-              <div class="flex items-center mt-4 gap-4">
-                <div class="text-xl flex items-center gap-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1"
-                    stroke="currentColor"
-                    class="size-5 text-gray-500 mt-0.5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                    />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                    />
-                  </svg>
-                  <span class="sr-only">Likes</span>
-                  <div class="text-gray-500 text-sm">10 views</div>
+
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center mt-4 gap-3">
+                  <div class="text-md flex gap-1 text-gray-500">Phoenix, AZ</div>
+                  <div class="w-px h-4 bg-gray-400"></div>
+                  <div class="text-md flex items-center gap-1">
+                    <.icon name="hero-bookmark-solid" class="h-3 w-3 text-gray-500 mt-px" />
+                    <span class="sr-only">Saves</span>
+                    <div class="text-gray-500 flex gap-1">
+                      <span>10</span> <span>saves</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
