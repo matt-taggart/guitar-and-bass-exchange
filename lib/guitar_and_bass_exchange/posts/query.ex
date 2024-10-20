@@ -20,6 +20,12 @@ defmodule GuitarAndBassExchange.Post.Query do
     |> Repo.all()
   end
 
+  def list_featured_posts() do
+    Post
+    |> where([p], p.featured == true)
+    |> Repo.all()
+  end
+
   def get_draft_post_for_user(user_id) do
     Post
     |> where([p], p.user_id == ^user_id and p.status == :draft)

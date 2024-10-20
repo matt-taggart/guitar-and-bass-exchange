@@ -8,6 +8,8 @@ defmodule GuitarAndBassExchange.Repo.Migrations.CreateUsersAuthTables do
       add :id, :binary_id, primary_key: true
       add :email, :citext, null: false
       add :hashed_password, :string, null: false
+      add :first_name, :string, null: true
+      add :last_name, :string, null: true
       add :confirmed_at, :utc_datetime
 
       timestamps(type: :utc_datetime)
