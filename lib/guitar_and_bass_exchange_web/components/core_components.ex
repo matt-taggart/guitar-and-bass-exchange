@@ -288,6 +288,7 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
   attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
   attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
+  attr :variant, :string, values: ~w(country_select)
 
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
@@ -331,6 +332,29 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
   end
 
   def input(%{type: "select"} = assigns) do
+    ~H"""
+    <div>
+      <.label for={@id}><%= @label %></.label>
+      <select
+        id={@id}
+        name={@name}
+        class={[
+          "bg-gray-50 mt-2 block w-full rounded-lg border text-zinc-900 text-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 focus:outline-none",
+          @errors == [] && "border-zinc-300 focus:border-zinc-400",
+          @errors != [] && "border-rose-400 focus:border-rose-400"
+        ]}
+        multiple={@multiple}
+        {@rest}
+      >
+        <option :if={@prompt} value=""><%= @prompt %></option>
+        <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
+      </select>
+      <.error :for={msg <- @errors}><%= msg %></.error>
+    </div>
+    """
+  end
+
+  def input(%{variant: "country_select"} = assigns) do
     ~H"""
     <div>
       <.label for={@id}><%= @label %></.label>

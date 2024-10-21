@@ -87,7 +87,17 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                   required
                 />
                 <.input field={@form[:color]} label="Color" required />
-                <.input field={@form[:country_built]} label="Country Built" required />
+                <.input
+                  variant="country_select"
+                  field={@form[:country_built]}
+                  label="Country Built"
+                  options={
+                    Countries.all()
+                    |> Enum.sort_by(& &1.name)
+                    |> Enum.map(fn country -> {country.name, country.alpha2} end)
+                  }
+                  required
+                />
                 <.input
                   type="number"
                   min="1"

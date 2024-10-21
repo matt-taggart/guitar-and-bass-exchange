@@ -61,7 +61,8 @@ defmodule GuitarAndBassExchange.MixProject do
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
       {:timex, "~> 3.7"},
-      {:httpoison, "~> 1.8"}
+      {:httpoison, "~> 1.8"},
+      {:countries, "~> 1.6"}
     ]
   end
 
