@@ -56,3 +56,42 @@
 	margin: 0;
 
 }
+
+.search-input {
+	border: 0px !important;
+	outline: none !important;
+
+	box-shadow: none !important;
+}
+
+.search-input:hover {
+	border: 0px !important;
+
+	outline: none !important;
+
+	box-shadow: none !important;
+}
+
+.search-input:focus {
+	border: 0px !important;
+
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.search-input:focus-within {
+	border: 0px !important;
+
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.search-input:focus-visible {
+	border: 0px !important;
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.search-input .input--standard.input--focused:not(.input--disabled) .input-control {
+	color: blue;
+}

@@ -773,12 +773,7 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
         <!-- Search Bar -->
         <div class="hidden lg:flex">
           <div class="relative">
-            <sl-input
-              placeholder="Search"
-              size="medium"
-              pill
-              class="search-input border-0 outline-none shadow-none hover:border-0 hover:outline-none hover:shadow-none focus:border-0 focus:outline-none focus:shadow-none focus-within:border-0 focus-within:outline-none focus-within:shadow-none focus-visible:border-0 focus-visible:outline-none focus-visible:shadow-none"
-            >
+            <sl-input placeholder="Search" size="medium" pill class="search-input">
               <sl-icon slot="prefix" name="search"></sl-icon>
             </sl-input>
           </div>
