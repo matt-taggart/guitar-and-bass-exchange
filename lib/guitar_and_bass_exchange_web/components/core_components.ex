@@ -763,90 +763,84 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
 
   def navbar(assigns) do
     ~H"""
-    <nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 bg-white z-10">
-      <div class="flex items-center gap-4">
-        <a href="/">
-          <h1 class="text-brand text-xl font-semibold">Guitar & Bass Exchange</h1>
+    <nav class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-8">
+        <a href="/" class="flex items-center text-blue-600 hover:text-blue-700">
+          <!-- Optional logo image -->
+          <!-- <img src="/path/to/logo.png" alt="Logo" class="h-8 mr-2"> -->
+          <h1 class="text-2xl font-bold">Guitar & Bass Exchange</h1>
         </a>
-        <div class="mx-10">
+        <!-- Search Bar -->
+        <div class="hidden lg:flex">
           <div class="relative">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-              <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </span>
-            <input
-              type="text"
-              class="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-md focus:border-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-blue-300"
+            <sl-input
               placeholder="Search"
-            />
+              size="medium"
+              pill
+              class="search-input border-0 outline-none shadow-none hover:border-0 hover:outline-none hover:shadow-none focus:border-0 focus:outline-none focus:shadow-none focus-within:border-0 focus-within:outline-none focus-within:shadow-none focus-visible:border-0 focus-visible:outline-none focus-visible:shadow-none"
+            >
+              <sl-icon slot="prefix" name="search"></sl-icon>
+            </sl-input>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="flex items-center gap-1.5">
-            <.icon name="hero-map-pin-solid" class="h-7.5 w-7.5 text-blue-500" />
-            <div class="text-blue-500"><%= @geocode_data.city %>, <%= @geocode_data.state %></div>
+        <div class="hidden md:flex items-center gap-2">
+          <sl-icon name="geo-alt-fill" class="text-blue-600"></sl-icon>
+          <div class="text-gray-700 text-sm">
+            <%= @geocode_data.city %>, <%= @geocode_data.state %>
           </div>
-          <div class="text-gray-500 text-[0.85rem] text-md hover:underline hover:text-gray-700 cursor-pointer">
-            update
-          </div>
+          <a href="#" class="text-blue-600 text-sm hover:underline">Update</a>
         </div>
       </div>
-      <div class="flex items-baseline gap-4">
+      <div class="flex items-center">
         <%= if @current_user do %>
-          <sl-button variant="default" size="small">
-            <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
-            Messages
-          </sl-button>
-          <.link href={~p"/users/#{@current_user.id}/posts"}>
-            <sl-button variant="default" size="small">
-              <sl-icon slot="prefix" name="file-earmark-plus"></sl-icon>
-              Posts
+          <div class="mr-4">
+            <sl-button size="medium" variant="text">
+              <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
+              <span>Messages</span>
             </sl-button>
-          </.link>
-          <sl-button variant="default" size="small">
-            <sl-icon slot="prefix" name="heart" class="mt-0.5"></sl-icon>
-            Favorites
-          </sl-button>
-          <sl-dropdown class="ml-2">
-            <button slot="trigger" class="cursor-pointer">
-              <sl-avatar label="User avatar" style="--size: 2.5rem;"></sl-avatar>
+            <.link href={~p"/users/#{@current_user.id}/posts"}>
+              <sl-button size="medium" variant="text">
+                <sl-icon slot="prefix" name="file-earmark-plus"></sl-icon>
+                <span>Posts</span>
+              </sl-button>
+            </.link>
+            <sl-button size="medium" variant="text">
+              <sl-icon slot="prefix" name="heart"></sl-icon>
+              <span>Favorites</span>
+            </sl-button>
+          </div>
+          <!-- User Dropdown -->
+          <sl-dropdown>
+            <button slot="trigger" class="flex items-center focus:outline-none">
+              <sl-avatar label="User avatar" style="--size: 2rem;"></sl-avatar>
             </button>
-            <sl-menu style="max-width: 200px;">
-              <sl-menu-item value="email" role="none" class="unstyled-menu-item">
-                <%= @current_user.email %>
-              </sl-menu-item>
-              <div class="h-px w-full bg-gray-200"></div>
-              <.link
-                href={~p"/users/settings"}
-                class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-              >
-                <sl-menu-item value="Logout">Settings</sl-menu-item>
+            <sl-menu>
+              <sl-menu-item disabled><%= @current_user.email %></sl-menu-item>
+              <sl-divider></sl-divider>
+              <.link href={~p"/users/settings"}>
+                <sl-menu-item>
+                  <sl-icon slot="prefix" name="gear"></sl-icon>
+                  Settings
+                </sl-menu-item>
               </.link>
-              <.link
-                href={~p"/users/log_out"}
-                method="delete"
-                class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-              >
-                <sl-menu-item value="delete">Logout</sl-menu-item>
+              <.link href={~p"/users/log_out"} method="delete">
+                <sl-menu-item>
+                  <sl-icon slot="prefix" name="box-arrow-right"></sl-icon>
+                  Logout
+                </sl-menu-item>
               </.link>
             </sl-menu>
           </sl-dropdown>
         <% else %>
-          <a href="/users/log_in" class="text-blue-700 hover:text-blue-900">Sign In</a>
+          <!-- Sign In Link -->
+          <a href="/users/log_in" class="text-gray-700 hover:text-blue-600 text-sm font-medium">
+            Sign In
+          </a>
+          <!-- Sign Up Button -->
           <a href="/users/register">
-            <button
-              type="button"
-              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
-            >
+            <sl-button size="medium" variant="primary" class="hidden sm:inline-flex">
               Sign Up
-            </button>
+            </sl-button>
           </a>
         <% end %>
       </div>
