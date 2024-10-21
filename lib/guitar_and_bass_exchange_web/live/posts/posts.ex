@@ -25,7 +25,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
           <h3 class="text-lg font-medium">Ready to sell your instrument?</h3>
         </div>
         <div class="mt-2 mb-4 text-sm">
-          You haven't listed any instruments yet. Create a listing to showcase your musical equipment to our extensive network of buyers. Our streamlined process helps you reach a broader audience, potentially accelerating your sale and maximizing your instrument's value.
+          You haven't posted any instruments yet. Create a post to showcase your musical equipment to our extensive network of buyers. Our streamlined process helps you reach a broader audience, potentially accelerating your sale and maximizing your instrument's value.
         </div>
         <div class="flex">
           <.link href={~p"/users/#{@current_user.id}/post/new"}>
@@ -33,7 +33,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
               type="button"
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Create a new listing
+              Create a new post
             </button>
           </.link>
         </div>
