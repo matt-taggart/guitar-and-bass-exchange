@@ -53,7 +53,7 @@
           <span class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-blue-600 border border-blue-200 rounded-full flex justify-center items-center mr-3 text-base sm:text-lg md:text-xl text-white">
             1
           </span>
-          List Instrument
+          Describe Your Item
         </div>
       </li>
 
@@ -62,7 +62,7 @@
           <span class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-blue-600 border border-blue-200 rounded-full flex justify-center items-center mr-3 text-base sm:text-lg md:text-xl text-white">
             2
           </span>
-          Pay $3 to Post
+          Add Photos
         </div>
       </li>
       <li class="flex md:w-full items-center text-xl">
@@ -71,15 +71,15 @@
           <span class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-blue-600 border border-blue-200 rounded-full flex justify-center items-center mr-3 text-base sm:text-lg md:text-xl text-white">
             3
           </span>
-          Get Paid
+          Set Price and Sell
         </div>
       </li>
     </ol>
     <!-- Enhanced CTA Section -->
     <section class="bg-indigo-50 p-8 rounded-lg shadow-md flex flex-col items-center justify-center mb-12">
-      <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Ready to Sell Your Gear?</h2>
+      <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Ready to Sell Your Instrument?</h2>
       <p class="text-gray-600 mb-6 text-center max-w-md">
-        Join our community of musicians and easily sell your guitars and basses. Get started today!
+        Join our community of musicians and easily sell your guitars and basses for free.
       </p>
 
       <%= if @current_user do %>
@@ -88,7 +88,7 @@
             type="button"
             class="flex items-center px-6 py-3 text-lg font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 transition duration-200 hover:scale-[102%]"
           >
-            Sell Your Gear
+            Sell for Free
           </button>
         </.link>
       <% else %>
@@ -97,7 +97,7 @@
             type="button"
             class="flex items-center px-6 py-3 text-lg font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 transition duration-200 hover:scale-[102%]"
           >
-            Sell Your Gear
+            Sell for Free
           </button>
         </.link>
       <% end %>
