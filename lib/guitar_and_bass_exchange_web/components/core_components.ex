@@ -811,10 +811,10 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
             </sl-button>
           </.link>
           <sl-button variant="default" size="small">
-            <sl-icon slot="prefix" name="bookmark"></sl-icon>
+            <sl-icon slot="prefix" name="heart" class="mt-0.5"></sl-icon>
             Favorites
           </sl-button>
-          <sl-dropdown>
+          <sl-dropdown class="ml-2">
             <button slot="trigger" class="cursor-pointer">
               <sl-avatar label="User avatar" style="--size: 2.5rem;"></sl-avatar>
             </button>
