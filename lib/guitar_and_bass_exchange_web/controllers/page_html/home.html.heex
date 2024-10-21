@@ -106,12 +106,12 @@
     <div class="border-b border-gray-300 my-8"></div>
     <!-- Featured Instruments Section -->
     <h2 class="text-2xl font-semibold text-brand mb-7">Featured Instruments</h2>
-    <ul class="grid gap-x-6 gap-y-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 list-none pl-0">
+    <ul class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <%= for post <- @posts do %>
-        <li class="bg-white shadow-lg rounded-lg overflow-hidden transform transition hover:scale-[101%]">
-          <a href="/" class="block w-full h-full">
+        <li class="bg-white shadow-md rounded-lg overflow-hidden transform transition hover:scale-105">
+          <a href="/" class="block">
             <!-- Image Section -->
-            <div class="relative w-full pt-[100%] overflow-hidden">
+            <div class="relative w-full pt-[75%] bg-gray-100">
               <img
                 src="https://placehold.co/600x400"
                 alt="Guitar"
@@ -120,28 +120,18 @@
             </div>
             <!-- Content Section -->
             <div class="p-4">
-              <div class="flex gap-2">
-                <!-- Truncate the title with ellipsis -->
-                <div class="truncate max-w-full text-xl"><%= post.title %></div>
+              <h3 class="text-xl font-semibold text-gray-800 truncate mb-2">
+                <%= post.title %>
+              </h3>
+              <div class="text-lg text-blue-600 font-bold mb-4">
+                $<%= :erlang.float_to_binary(post.price, decimals: 2) %>
               </div>
-              <div class="flex gap-2 items-center h-4 mt-1.5">
-                <div class="text-xl">
-                  $<%= :erlang.float_to_binary(post.price, decimals: 2) %>
-                </div>
-              </div>
-
-              <div class="flex flex-col gap-1">
-                <div class="flex items-center mt-4 gap-3">
-                  <div class="text-md flex gap-1 text-gray-500">Phoenix, AZ</div>
-                  <div class="w-px h-4 bg-gray-400"></div>
-                  <div class="text-md flex items-center gap-1">
-                    <.icon name="hero-bookmark-solid" class="h-3 w-3 text-gray-500 mt-px" />
-                    <span class="sr-only">Saves</span>
-                    <div class="text-gray-500 flex gap-1">
-                      <span>10</span> <span>saves</span>
-                    </div>
-                  </div>
-                </div>
+              <div class="flex items-center text-gray-500 text-sm">
+                <sl-icon name="geo-alt-fill" class="mr-1"></sl-icon>
+                <div><%= @geocode_data.city %>, <%= @geocode_data.state %></div>
+                <div class="ml-4 w-px h-4 bg-gray-400"></div>
+                <sl-icon name="heart-fill" class="ml-4 mr-1 mt-0.5"></sl-icon>
+                10
               </div>
             </div>
           </a>
