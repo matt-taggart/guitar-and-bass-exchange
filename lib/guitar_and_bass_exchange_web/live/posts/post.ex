@@ -102,7 +102,15 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                   label="Condition"
                   required
                 />
-                <.input field={@form[:price]} label="Price" required />
+                <.input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  field={@form[:price]}
+                  label="Price"
+                  placeholder="$"
+                  required
+                />
                 <.input
                   type="checkbox"
                   field={@form[:shipping]}
