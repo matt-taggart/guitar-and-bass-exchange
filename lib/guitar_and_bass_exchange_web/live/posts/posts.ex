@@ -1,9 +1,10 @@
 defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
   use GuitarAndBassExchangeWeb, :live_view
+  alias GuitarAndBassExchangeWeb.Plugs.FetchGeocodeData
 
   def render(assigns) do
     ~H"""
-    <.navbar current_user={@current_user} />
+    <.navbar current_user={@current_user} geocode_data={@geocode_data} />
     <main class="flex flex-col items-center my-16 mx-8">
       <div
         id="alert-additional-content-1"
@@ -41,9 +42,12 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
     """
   end
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     email = Phoenix.Flash.get(socket.assigns.flash, :email)
     form = to_form(%{"email" => email}, as: "user")
-    {:ok, assign(socket, form: form), temporary_assigns: [form: form]}
+
+    geocode_data = FetchGeocodeData.fetch_geocode_data(session, socket)
+
+    {:ok, assign(socket, form: form, geocode_data: geocode_data), temporary_assigns: [form: form]}
   end
 end

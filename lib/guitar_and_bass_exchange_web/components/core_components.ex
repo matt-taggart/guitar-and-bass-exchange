@@ -742,7 +742,7 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
     <nav class="border-b border-gray-100 px-5 py-4 flex items-center justify-between gap-8 bg-white z-10">
       <div class="flex items-center gap-4">
         <a href="/">
-          <h1 class="text-brand text-xl font-semibold">Guitar And Bass Exchange</h1>
+          <h1 class="text-brand text-xl font-semibold">Guitar & Bass Exchange</h1>
         </a>
         <div class="mx-10">
           <div class="relative">
@@ -767,7 +767,7 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1.5">
             <.icon name="hero-map-pin-solid" class="h-7.5 w-7.5 text-blue-500" />
-            <div class="text-blue-500">Phoenix, AZ</div>
+            <div class="text-blue-500"><%= @geocode_data.city %>, <%= @geocode_data.state %></div>
           </div>
           <div class="text-gray-500 text-[0.85rem] text-md hover:underline hover:text-gray-700 cursor-pointer">
             update

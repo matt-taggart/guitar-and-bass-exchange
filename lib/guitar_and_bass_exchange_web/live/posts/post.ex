@@ -1,6 +1,7 @@
 defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   use GuitarAndBassExchangeWeb, :live_view
   alias GuitarAndBassExchange.Post
+  alias GuitarAndBassExchangeWeb.Plugs.FetchGeocodeData
   require Logger
   require ExAws.S3
 
@@ -36,6 +37,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
   def render(assigns) do
     ~H"""
+    <.navbar current_user={@current_user} geocode_data={@geocode_data} />
     <main class="flex flex-col items-center my-16 mx-8">
       <ol class="flex items-center justify-center text-sm font-medium text-center text-gray-500 sm:text-base max-w-2xl mx-auto mb-16">
         <!-- Step Headings -->
@@ -303,7 +305,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     current_user = socket.assigns.current_user
 
     if current_user do
@@ -316,6 +318,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
           {Post.changeset(%Post{user_id: current_user.id}, %{}), 1}
         end
 
+      geocode_data = FetchGeocodeData.fetch_geocode_data(session, socket)
+
       socket =
         socket
         |> assign(:form, to_form(changeset, as: "post"))
@@ -323,6 +327,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         |> assign(:current_step, current_step)
         |> assign(:uploaded_files, [])
         |> assign(:preview_upload, nil)
+        |> assign(:geocode_data, geocode_data)
         |> assign(:show_preview, false)
         |> assign(:show_progress, false)
         |> assign(:total_progress, 0)
