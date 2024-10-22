@@ -2,6 +2,7 @@ defmodule GuitarAndBassExchange.Post.Query do
   import Ecto.Query, warn: false
   alias GuitarAndBassExchange.Repo
   alias GuitarAndBassExchange.Post
+  require Logger
 
   def list_posts_for_user(user_id) do
     Post
@@ -31,8 +32,12 @@ defmodule GuitarAndBassExchange.Post.Query do
     changeset
     |> Repo.update()
     |> case do
-      {:ok, post} -> {:ok, Repo.preload(post, :photos)}
-      error -> error
+      {:ok, post} ->
+        {:ok, Repo.preload(post, :photos)}
+
+      {:error, changeset} ->
+        Logger.error("Failed to update post. Errors: #{inspect(changeset.errors)}")
+        {:error, changeset}
     end
   end
 

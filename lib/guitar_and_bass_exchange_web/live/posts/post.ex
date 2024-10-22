@@ -503,7 +503,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
       {:ok, successful_urls} ->
         changeset =
           post
-          |> Post.changeset(%{photos: Enum.map(successful_urls, &%{url: &1})})
+          |> Post.changeset(%{
+            photos: Enum.map(successful_urls, &%{url: &1}),
+            current_step: post.current_step + 1
+          })
           |> Map.put(:action, :update)
 
         case GuitarAndBassExchange.Post.Query.update_post(changeset) do
