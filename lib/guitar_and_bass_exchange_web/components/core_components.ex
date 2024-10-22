@@ -788,18 +788,30 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
       </div>
       <div class="flex items-center">
         <%= if @current_user do %>
-          <div class="mr-4">
-            <sl-button size="medium" variant="text">
+          <div class="mr-5">
+            <sl-button
+              size="medium"
+              variant="text"
+              class="[&>*]:text-blue-600 hover:[&>*]:text-blue-700 !pl-0"
+            >
               <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
               <span>Messages</span>
             </sl-button>
             <.link href={~p"/users/#{@current_user.id}/posts"}>
-              <sl-button size="medium" variant="text">
+              <sl-button
+                size="medium"
+                variant="text"
+                class="[&>*]:text-blue-600 hover:[&>*]:text-blue-700 !pl-0"
+              >
                 <sl-icon slot="prefix" name="file-earmark-plus"></sl-icon>
                 <span>Posts</span>
               </sl-button>
             </.link>
-            <sl-button size="medium" variant="text">
+            <sl-button
+              size="medium"
+              variant="text"
+              class="[&>*]:text-blue-600 hover:[&>*]:text-blue-700 !pl-0"
+            >
               <sl-icon slot="prefix" name="heart"></sl-icon>
               <span>Favorites</span>
             </sl-button>
