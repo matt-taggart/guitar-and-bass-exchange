@@ -76,6 +76,8 @@ config :guitar_and_bass_exchange, GuitarAndBassExchange.Mailer,
   username: "support@guitarandbassexchange.com",
   password: System.get_env("SMTP_PASSWORD")
 
+config :stripity_stripe, api_key: System.get_env("STRIPE_API_KEY")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

@@ -48,6 +48,11 @@ defmodule GuitarAndBassExchangeWeb.Endpoint do
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
 
+  plug Stripe.WebhookPlug,
+    at: "/webhook/stripe",
+    handler: GuitarandBassExchange.StripeHandler,
+    secret: {Application, :get_env, [:stripity_stripe, :stripe_webhook_secret]}
+
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options

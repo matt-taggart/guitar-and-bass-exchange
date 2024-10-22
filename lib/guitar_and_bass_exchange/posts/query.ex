@@ -3,27 +3,18 @@ defmodule GuitarAndBassExchange.Post.Query do
   alias GuitarAndBassExchange.Repo
   alias GuitarAndBassExchange.Post
 
-  def update_post(%Ecto.Changeset{} = changeset) do
-    # Update the post using the changeset
-    Repo.update(changeset)
-  end
-
-  def create_post(attrs \\ %{}) do
-    %Post{}
-    |> Post.changeset(attrs)
-    |> Repo.insert()
-  end
-
   def list_posts_for_user(user_id) do
     Post
     |> where([p], p.user_id == ^user_id)
     |> Repo.all()
+    |> Repo.preload(:photos)
   end
 
   def list_featured_posts() do
     Post
     |> where([p], p.featured == true)
     |> Repo.all()
+    |> Repo.preload(:photos)
   end
 
   def get_draft_post_for_user(user_id) do
@@ -34,5 +25,24 @@ defmodule GuitarAndBassExchange.Post.Query do
     |> Repo.one()
     # Add this line to preload photos
     |> Repo.preload(:photos)
+  end
+
+  def update_post(%Ecto.Changeset{} = changeset) do
+    changeset
+    |> Repo.update()
+    |> case do
+      {:ok, post} -> {:ok, Repo.preload(post, :photos)}
+      error -> error
+    end
+  end
+
+  def create_post(attrs \\ %{}) do
+    %Post{}
+    |> Post.changeset(attrs)
+    |> Repo.insert()
+    |> case do
+      {:ok, post} -> {:ok, Repo.preload(post, :photos)}
+      error -> error
+    end
   end
 end

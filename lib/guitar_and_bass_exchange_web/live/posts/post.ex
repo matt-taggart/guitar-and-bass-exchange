@@ -291,6 +291,30 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
           <% 3 -> %>
             <!-- Step 3: Payment Info -->
             <div>Step 3: Payment Info</div>
+
+            <button id="checkout-button">Checkout</button>
+
+            <script src="https://js.stripe.com/v3/">
+            </script>
+            <script>
+              var stripe = Stripe("pk_test_51OTGR2JfBe5DtFSh96F8uf7T4kXhTePwlrZlHAB09G3hadPdkqbZZ5Sy4R2r5nriZ0PQY2y0CNuRbTTpXX4paJqf00zmYNl6nA");
+              var checkoutButton = document.getElementById('checkout-button');
+
+              checkoutButton.addEventListener('click', function() {
+              fetch('/create-checkout-session', {method: 'POST'})
+                .then(function(response) {
+                  return response.json();
+                })
+                .then(function(session) {
+                  return stripe.redirectToCheckout({ sessionId: session.id });
+                })
+                .then(function(result) {
+                  if (result.error) {
+                    alert(result.error.message);
+                  }
+                });
+              });
+            </script>
         <% end %>
       </div>
     </main>
@@ -424,6 +448,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
       case result do
         {:ok, post} ->
+          # Preload the photos association after creating/updating
+          post = GuitarAndBassExchange.Repo.preload(post, :photos)
+
           {:noreply,
            socket
            |> assign(:current_step, post.current_step)
@@ -461,13 +488,11 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
               {:error, reason} ->
                 Logger.error("Failed to upload #{dest_path}: #{inspect(reason)}")
-                # Changed to {:ok, nil}
                 {:ok, nil}
             end
 
           {:error, reason} ->
             Logger.error("Failed to read file #{src_path}: #{inspect(reason)}")
-            # Changed to {:ok, nil}
             {:ok, nil}
         end
       end)
@@ -483,23 +508,18 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
         case GuitarAndBassExchange.Post.Query.update_post(changeset) do
           {:ok, updated_post} ->
-            Logger.info("Successfully updated post: #{inspect(updated_post)}")
+            # Preload the photos association after updating
+            updated_post = GuitarAndBassExchange.Repo.preload(updated_post, :photos)
 
             next_step = updated_post.current_step + 1
             updated_changeset = Post.changeset(updated_post, %{current_step: next_step})
 
             {:noreply,
              socket
-             |> assign(
-               :form,
-               to_form(updated_changeset, as: "post")
-             )
+             |> assign(:form, to_form(updated_changeset, as: "post"))
              |> assign(:current_step, next_step)
              |> assign(:uploaded_files, successful_urls)
-             |> put_flash(
-               :info,
-               "Successfully uploaded photos"
-             )}
+             |> put_flash(:info, "Successfully uploaded photos")}
 
           {:error, changeset} ->
             Logger.error("Failed to update post: #{inspect(changeset.errors)}")
@@ -526,5 +546,33 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         Logger.error("Unexpected upload result: #{inspect(unexpected)}")
         {:halt, {:error, :unexpected_result}}
     end)
+  end
+
+  def create_checkout_session(conn, _params) do
+    {:ok, session} =
+      Stripe.Session.create(%{
+        payment_method_types: ["card"],
+        line_items: [
+          %{
+            price_data: %{
+              currency: "usd",
+              product_data: %{
+                name: "Guitar and Bass Exchange"
+              },
+              unit_amount: 2000
+            },
+            quantity: 1
+          }
+        ],
+        mode: "payment",
+        success_url: "http://localhost:4000/success",
+        cancel_url: "http://localhost:4000/cancel"
+      })
+
+    json_body = Jason.encode!(%{id: session.id})
+
+    conn
+    |> Plug.Conn.put_resp_content_type("application/json")
+    |> Plug.Conn.send_resp(200, json_body)
   end
 end

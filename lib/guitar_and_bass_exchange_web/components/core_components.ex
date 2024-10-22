@@ -822,7 +822,7 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
               <sl-avatar label="User avatar" style="--size: 2rem;"></sl-avatar>
             </button>
             <sl-menu>
-              <sl-menu-item disabled><%= @current_user.email %></sl-menu-item>
+              <sl-menu-item><%= @current_user.email %></sl-menu-item>
               <sl-divider></sl-divider>
               <.link href={~p"/users/settings"}>
                 <sl-menu-item>
