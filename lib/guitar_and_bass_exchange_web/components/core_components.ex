@@ -378,12 +378,19 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
   end
 
   def input(%{type: "textarea"} = assigns) do
+    assigns =
+      assigns
+      |> assign(:maxlength, 1000)
+      |> assign(:current_length, get_field_length(assigns))
+
     ~H"""
     <div>
       <.label for={@id}><%= @label %></.label>
       <textarea
         id={@id}
         name={@name}
+        maxlength={1000}
+        phx-change="validate"
         class={[
           "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 min-h-[6rem]",
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
@@ -391,9 +398,19 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
+      <div class="text-sm text-gray-500 text-right mt-1">
+        <span><%= @current_length %></span>/<%= @maxlength %>
+      </div>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
     """
+  end
+
+  defp get_field_length(assigns) do
+    case assigns.value do
+      nil -> 0
+      value -> String.length(to_string(value))
+    end
   end
 
   # All other inputs text, datetime-local, url, password, etc. are handled here...

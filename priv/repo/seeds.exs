@@ -139,6 +139,7 @@ for _ <- 1..100 do
     country_built: Enum.random(countries),
     number_of_strings: Faker.random_between(4, 8),
     condition: Enum.random(conditions),
+    description: Faker.Lorem.paragraph(),
     shipping: shipping,
     shipping_cost: if(shipping, do: Faker.Commerce.price(), else: 0.0),
     price: Faker.Commerce.price(),

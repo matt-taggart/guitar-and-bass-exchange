@@ -13,6 +13,7 @@ defmodule GuitarAndBassExchange.Post do
     field :country_built, :string
     field :number_of_strings, :integer
     field :condition, :string
+    field :description, :string
     field :shipping, :boolean, default: false
     field :shipping_cost, :float
     field :price, :float
@@ -50,6 +51,7 @@ defmodule GuitarAndBassExchange.Post do
       :country_built,
       :number_of_strings,
       :condition,
+      :description,
       :shipping,
       :shipping_cost,
       :price,
@@ -81,6 +83,7 @@ defmodule GuitarAndBassExchange.Post do
             :country_built,
             :number_of_strings,
             :condition,
+            :description,
             :shipping,
             :price
           ]

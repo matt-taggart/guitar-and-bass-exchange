@@ -35,6 +35,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     """
   end
 
+  @impl true
   def render(assigns) do
     ~H"""
     <.navbar current_user={@current_user} geocode_data={@geocode_data} />
@@ -105,6 +106,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                   label="Number of Strings"
                   required
                 />
+
+                <.input type="textarea" field={@form[:description]} label="Description" required />
                 <.input
                   type="select"
                   options={["New", "Excellent", "Good", "Fair", "Poor"]}
@@ -451,6 +454,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
+  @impl true
   def mount(_params, session, socket) do
     current_user = socket.assigns.current_user
 
@@ -514,12 +518,21 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
   end
 
-  def handle_event("validate", %{"_target" => ["photos"]}, socket) do
-    {:noreply, socket}
-  end
+  def handle_event("validate", params, socket) do
+    case params do
+      %{"_target" => ["photos"]} ->
+        {:noreply, socket}
 
-  def handle_event("validate", _params, socket) do
-    {:noreply, socket}
+      %{"post" => post_params} ->
+        changeset =
+          socket.assigns.form.source
+          |> Post.changeset(post_params)
+
+        {:noreply, assign(socket, form: to_form(changeset))}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
   def handle_event("remove_photo", %{"ref" => ref}, socket) do
