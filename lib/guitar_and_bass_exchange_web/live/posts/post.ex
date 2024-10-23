@@ -576,6 +576,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
   def handle_event("save", _params, socket) do
     post = socket.assigns.form.source.data
+    photos = socket.assigns.uploads.photos.entries
+    primary_photo_index = socket.assigns.primary_photo
+    primary_photo_id = photos |> Enum.at(primary_photo_index) |> Map.get(:id)
 
     uploaded_urls =
       consume_uploaded_entries(socket, :photos, fn %{path: src_path}, entry ->
@@ -615,7 +618,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
           post
           |> Post.changeset(%{
             photos: Enum.map(successful_urls, &%{url: &1}),
-            current_step: post.current_step + 1
+            current_step: post.current_step + 1,
+            primary_photo_id: primary_photo_id
           })
           |> Map.put(:action, :update)
 

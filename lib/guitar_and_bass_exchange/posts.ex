@@ -16,6 +16,7 @@ defmodule GuitarAndBassExchange.Post do
     field :shipping, :boolean, default: false
     field :shipping_cost, :float
     field :price, :float
+    field :primary_photo_id, :binary_id
 
     field :status, Ecto.Enum,
       values: [:draft, :completed],
@@ -27,6 +28,10 @@ defmodule GuitarAndBassExchange.Post do
     has_many :photos, GuitarAndBassExchange.Photo,
       on_replace: :delete_if_exists,
       on_delete: :delete_all
+
+    has_one :primary_photo, GuitarAndBassExchange.Photo,
+      foreign_key: :id,
+      references: :primary_photo_id
 
     belongs_to :user, GuitarAndBassExchange.Accounts.User
 
@@ -48,6 +53,7 @@ defmodule GuitarAndBassExchange.Post do
       :shipping,
       :shipping_cost,
       :price,
+      :primary_photo_id,
       :status,
       :user_id,
       :current_step,
@@ -56,6 +62,7 @@ defmodule GuitarAndBassExchange.Post do
     |> validate_required([:user_id])
     |> validate_required_for_step()
     |> cast_assoc(:photos, with: &GuitarAndBassExchange.Photo.changeset/2)
+    |> foreign_key_constraint(:primary_photo_id)
   end
 
   # Custom validation based on the post's status

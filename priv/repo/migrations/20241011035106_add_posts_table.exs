@@ -15,6 +15,7 @@ defmodule GuitarAndBassExchange.Repo.Migrations.CreatePosts do
       add :shipping, :boolean, default: false
       add :shipping_cost, :float
       add :price, :float
+      add :primary_photo_id, :binary_id
       add :status, :string, default: "draft"
       add :current_step, :integer, default: 1
       add :featured, :boolean, default: false

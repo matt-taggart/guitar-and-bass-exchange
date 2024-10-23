@@ -789,32 +789,37 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
       <div class="flex items-center">
         <%= if @current_user do %>
           <div class="mr-5">
-            <sl-button
-              size="medium"
-              variant="text"
-              class="[&>*]:text-blue-600 hover:[&>*]:text-blue-700 !pl-0"
-            >
-              <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
-              <span>Messages</span>
-            </sl-button>
             <.link href={~p"/users/#{@current_user.id}/posts"}>
               <sl-button
                 size="medium"
                 variant="text"
-                class="[&>*]:text-blue-600 hover:[&>*]:text-blue-700 !pl-0"
+                class="nav-item [&>*]:text-blue-600 hover:bg-gray-50 px-2"
+              >
+                <sl-icon slot="prefix" name="chat-left-text"></sl-icon>
+                <span>Messages</span>
+              </sl-button>
+            </.link>
+            <.link href={~p"/users/#{@current_user.id}/posts"}>
+              <sl-button
+                size="medium"
+                variant="text"
+                class="nav-item [&>*]:text-blue-600 hover:bg-gray-50 px-2"
               >
                 <sl-icon slot="prefix" name="file-earmark-plus"></sl-icon>
                 <span>Posts</span>
               </sl-button>
             </.link>
-            <sl-button
-              size="medium"
-              variant="text"
-              class="[&>*]:text-blue-600 hover:[&>*]:text-blue-700 !pl-0"
-            >
-              <sl-icon slot="prefix" name="heart"></sl-icon>
-              <span>Favorites</span>
-            </sl-button>
+
+            <.link href={~p"/users/#{@current_user.id}/posts"}>
+              <sl-button
+                size="medium"
+                variant="text"
+                class="nav-item [&>*]:text-blue-600 hover:bg-gray-50 px-2"
+              >
+                <sl-icon slot="prefix" name="heart"></sl-icon>
+                <span>Favorites</span>
+              </sl-button>
+            </.link>
           </div>
           <!-- User Dropdown -->
           <sl-dropdown>
@@ -839,16 +844,22 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
             </sl-menu>
           </sl-dropdown>
         <% else %>
-          <!-- Sign In Link -->
-          <a href="/users/log_in" class="text-gray-700 hover:text-blue-600 text-sm font-medium">
-            Sign In
-          </a>
-          <!-- Sign Up Button -->
-          <a href="/users/register">
-            <sl-button size="medium" variant="primary" class="hidden sm:inline-flex">
-              Sign Up
-            </sl-button>
-          </a>
+          <div class="flex items-center gap-4">
+            <!-- Sign In Link -->
+            <a href="/users/log_in" class="text-gray-700 hover:text-blue-600 text-sm font-medium">
+              Sign In
+            </a>
+            <!-- Sign Up Button -->
+            <a href="/users/register">
+              <button
+                size="medium"
+                variant="primary"
+                class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none"
+              >
+                Sign Up
+              </button>
+            </a>
+          </div>
         <% end %>
       </div>
     </nav>
