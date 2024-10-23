@@ -197,7 +197,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4",
                 length(@uploads.photos.entries) > 0 && "mb-5"
               ]}>
-                <%= for entry <- @uploads.photos.entries do %>
+                <%= for { entry, index } <- Enum.with_index(@uploads.photos.entries) do %>
                   <div class="flex flex-col gap-1 relative">
                     <div
                       class="relative cursor-pointer"
@@ -219,6 +219,15 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                     >
                       <.icon name="hero-trash-solid" class="h-4 w-4" />
                     </button>
+                    <%= if index == @primary_photo do %>
+                      <sl-badge color="primary" class="h-full w-full">
+                        Primary Photo
+                      </sl-badge>
+                    <% else %>
+                      <sl-button size="small" phx-click="set_primary_photo" phx-value-primary={index}>
+                        Make Primary
+                      </sl-button>
+                    <% end %>
                   </div>
                   <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
                   <%= for err <- upload_errors(@uploads.photos, entry) do %>
@@ -486,7 +495,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
-  def handle_event("show_preview", %{"entry" => entry_ref}, socket) do
+  def handle_event("show_preview", %{"ref" => entry_ref}, socket) do
     entry = Enum.find(socket.assigns.uploads.photos.entries, &(&1.ref == entry_ref))
     {:noreply, assign(socket, show_preview: true, preview_entry: entry)}
   end
@@ -518,6 +527,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
     # Call your remove_photo utility function here with the id
     {:noreply, cancel_upload(socket, :photos, ref)}
+  end
+
+  def handle_event("set_primary_photo", %{"primary" => index}, socket) do
+    {:noreply, assign(socket, :primary_photo, String.to_integer(index))}
   end
 
   def handle_event("advance_to_step_2", %{"post" => post_params}, socket) do
