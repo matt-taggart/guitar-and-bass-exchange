@@ -17,6 +17,12 @@ defmodule GuitarAndBassExchangeWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_raw_body_for_stripe
+  end
+
+  defp fetch_raw_body_for_stripe(conn, _opts) do
+    {:ok, raw_body, conn} = Plug.Conn.read_body(conn)
+    assign(conn, :raw_body, raw_body)
   end
 
   scope "/", GuitarAndBassExchangeWeb do
@@ -25,6 +31,19 @@ defmodule GuitarAndBassExchangeWeb.Router do
     get "/", PageController, :home
     get "/terms", PageController, :terms
     get "/privacy", PageController, :privacy
+  end
+
+  scope "/", GuitarAndBassExchangeWeb do
+    pipe_through :browser
+
+    live "/checkout", CheckoutLive
+    live "/checkout/success", CheckoutSuccessLive
+    live "/checkout/cancel", CheckoutCancelLive
+  end
+
+  scope "/api", GuitarAndBassExchangeWeb do
+    pipe_through :api
+    post "/webhook", StripeHandler, :create_checkout_session
   end
 
   # Other scopes may use custom stacks.

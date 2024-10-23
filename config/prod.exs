@@ -21,3 +21,8 @@ config :logger, level: :info
 # of environment variables, is done on config/runtime.exs.
 
 # config :guitar_and_bass_exchange, GuitarAndBassExchangeWeb.Endpoint, force_ssl: [hsts: true]
+
+config :guitar_and_bass_exchange,
+  stripe_publishable_key: System.get_env("STRIPE_PUBLISHABLE_KEY"),
+  success_url: "https://guitarandbassexchange.com/success",
+  cancel_url: "https://guitarandbassexchange.com/cancel"

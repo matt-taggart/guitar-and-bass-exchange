@@ -290,31 +290,126 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
             <% end %>
           <% 3 -> %>
             <!-- Step 3: Payment Info -->
-            <div>Step 3: Payment Info</div>
+            <.header class="mb-8">
+              <h2 class="text-3xl font-bold mb-4">Promote Your Post (Optional)</h2>
+              <sl-alert variant="info" open>
+                <span class="text-lg font-semibold">Want your instrument to stand out?</span>
+                <p class="mt-2">
+                  Promote your listing to gain more visibility:
+                </p>
+                <ul class="mt-2 list-disc list-inside">
+                  <li>Promoted listings appear at the top of our featured page</li>
+                  <li>Higher promotion amounts get higher placement</li>
+                  <li>Posts with equal promotion amounts are randomly shuffled for fairness</li>
+                  <li>You can still post for free - promotion is entirely optional</li>
+                </ul>
+              </sl-alert>
+            </.header>
+            <!-- Step 3: Review Post Details -->
+            <sl-card class="w-full mb-8">
+              <.header class="text-center mb-4">
+                <h2 class="text-2xl font-semibold">Review Your Post Details</h2>
+              </.header>
+              <div class="p-4">
+                <div class="mb-4">
+                  <h3 class="text-xl font-medium">Instrument Details</h3>
+                  <ul class="list-inside list-disc">
+                    <li><strong>Title:</strong> { @form[:title].value }</li>
+                    <li><strong>Brand:</strong> { @form[:brand].value }</li>
+                    <li><strong>Model:</strong> { @form[:model].value }</li>
+                    <li><strong>Year:</strong> { @form[:year].value }</li>
+                    <li><strong>Color:</strong> { @form[:color].value }</li>
+                    <li><strong>Country Built:</strong> { @form[:country_built].value }</li>
+                    <li><strong>Number of Strings:</strong> { @form[:number_of_strings].value }</li>
+                    <li><strong>Condition:</strong> { @form[:condition].value }</li>
+                    <li><strong>Price:</strong> ${ @form[:price].value }</li>
+                    <%= if @form[:shipping].value do %>
+                      <li><strong>Shipping Available:</strong> Yes</li>
+                      <li><strong>Shipping Cost:</strong> ${ @form[:shipping_cost].value }</li>
+                    <% else %>
+                      <li><strong>Shipping Available:</strong> No</li>
+                    <% end %>
+                  </ul>
+                </div>
+                <div class="mb-4">
+                  <h3 class="text-xl font-medium">Photos</h3>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Display uploaded photos with indication of primary photo -->
+                    <div class="relative">
+                      <img
+                        src="/path/to/uploaded1.jpg"
+                        alt="Uploaded Photo 1"
+                        class="w-full h-32 object-cover rounded"
+                      />
+                      <span class="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                        Primary
+                      </span>
+                    </div>
+                    <div class="relative">
+                      <img
+                        src="/path/to/uploaded2.jpg"
+                        alt="Uploaded Photo 2"
+                        class="w-full h-32 object-cover rounded"
+                      />
+                    </div>
+                    <div class="relative">
+                      <img
+                        src="/path/to/uploaded3.jpg"
+                        alt="Uploaded Photo 3"
+                        class="w-full h-32 object-cover rounded"
+                      />
+                    </div>
+                    <div class="relative">
+                      <img
+                        src="/path/to/uploaded4.jpg"
+                        alt="Uploaded Photo 4"
+                        class="w-full h-32 object-cover rounded"
+                      />
+                    </div>
+                    <!-- Add more uploaded photos as needed -->
+                  </div>
+                </div>
+              </div>
+            </sl-card>
 
-            <button id="checkout-button">Checkout</button>
+            <.simple_form
+              id="post-instrument-form"
+              class="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-md"
+              for={@checkout_form}
+              phx-submit="checkout"
+            >
+              <div class="mb-4">
+                <label for="promotion-amount" class="block text-gray-700 font-medium mb-2">
+                  Enter Promotion Amount (USD):
+                </label>
+                <.input
+                  type="number"
+                  field={@checkout_form[:promotion_amount]}
+                  name="promotions_amount"
+                  step="0.01"
+                  min="0"
+                  placeholder="$0.00"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                />
+              </div>
 
-            <script src="https://js.stripe.com/v3/">
-            </script>
-            <script>
-              var stripe = Stripe("pk_test_51OTGR2JfBe5DtFSh96F8uf7T4kXhTePwlrZlHAB09G3hadPdkqbZZ5Sy4R2r5nriZ0PQY2y0CNuRbTTpXX4paJqf00zmYNl6nA");
-              var checkoutButton = document.getElementById('checkout-button');
+              <div class="flex flex-col md:flex-row md:space-x-4">
+                <.button
+                  type="submit"
+                  class="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Proceed to Payment
+                </.button>
 
-              checkoutButton.addEventListener('click', function() {
-              fetch('/create-checkout-session', {method: 'POST'})
-                .then(function(response) {
-                  return response.json();
-                })
-                .then(function(session) {
-                  return stripe.redirectToCheckout({ sessionId: session.id });
-                })
-                .then(function(result) {
-                  if (result.error) {
-                    alert(result.error.message);
-                  }
-                });
-              });
-            </script>
+                <a
+                  href="/users/{{@current_user.id}}/post/new"
+                  class="w-full md:w-auto bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-center hover:bg-gray-300"
+                >
+                  Continue Without Promotion
+                </a>
+              </div>
+            </.simple_form>
         <% end %>
       </div>
     </main>
@@ -365,8 +460,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
       socket =
         socket
         |> assign(:form, to_form(changeset, as: "post"))
+        |> assign(:checkout_form, to_form(changeset, as: "checkout"))
         |> assign(:current_user, current_user)
         |> assign(:current_step, current_step)
+        |> assign(:primary_photo, 0)
         |> assign(:uploaded_files, [])
         |> assign(:preview_upload, nil)
         |> assign(:geocode_data, geocode_data)
@@ -535,6 +632,43 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
+  @impl true
+  def handle_event("checkout", _params, socket) do
+    case create_checkout_session() do
+      {:ok, session} ->
+        {:noreply,
+         socket
+         |> redirect(external: session.url)}
+
+      {:error, error} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Payment failed: #{error.message}")
+         |> push_navigate(to: ~p"/")}
+    end
+  end
+
+  defp create_checkout_session do
+    Stripe.Session.create(%{
+      payment_method_types: ["card"],
+      line_items: [
+        %{
+          price_data: %{
+            currency: "usd",
+            product_data: %{
+              name: "Guitar and Bass Exchange Promotion"
+            },
+            unit_amount: 2000
+          },
+          quantity: 1
+        }
+      ],
+      mode: "payment",
+      success_url: url(~p"/checkout/success"),
+      cancel_url: url(~p"/checkout/cancel")
+    })
+  end
+
   # Updated process_upload_results to handle {:ok, nil} cases
   defp process_upload_results(upload_results) do
     Enum.reduce_while(upload_results, {:ok, []}, fn
@@ -549,33 +683,5 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         Logger.error("Unexpected upload result: #{inspect(unexpected)}")
         {:halt, {:error, :unexpected_result}}
     end)
-  end
-
-  def create_checkout_session(conn, _params) do
-    {:ok, session} =
-      Stripe.Session.create(%{
-        payment_method_types: ["card"],
-        line_items: [
-          %{
-            price_data: %{
-              currency: "usd",
-              product_data: %{
-                name: "Guitar and Bass Exchange"
-              },
-              unit_amount: 2000
-            },
-            quantity: 1
-          }
-        ],
-        mode: "payment",
-        success_url: "http://localhost:4000/success",
-        cancel_url: "http://localhost:4000/cancel"
-      })
-
-    json_body = Jason.encode!(%{id: session.id})
-
-    conn
-    |> Plug.Conn.put_resp_content_type("application/json")
-    |> Plug.Conn.send_resp(200, json_body)
   end
 end

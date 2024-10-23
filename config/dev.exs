@@ -84,3 +84,8 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+config :guitar_and_bass_exchange,
+  stripe_publishable_key: System.get_env("STRIPE_PUBLISHABLE_KEY"),
+  success_url: "http://localhost:4000/success",
+  cancel_url: "http://localhost:4000/cancel"
