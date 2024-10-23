@@ -220,7 +220,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                       <.icon name="hero-trash-solid" class="h-4 w-4" />
                     </button>
                     <%= if index == @primary_photo do %>
-                      <sl-badge color="primary" class="h-full w-full">
+                      <sl-badge color="primary" class="primary-photo">
                         Primary Photo
                       </sl-badge>
                     <% else %>

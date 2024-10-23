@@ -95,3 +95,19 @@
 .search-input .input--standard.input--focused:not(.input--disabled) .input-control {
 	color: blue;
 }
+
+.primary-photo {
+	width: 100%;
+	height: 100%;
+}
+
+.primary-photo {
+	width: 100%;
+	height: 100%;
+}
+
+.primary-photo::part(base) {
+	min-height: 30px !important;
+	width: 100%;
+	height: 100%;
+}
