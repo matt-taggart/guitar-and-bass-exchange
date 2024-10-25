@@ -299,7 +299,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
             <%= if @show_preview do %>
               <div
                 id="preview-modal"
-                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
                 phx-click="hide_preview"
               >
                 <.live_img_preview entry={@preview_entry} class="w-4/5 h-4/5 object-contain" />
@@ -307,286 +307,275 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
             <% end %>
           <% 3 -> %>
             <!-- Step 3: Review Post Details -->
-            <div class="max-w-4xl mx-auto space-y-8 p-6">
-              <!-- Promotion Section -->
-              <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-8 border border-blue-200">
-                <h2 class="text-3xl font-bold text-blue-900 mb-6">Promote Your Post</h2>
+            <div class="max-w-4xl mx-auto space-y-8">
+              <!-- Progress Summary -->
+              <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                  <h2 class="text-2xl font-bold text-gray-900">Almost Done!</h2>
+                  <div class="flex items-center space-x-2">
+                    <div class="flex items-center">
+                      <div class="w-2.5 h-2.5 bg-blue-600 rounded-full mr-2"></div>
+                      <span class="text-sm text-gray-600">Review Details</span>
+                    </div>
+                    <span class="text-gray-300">→</span>
+                    <div class="flex items-center">
+                      <div class="w-2.5 h-2.5 bg-blue-600 rounded-full mr-2"></div>
+                      <span class="text-sm text-gray-600">Choose Promotion</span>
+                    </div>
+                    <span class="text-gray-300">→</span>
+                    <div class="flex items-center">
+                      <div class="w-2.5 h-2.5 bg-gray-300 rounded-full mr-2"></div>
+                      <span class="text-sm text-gray-600">Publish</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Instrument Preview Card -->
+              <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="relative aspect-video bg-gray-100">
+                  <%= if length(@photos) > 0 do %>
+                    <img
+                      src={List.first(@photos).url}
+                      alt="Primary instrument photo"
+                      class="w-full h-full object-cover"
+                    />
+                  <% else %>
+                    <div class="flex items-center justify-center h-full">
+                      <p class="text-gray-400">No photos uploaded</p>
+                    </div>
+                  <% end %>
 
-                <div class="bg-white rounded-lg p-6 shadow-sm border border-blue-200">
-                  <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0">
-                      <svg
-                        class="w-6 h-6 text-blue-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div class="absolute bottom-0 left-0 right-0 p-6">
+                    <h1 class="text-3xl font-bold text-white mb-2"><%= @form[:title].value %></h1>
+                    <div class="flex items-center space-x-4">
+                      <span class="text-2xl font-bold text-white">
+                        $<%= :erlang.float_to_binary(@form[:price].value || 0.0, decimals: 2) %>
+                      </span>
+                      <%= if @form[:shipping].value do %>
+                        <span class="px-3 py-1 rounded-full bg-green-500/20 text-green-100 text-sm">
+                          Shipping Available
+                        </span>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+                <!-- Photo Gallery -->
+                <div class="p-6 border-b border-gray-200">
+                  <h3 class="text-lg font-semibold text-gray-900 mb-4">Photos</h3>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <%= for photo <- @photos do %>
+                      <div class="relative group rounded-lg overflow-hidden bg-gray-100 aspect-square">
+                        <img
+                          src={photo.url}
+                          alt="Instrument photo"
+                          class="w-full h-full object-cover transition duration-300 cursor-pointer hover:opacity-75"
+                          phx-click="show_stored_preview"
+                          phx-value-url={photo.url}
                         />
-                      </svg>
+                        <%= if photo.id == photo.post.primary_photo_id do %>
+                          <div class="absolute top-2 right-2">
+                            <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium shadow-sm">
+                              Primary
+                            </span>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                <!-- Details Grid -->
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Basic Info -->
+                  <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Basic Information</h3>
+                    <dl class="space-y-2">
+                      <div class="flex justify-between">
+                        <dt class="text-gray-500">Brand</dt>
+                        <dd class="text-gray-900 font-medium"><%= @form[:brand].value %></dd>
+                      </div>
+                      <div class="flex justify-between">
+                        <dt class="text-gray-500">Model</dt>
+                        <dd class="text-gray-900 font-medium"><%= @form[:model].value %></dd>
+                      </div>
+                      <div class="flex justify-between">
+                        <dt class="text-gray-500">Year</dt>
+                        <dd class="text-gray-900 font-medium"><%= @form[:year].value %></dd>
+                      </div>
+                      <div class="flex justify-between">
+                        <dt class="text-gray-500">Color</dt>
+                        <dd class="text-gray-900 font-medium"><%= @form[:color].value %></dd>
+                      </div>
+                      <div class="flex justify-between">
+                        <dt class="text-gray-500">Country Built</dt>
+                        <dd class="text-gray-900 font-medium"><%= @form[:country_built].value %></dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <!-- Specifications -->
+                  <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Specifications</h3>
+                    <dl class="space-y-2">
+                      <div class="flex justify-between">
+                        <dt class="text-gray-500">Number of Strings</dt>
+                        <dd class="text-gray-900 font-medium">
+                          <%= @form[:number_of_strings].value %>
+                        </dd>
+                      </div>
+                      <div class="flex justify-between">
+                        <dt class="text-gray-500">Condition</dt>
+                        <dd class="text-gray-900 font-medium"><%= @form[:condition].value %></dd>
+                      </div>
+                      <%= if @form[:shipping].value do %>
+                        <div class="flex justify-between">
+                          <dt class="text-gray-500">Shipping Cost</dt>
+                          <dd class="text-gray-900 font-medium">
+                            $<%= :erlang.float_to_binary(@form[:shipping_cost].value || 0.0,
+                              decimals: 2
+                            ) %>
+                          </dd>
+                        </div>
+                      <% end %>
+                    </dl>
+                  </div>
+                  <!-- Description -->
+                  <div class="md:col-span-2 space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Description</h3>
+                    <p class="text-gray-600 whitespace-pre-wrap"><%= @form[:description].value %></p>
+                  </div>
+                </div>
+              </div>
+              <!-- Promotion Card -->
+              <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 border border-blue-100">
+                <div class="max-w-2xl mx-auto">
+                  <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 mt-1">
+                      <div class="p-2 bg-blue-600 rounded-lg">
+                        <svg
+                          class="w-5 h-5 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                          />
+                        </svg>
+                      </div>
                     </div>
                     <div class="flex-1">
-                      <h3 class="text-xl font-semibold text-blue-900 mb-3">
-                        Want your instrument to stand out?
-                      </h3>
-                      <p class="text-gray-700 mb-4">Promote your listing to gain more visibility:</p>
-                      <ul class="space-y-2">
-                        <li class="flex items-center text-gray-700">
-                          <svg
-                            class="w-5 h-5 text-blue-500 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M5 13l4 4L19 7"
+                      <h2 class="text-xl font-bold text-gray-900 mb-2">
+                        Boost Your Listing's Visibility
+                      </h2>
+                      <p class="text-gray-600 mb-6">
+                        Promote your listing to reach more potential buyers and sell faster. Choose your promotion amount - the higher the amount, the better the visibility.
+                      </p>
+                      <!-- Promotion Tiers -->
+                      <div class="grid gap-4 mb-8">
+                        <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
+                          <div class="flex items-center h-5">
+                            <input
+                              type="radio"
+                              name="promotion-tier"
+                              class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
-                          </svg>
-                          Promoted listings appear at the top of our featured page
-                        </li>
-                        <li class="flex items-center text-gray-700">
-                          <svg
-                            class="w-5 h-5 text-blue-500 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M5 13l4 4L19 7"
+                          </div>
+                          <div class="ml-3">
+                            <span class="block text-sm font-medium text-gray-900">
+                              Basic Promotion
+                            </span>
+                            <span class="block text-sm text-gray-500">
+                              $5.00 - Top of search results for 24 hours
+                            </span>
+                          </div>
+                          <span class="ml-auto font-medium text-gray-900">$5</span>
+                        </label>
+
+                        <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
+                          <div class="flex items-center h-5">
+                            <input
+                              type="radio"
+                              name="promotion-tier"
+                              class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
-                          </svg>
-                          Higher promotion amounts get higher placement
-                        </li>
-                        <li class="flex items-center text-gray-700">
-                          <svg
-                            class="w-5 h-5 text-blue-500 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M5 13l4 4L19 7"
+                          </div>
+                          <div class="ml-3">
+                            <span class="block text-sm font-medium text-gray-900">
+                              Premium Promotion
+                            </span>
+                            <span class="block text-sm text-gray-500">
+                              $10.00 - Featured listing for 3 days
+                            </span>
+                          </div>
+                          <span class="ml-auto font-medium text-gray-900">$10</span>
+                        </label>
+
+                        <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
+                          <div class="flex items-center h-5">
+                            <input
+                              type="radio"
+                              name="promotion-tier"
+                              class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
-                          </svg>
-                          Posts with equal promotion amounts are randomly shuffled for fairness
-                        </li>
-                        <li class="flex items-center text-gray-700">
-                          <svg
-                            class="w-5 h-5 text-blue-500 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M5 13l4 4L19 7"
+                          </div>
+                          <div class="ml-3">
+                            <span class="block text-sm font-medium text-gray-900">Custom Amount</span>
+                            <span class="block text-sm text-gray-500">
+                              Enter your own promotion amount
+                            </span>
+                          </div>
+                          <div class="ml-auto">
+                            <.input
+                              type="number"
+                              field={@checkout_form[:promotion_amount]}
+                              min="0"
+                              step="0.01"
+                              placeholder="0.00"
+                              class="w-24 text-right"
                             />
-                          </svg>
-                          You can still post for free - promotion is entirely optional
-                        </li>
-                      </ul>
+                          </div>
+                        </label>
+                      </div>
+                      <!-- Action Buttons -->
+                      <div class="flex flex-col sm:flex-row gap-4">
+                        <button
+                          type="submit"
+                          phx-click="promote_listing"
+                          class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200"
+                        >
+                          Promote Listing
+                        </button>
+                        <button
+                          type="button"
+                          phx-click="publish_without_promotion"
+                          class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50 transition duration-150 focus:ring-4 focus:ring-gray-200 border border-gray-200"
+                        >
+                          Publish Without Promotion
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <!-- Review Details Section -->
-              <div class="bg-white rounded-xl shadow-lg border border-gray-200">
-                <div class="border-b border-gray-200 p-6">
-                  <h2 class="text-2xl font-bold text-blue-900 text-center">
-                    Review Your Post Details
-                  </h2>
+
+              <%= if @show_preview do %>
+                <div
+                  id="preview-modal"
+                  class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center z-50 !m-0 !p-0"
+                  phx-click="hide_preview"
+                  style="position: fixed; top: 0; left: 0;"
+                >
+                  <%= if @preview_entry do %>
+                    <.live_img_preview entry={@preview_entry} class="w-4/5 h-4/5 object-contain" />
+                  <% else %>
+                    <img src={@preview_url} class="w-4/5 h-4/5 object-contain" />
+                  <% end %>
                 </div>
-
-                <div class="p-6 space-y-8">
-                  <!-- Instrument Details -->
-                  <div>
-                    <h3 class="text-xl font-semibold text-blue-900 mb-4 flex items-center">
-                      <svg
-                        class="w-6 h-6 mr-2 text-blue-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                        />
-                      </svg>
-                      Instrument Details
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Title:</span>
-                        <span class="text-gray-900"><%= @form[:title].value %></span>
-                      </div>
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Brand:</span>
-                        <span class="text-gray-900"><%= @form[:brand].value %></span>
-                      </div>
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Brand:</span>
-                        <span class="text-gray-900"><%= @form[:model].value %></span>
-                      </div>
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Year:</span>
-                        <span class="text-gray-900"><%= @form[:year].value %></span>
-                      </div>
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Color:</span>
-                        <span class="text-gray-900"><%= @form[:color].value %></span>
-                      </div>
-
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Country Built:</span>
-                        <span class="text-gray-900"><%= @form[:country_built].value %></span>
-                      </div>
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Number of Strings:</span>
-                        <span class="text-gray-900"><%= @form[:number_of_strings].value %></span>
-                      </div>
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Description:</span>
-                        <span class="text-gray-900"><%= @form[:description].value %></span>
-                      </div>
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Condition:</span>
-                        <span class="text-gray-900"><%= @form[:condition].value %></span>
-                      </div>
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Price:</span>
-                        <span class="text-gray-900"><%= @form[:price].value %></span>
-                      </div>
-                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-medium w-32">Shipping Available:</span>
-                        <span class="text-gray-900"><%= @form[:shipping].value %></span>
-                      </div>
-                      <%= if @form[:shipping].value == true do %>
-                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                          <span class="text-gray-600 font-medium w-32">Shipping Cost:</span>
-                          <span class="text-gray-900"><%= @form[:shipping_cost].value %></span>
-                        </div>
-                      <% end %>
-                    </div>
-                  </div>
-                  <!-- Photos Section -->
-                  <div>
-                    <h3 class="text-xl font-semibold text-blue-900 mb-4 flex items-center">
-                      <svg
-                        class="w-6 h-6 mr-2 text-blue-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Photos
-                    </h3>
-                    <!-- In the Photos Section of step 3 -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <%= for photo <- @photos do %>
-                        <div class="relative group rounded-lg overflow-hidden">
-                          <img
-                            src={photo.url}
-                            alt="Uploaded Photo"
-                            class="w-full h-32 object-cover transition duration-300 cursor-pointer"
-                            phx-click="show_stored_preview"
-                            phx-value-url={photo.url}
-                          />
-                          <%= if photo.id == photo.post.primary_photo_id do %>
-                            <div class="absolute bottom-2 left-2">
-                              <span class="bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-medium shadow-sm">
-                                Primary
-                              </span>
-                            </div>
-                          <% end %>
-                        </div>
-                      <% end %>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Promotion Form -->
-              <.simple_form
-                id="post-instrument-form"
-                class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
-                for={@checkout_form}
-                phx-submit="checkout"
-              >
-                <div class="space-y-6">
-                  <div>
-                    <label
-                      for="promotion-amount"
-                      class="block text-lg font-semibold text-blue-900 mb-2"
-                    >
-                      Enter Promotion Amount (USD)
-                    </label>
-                    <.input
-                      type="number"
-                      field={@checkout_form[:promotion_amount]}
-                      name="promotions_amount"
-                      step="0.01"
-                      min="0"
-                      placeholder="$0.00"
-                      required
-                      class="w-full px-4 py-3 text-lg border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-
-                  <div class="flex flex-col sm:flex-row gap-4">
-                    <.button
-                      type="submit"
-                      class="text-[14px] flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200"
-                    >
-                      Promote
-                    </.button>
-
-                    <a
-                      href={~p"/users/{{@current_user.id}}/post/new"}
-                      class="text-[14px] flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-200 transition duration-150 focus:ring-4 focus:ring-gray-200"
-                    >
-                      Post Without Promotion
-                    </a>
-                  </div>
-                </div>
-              </.simple_form>
+              <% end %>
             </div>
-            <!-- Add this at the end of step 3 -->
-            <%= if @show_preview do %>
-              <div
-                id="preview-modal"
-                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-                phx-click="hide_preview"
-              >
-                <%= if @preview_entry do %>
-                  <.live_img_preview entry={@preview_entry} class="w-4/5 h-4/5 object-contain" />
-                <% else %>
-                  <img src={@preview_url} class="w-4/5 h-4/5 object-contain" />
-                <% end %>
-              </div>
-            <% end %>
         <% end %>
       </div>
     </main>
