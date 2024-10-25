@@ -873,4 +873,57 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         {:halt, {:error, :unexpected_result}}
     end)
   end
+
+  @impl true
+  def handle_event("checkout", _params, socket) do
+    case create_checkout_session() do
+      {:ok, session} ->
+        {:noreply,
+         socket
+         |> redirect(external: session.url)}
+
+      {:error, error} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Payment failed: #{error.message}")
+         |> push_navigate(to: ~p"/")}
+    end
+  end
+
+  defp create_checkout_session do
+    Stripe.Session.create(%{
+      payment_method_types: ["card"],
+      line_items: [
+        %{
+          price_data: %{
+            currency: "usd",
+            product_data: %{
+              name: "Guitar and Bass Exchange Promotion"
+            },
+            unit_amount: 2000
+          },
+          quantity: 1
+        }
+      ],
+      mode: "payment",
+      success_url: url(~p"/checkout/success"),
+      cancel_url: url(~p"/checkout/cancel")
+    })
+  end
+
+  # Updated process_upload_results to handle {:ok, nil} cases
+  defp process_upload_results(upload_results) do
+    Enum.reduce_while(upload_results, {:ok, []}, fn
+      nil, _acc ->
+        # Halt on first failure
+        {:halt, {:error, :upload_failed}}
+
+      url, {:ok, acc} ->
+        {:cont, {:ok, [url | acc]}}
+
+      unexpected, _acc ->
+        Logger.error("Unexpected upload result: #{inspect(unexpected)}")
+        {:halt, {:error, :unexpected_result}}
+    end)
+  end
 end
