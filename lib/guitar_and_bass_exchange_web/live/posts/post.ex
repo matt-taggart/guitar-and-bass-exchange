@@ -504,15 +504,24 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                       </svg>
                       Photos
                     </h3>
-
+                    <!-- In the Photos Section of step 3 -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <%= for photo <- @photos do %>
                         <div class="relative group rounded-lg overflow-hidden">
                           <img
                             src={photo.url}
                             alt="Uploaded Photo"
-                            class="w-full h-32 object-cover transition duration-300"
+                            class="w-full h-32 object-cover transition duration-300 cursor-pointer"
+                            phx-click="show_stored_preview"
+                            phx-value-url={photo.url}
                           />
+                          <%= if photo.id == photo.post.primary_photo_id do %>
+                            <div class="absolute bottom-2 left-2">
+                              <span class="bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-medium shadow-sm">
+                                Primary
+                              </span>
+                            </div>
+                          <% end %>
                         </div>
                       <% end %>
                     </div>
@@ -564,6 +573,20 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 </div>
               </.simple_form>
             </div>
+            <!-- Add this at the end of step 3 -->
+            <%= if @show_preview do %>
+              <div
+                id="preview-modal"
+                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                phx-click="hide_preview"
+              >
+                <%= if @preview_entry do %>
+                  <.live_img_preview entry={@preview_entry} class="w-4/5 h-4/5 object-contain" />
+                <% else %>
+                  <img src={@preview_url} class="w-4/5 h-4/5 object-contain" />
+                <% end %>
+              </div>
+            <% end %>
         <% end %>
       </div>
     </main>
@@ -630,6 +653,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         |> assign(:uploaded_files, [])
         |> assign(:photos, photos)
         |> assign(:preview_upload, nil)
+        |> assign(:preview_url, nil)
         |> assign(:geocode_data, geocode_data)
         |> assign(:show_preview, false)
         |> assign(:show_progress, false)
@@ -650,13 +674,19 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
+  @impl true
+  # Update your show_preview handler and add a new one for stored photos
   def handle_event("show_preview", %{"ref" => entry_ref}, socket) do
     entry = Enum.find(socket.assigns.uploads.photos.entries, &(&1.ref == entry_ref))
-    {:noreply, assign(socket, show_preview: true, preview_entry: entry)}
+    {:noreply, assign(socket, show_preview: true, preview_entry: entry, preview_url: nil)}
+  end
+
+  def handle_event("show_stored_preview", %{"url" => url}, socket) do
+    {:noreply, assign(socket, show_preview: true, preview_entry: nil, preview_url: url)}
   end
 
   def handle_event("hide_preview", _params, socket) do
-    {:noreply, assign(socket, show_preview: false, preview_entry: nil)}
+    {:noreply, assign(socket, show_preview: false, preview_entry: nil, preview_url: nil)}
   end
 
   def handle_event("toggle_shipping", _, socket) do
