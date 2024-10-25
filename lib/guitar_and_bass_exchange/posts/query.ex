@@ -26,6 +26,7 @@ defmodule GuitarAndBassExchange.Post.Query do
     |> Repo.one()
     # Add this line to preload photos
     |> Repo.preload(:photos)
+    |> Repo.preload(:primary_photo)
   end
 
   def update_post(%Ecto.Changeset{} = changeset) do

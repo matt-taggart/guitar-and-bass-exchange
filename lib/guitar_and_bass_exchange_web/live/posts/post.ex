@@ -1,6 +1,7 @@
 defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   use GuitarAndBassExchangeWeb, :live_view
   alias GuitarAndBassExchange.Post
+  alias GuitarAndBassExchange.Photo
   alias GuitarAndBassExchangeWeb.Plugs.FetchGeocodeData
   require Logger
   require ExAws.S3
@@ -8,13 +9,13 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   def render_list_heading(assigns) do
     ~H"""
     <li class={[
-      "flex items-center",
+      "flex flex-col sm:flex-row items-center mb-6 sm:mb-0",
       @is_active && "text-blue-600 dark:text-blue-500"
     ]}>
-      <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
+      <span class="flex items-center space-x-2 whitespace-nowrap">
         <%= if @is_active do %>
           <svg
-            class="w-3.5 h-3.5 sm:w-4 sm:h-4 me-2.5"
+            class="w-3.5 h-3.5 sm:w-4 sm:h-4"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -23,15 +24,19 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
             <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
           </svg>
         <% else %>
-          <span class="me-2"><%= @step_number %></span>
+          <span class="font-semibold"><%= @step_number %></span>
         <% end %>
-        <%= @heading_start %> <span class="hidden sm:inline-flex sm:ms-2"><%= @heading_end %></span>
+        <span><%= @heading %></span>
       </span>
+      <!-- Separator (Only if not the last item) -->
+      <%= if !@is_last do %>
+        <div
+          aria-hidden="true"
+          class="hidden sm:block sm:w-[5rem] h-px bg-gray-400 sm:mx-[2rem] border-solid border border-gray-200"
+        >
+        </div>
+      <% end %>
     </li>
-    <%= if !@is_last do %>
-      <div class="sm:w-[5rem] h-px bg-gray-400 sm:mx-[2rem] border-solid border-1px border-gray-200">
-      </div>
-    <% end %>
     """
   end
 
@@ -40,29 +45,28 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     ~H"""
     <.navbar current_user={@current_user} geocode_data={@geocode_data} />
     <main class="flex flex-col items-center my-16 mx-8">
-      <ol class="flex items-center justify-center text-sm font-medium text-center text-gray-500 sm:text-base max-w-2xl mx-auto mb-16">
-        <!-- Step Headings -->
-        <%= render_list_heading(%{
-          is_active: @current_step == 1,
-          step_number: 1,
-          heading_start: "Listing",
-          heading_end: "Info",
-          is_last: false
-        }) %>
-        <%= render_list_heading(%{
-          is_active: @current_step == 2,
-          step_number: 2,
-          heading_start: "Upload",
-          heading_end: "Photos",
-          is_last: false
-        }) %>
-        <%= render_list_heading(%{
-          is_active: @current_step == 3,
-          step_number: 3,
-          heading_start: "Payment",
-          heading_end: "Info",
-          is_last: true
-        }) %>
+      <ol class="flex flex-col sm:flex-row justify-between items-center text-sm font-medium text-center text-gray-500 sm:text-base max-w-2xl mx-auto">
+        <ol class="flex flex-col sm:flex-row justify-between items-center text-sm font-medium text-center text-gray-500 sm:text-base max-w-2xl mx-auto mb-16">
+          <!-- Step Headings -->
+          <%= render_list_heading(%{
+            is_active: @current_step == 1,
+            step_number: 1,
+            heading: "Listing Info",
+            is_last: false
+          }) %>
+          <%= render_list_heading(%{
+            is_active: @current_step == 2,
+            step_number: 2,
+            heading: "Upload Photos",
+            is_last: false
+          }) %>
+          <%= render_list_heading(%{
+            is_active: @current_step == 3,
+            step_number: 3,
+            heading: "Promote and Submit",
+            is_last: true
+          }) %>
+        </ol>
       </ol>
 
       <div class="max-w-2xl w-full mx-auto">
@@ -121,7 +125,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                   min="0"
                   field={@form[:price]}
                   label="Price"
-                  placeholder="$"
+                  placeholder="$0.00"
                   required
                 />
                 <.input
@@ -135,7 +139,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 <% end %>
                 <:actions>
                   <.button phx-disable-with="Posting..." class="w-full">
-                    Upload Info
+                    Next Step
                   </.button>
                 </:actions>
               </.simple_form>
@@ -280,9 +284,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 <button
                   type="submit"
                   disabled={@uploads.photos.entries == [] || @show_progress}
+                  phx-disable-with="Uploading Photos..."
                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  Upload Photos
+                  Next Step
                 </button>
               </div>
             </form>
@@ -301,127 +306,264 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
               </div>
             <% end %>
           <% 3 -> %>
-            <!-- Step 3: Payment Info -->
-            <.header class="mb-8">
-              <h2 class="text-3xl font-bold mb-4">Promote Your Post (Optional)</h2>
-              <sl-alert variant="info" open>
-                <span class="text-lg font-semibold">Want your instrument to stand out?</span>
-                <p class="mt-2">
-                  Promote your listing to gain more visibility:
-                </p>
-                <ul class="mt-2 list-disc list-inside">
-                  <li>Promoted listings appear at the top of our featured page</li>
-                  <li>Higher promotion amounts get higher placement</li>
-                  <li>Posts with equal promotion amounts are randomly shuffled for fairness</li>
-                  <li>You can still post for free - promotion is entirely optional</li>
-                </ul>
-              </sl-alert>
-            </.header>
             <!-- Step 3: Review Post Details -->
-            <sl-card class="w-full mb-8">
-              <.header class="text-center mb-4">
-                <h2 class="text-2xl font-semibold">Review Your Post Details</h2>
-              </.header>
-              <div class="p-4">
-                <div class="mb-4">
-                  <h3 class="text-xl font-medium">Instrument Details</h3>
-                  <ul class="list-inside list-disc">
-                    <li><strong>Title:</strong> { @form[:title].value }</li>
-                    <li><strong>Brand:</strong> { @form[:brand].value }</li>
-                    <li><strong>Model:</strong> { @form[:model].value }</li>
-                    <li><strong>Year:</strong> { @form[:year].value }</li>
-                    <li><strong>Color:</strong> { @form[:color].value }</li>
-                    <li><strong>Country Built:</strong> { @form[:country_built].value }</li>
-                    <li><strong>Number of Strings:</strong> { @form[:number_of_strings].value }</li>
-                    <li><strong>Condition:</strong> { @form[:condition].value }</li>
-                    <li><strong>Price:</strong> ${ @form[:price].value }</li>
-                    <%= if @form[:shipping].value do %>
-                      <li><strong>Shipping Available:</strong> Yes</li>
-                      <li><strong>Shipping Cost:</strong> ${ @form[:shipping_cost].value }</li>
-                    <% else %>
-                      <li><strong>Shipping Available:</strong> No</li>
-                    <% end %>
-                  </ul>
-                </div>
-                <div class="mb-4">
-                  <h3 class="text-xl font-medium">Photos</h3>
-                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <!-- Display uploaded photos with indication of primary photo -->
-                    <div class="relative">
-                      <img
-                        src="/path/to/uploaded1.jpg"
-                        alt="Uploaded Photo 1"
-                        class="w-full h-32 object-cover rounded"
-                      />
-                      <span class="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
-                        Primary
-                      </span>
+            <div class="max-w-4xl mx-auto space-y-8 p-6">
+              <!-- Promotion Section -->
+              <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-8 border border-blue-200">
+                <h2 class="text-3xl font-bold text-blue-900 mb-6">Promote Your Post</h2>
+
+                <div class="bg-white rounded-lg p-6 shadow-sm border border-blue-200">
+                  <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                      <svg
+                        class="w-6 h-6 text-blue-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
+                      </svg>
                     </div>
-                    <div class="relative">
-                      <img
-                        src="/path/to/uploaded2.jpg"
-                        alt="Uploaded Photo 2"
-                        class="w-full h-32 object-cover rounded"
-                      />
+                    <div class="flex-1">
+                      <h3 class="text-xl font-semibold text-blue-900 mb-3">
+                        Want your instrument to stand out?
+                      </h3>
+                      <p class="text-gray-700 mb-4">Promote your listing to gain more visibility:</p>
+                      <ul class="space-y-2">
+                        <li class="flex items-center text-gray-700">
+                          <svg
+                            class="w-5 h-5 text-blue-500 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          Promoted listings appear at the top of our featured page
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                          <svg
+                            class="w-5 h-5 text-blue-500 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          Higher promotion amounts get higher placement
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                          <svg
+                            class="w-5 h-5 text-blue-500 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          Posts with equal promotion amounts are randomly shuffled for fairness
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                          <svg
+                            class="w-5 h-5 text-blue-500 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          You can still post for free - promotion is entirely optional
+                        </li>
+                      </ul>
                     </div>
-                    <div class="relative">
-                      <img
-                        src="/path/to/uploaded3.jpg"
-                        alt="Uploaded Photo 3"
-                        class="w-full h-32 object-cover rounded"
-                      />
-                    </div>
-                    <div class="relative">
-                      <img
-                        src="/path/to/uploaded4.jpg"
-                        alt="Uploaded Photo 4"
-                        class="w-full h-32 object-cover rounded"
-                      />
-                    </div>
-                    <!-- Add more uploaded photos as needed -->
                   </div>
                 </div>
               </div>
-            </sl-card>
+              <!-- Review Details Section -->
+              <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+                <div class="border-b border-gray-200 p-6">
+                  <h2 class="text-2xl font-bold text-blue-900 text-center">
+                    Review Your Post Details
+                  </h2>
+                </div>
 
-            <.simple_form
-              id="post-instrument-form"
-              class="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-md"
-              for={@checkout_form}
-              phx-submit="checkout"
-            >
-              <div class="mb-4">
-                <label for="promotion-amount" class="block text-gray-700 font-medium mb-2">
-                  Enter Promotion Amount (USD):
-                </label>
-                <.input
-                  type="number"
-                  field={@checkout_form[:promotion_amount]}
-                  name="promotions_amount"
-                  step="0.01"
-                  min="0"
-                  placeholder="$0.00"
-                  required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                />
+                <div class="p-6 space-y-8">
+                  <!-- Instrument Details -->
+                  <div>
+                    <h3 class="text-xl font-semibold text-blue-900 mb-4 flex items-center">
+                      <svg
+                        class="w-6 h-6 mr-2 text-blue-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                        />
+                      </svg>
+                      Instrument Details
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Title:</span>
+                        <span class="text-gray-900"><%= @form[:title].value %></span>
+                      </div>
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Brand:</span>
+                        <span class="text-gray-900"><%= @form[:brand].value %></span>
+                      </div>
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Brand:</span>
+                        <span class="text-gray-900"><%= @form[:model].value %></span>
+                      </div>
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Year:</span>
+                        <span class="text-gray-900"><%= @form[:year].value %></span>
+                      </div>
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Color:</span>
+                        <span class="text-gray-900"><%= @form[:color].value %></span>
+                      </div>
+
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Country Built:</span>
+                        <span class="text-gray-900"><%= @form[:country_built].value %></span>
+                      </div>
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Number of Strings:</span>
+                        <span class="text-gray-900"><%= @form[:number_of_strings].value %></span>
+                      </div>
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Description:</span>
+                        <span class="text-gray-900"><%= @form[:description].value %></span>
+                      </div>
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Condition:</span>
+                        <span class="text-gray-900"><%= @form[:condition].value %></span>
+                      </div>
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Price:</span>
+                        <span class="text-gray-900"><%= @form[:price].value %></span>
+                      </div>
+                      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-gray-600 font-medium w-32">Shipping Available:</span>
+                        <span class="text-gray-900"><%= @form[:shipping].value %></span>
+                      </div>
+                      <%= if @form[:shipping].value == true do %>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                          <span class="text-gray-600 font-medium w-32">Shipping Cost:</span>
+                          <span class="text-gray-900"><%= @form[:shipping_cost].value %></span>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                  <!-- Photos Section -->
+                  <div>
+                    <h3 class="text-xl font-semibold text-blue-900 mb-4 flex items-center">
+                      <svg
+                        class="w-6 h-6 mr-2 text-blue-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Photos
+                    </h3>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <%= for photo <- @photos do %>
+                        <div class="relative group rounded-lg overflow-hidden">
+                          <img
+                            src={photo.url}
+                            alt="Uploaded Photo"
+                            class="w-full h-32 object-cover transition duration-300"
+                          />
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
               </div>
+              <!-- Promotion Form -->
+              <.simple_form
+                id="post-instrument-form"
+                class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+                for={@checkout_form}
+                phx-submit="checkout"
+              >
+                <div class="space-y-6">
+                  <div>
+                    <label
+                      for="promotion-amount"
+                      class="block text-lg font-semibold text-blue-900 mb-2"
+                    >
+                      Enter Promotion Amount (USD)
+                    </label>
+                    <.input
+                      type="number"
+                      field={@checkout_form[:promotion_amount]}
+                      name="promotions_amount"
+                      step="0.01"
+                      min="0"
+                      placeholder="$0.00"
+                      required
+                      class="w-full px-4 py-3 text-lg border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
 
-              <div class="flex flex-col md:flex-row md:space-x-4">
-                <.button
-                  type="submit"
-                  class="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Proceed to Payment
-                </.button>
+                  <div class="flex flex-col sm:flex-row gap-4">
+                    <.button
+                      type="submit"
+                      class="text-[14px] flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200"
+                    >
+                      Promote
+                    </.button>
 
-                <a
-                  href="/users/{{@current_user.id}}/post/new"
-                  class="w-full md:w-auto bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-center hover:bg-gray-300"
-                >
-                  Continue Without Promotion
-                </a>
-              </div>
-            </.simple_form>
+                    <a
+                      href={~p"/users/{{@current_user.id}}/post/new"}
+                      class="text-[14px] flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-200 transition duration-150 focus:ring-4 focus:ring-gray-200"
+                    >
+                      Post Without Promotion
+                    </a>
+                  </div>
+                </div>
+              </.simple_form>
+            </div>
         <% end %>
       </div>
     </main>
@@ -470,6 +612,14 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
       geocode_data = FetchGeocodeData.fetch_geocode_data(session, socket)
 
+      # Load photos if we're on step 3 and have a draft post
+      photos =
+        if current_step == 3 && draft_post && draft_post.id do
+          Photo.Query.list_photos_for_post(draft_post.id)
+        else
+          []
+        end
+
       socket =
         socket
         |> assign(:form, to_form(changeset, as: "post"))
@@ -478,6 +628,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         |> assign(:current_step, current_step)
         |> assign(:primary_photo, 0)
         |> assign(:uploaded_files, [])
+        |> assign(:photos, photos)
         |> assign(:preview_upload, nil)
         |> assign(:geocode_data, geocode_data)
         |> assign(:show_preview, false)
@@ -572,7 +723,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
       case result do
         {:ok, post} ->
           # Preload the photos association after creating/updating
-          post = GuitarAndBassExchange.Repo.preload(post, :photos)
+          post = GuitarAndBassExchange.Repo.preload(post, [:photos, :primary_photo])
 
           {:noreply,
            socket
@@ -589,22 +740,20 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
   def handle_event("save", _params, socket) do
     post = socket.assigns.form.source.data
-    photos = socket.assigns.uploads.photos.entries
     primary_photo_index = socket.assigns.primary_photo
-    primary_photo_id = photos |> Enum.at(primary_photo_index) |> Map.get(:id)
 
     uploaded_urls =
       consume_uploaded_entries(socket, :photos, fn %{path: src_path}, entry ->
         dest_path = "uploads/#{entry.client_name}"
         bucket = System.get_env("SPACES_NAME")
         region = System.get_env("SPACES_REGION")
-        host = "#{bucket}.#{region}.digitaloceanspaces.com"
+        host = "#{bucket}.#{region}.cdn.digitaloceanspaces.com/#{bucket}"
 
         Logger.debug("Attempting to upload to host: #{host}")
 
         case File.read(src_path) do
           {:ok, content} ->
-            operation = ExAws.S3.put_object(bucket, dest_path, content)
+            operation = ExAws.S3.put_object(bucket, dest_path, content, acl: :public_read)
 
             case ExAws.request(operation) do
               {:ok, %{status_code: 200}} ->
@@ -623,80 +772,71 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         end
       end)
 
-    IO.inspect(uploaded_urls, label: "Uploaded URLs")
-
     case process_upload_results(uploaded_urls) do
       {:ok, successful_urls} ->
-        changeset =
-          post
-          |> Post.changeset(%{
-            photos: Enum.map(successful_urls, &%{url: &1}),
-            current_step: post.current_step + 1,
-            primary_photo_id: primary_photo_id
-          })
-          |> Map.put(:action, :update)
+        # Create photos one by one using create_photo
+        photos_results =
+          successful_urls
+          |> Enum.map(fn url ->
+            Photo.Query.create_photo(%{
+              url: url,
+              post_id: post.id
+            })
+          end)
 
-        case GuitarAndBassExchange.Post.Query.update_post(changeset) do
-          {:ok, updated_post} ->
-            # Preload the photos association after updating
-            updated_post = GuitarAndBassExchange.Repo.preload(updated_post, :photos)
+        # Check if all photos were created successfully
+        case Enum.split_with(photos_results, fn
+               {:ok, _} -> true
+               _ -> false
+             end) do
+          {successes, []} ->
+            # All photos created successfully
+            inserted_photos = Enum.map(successes, fn {:ok, photo} -> photo end)
+            # Get the primary photo based on index
+            primary_photo = Enum.at(inserted_photos, primary_photo_index)
 
-            next_step = updated_post.current_step + 1
-            updated_changeset = Post.changeset(updated_post, %{current_step: next_step})
+            # Update post with primary_photo_id
+            changeset =
+              post
+              |> Post.changeset(%{
+                current_step: post.current_step + 1,
+                primary_photo_id: primary_photo.id
+              })
 
-            {:noreply,
-             socket
-             |> assign(:form, to_form(updated_changeset, as: "post"))
-             |> assign(:current_step, next_step)
-             |> assign(:uploaded_files, successful_urls)
-             |> put_flash(:info, "Successfully uploaded photos")}
+            case Post.Query.update_post(changeset) do
+              {:ok, updated_post} ->
+                # Preload associations
+                updated_post =
+                  GuitarAndBassExchange.Repo.preload(updated_post, [:photos, :primary_photo])
 
-          {:error, changeset} ->
-            Logger.error("Failed to update post: #{inspect(changeset.errors)}")
-            {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
+                photos = Photo.Query.list_photos_for_post(updated_post.id)
+
+                next_step = updated_post.current_step
+                updated_changeset = Post.changeset(updated_post, %{current_step: next_step})
+
+                {:noreply,
+                 socket
+                 |> assign(:form, to_form(updated_changeset, as: "post"))
+                 |> assign(:current_step, next_step)
+                 |> assign(:uploaded_files, successful_urls)
+                 |> assign(:photos, photos)
+                 |> put_flash(:info, "Successfully uploaded photos")}
+
+              {:error, changeset} ->
+                Logger.error("Failed to update post: #{inspect(changeset.errors)}")
+                {:noreply, assign(socket, form: to_form(changeset, as: "post"))}
+            end
+
+          {_, failures} ->
+            # Some photos failed to create
+            Logger.error("Failed to create some photos: #{inspect(failures)}")
+            {:noreply, put_flash(socket, :error, "Failed to process some photos")}
         end
 
       {:error, _reason} ->
         {:noreply,
          put_flash(socket, :error, "Failed to upload one or more photos. Please try again.")}
     end
-  end
-
-  @impl true
-  def handle_event("checkout", _params, socket) do
-    case create_checkout_session() do
-      {:ok, session} ->
-        {:noreply,
-         socket
-         |> redirect(external: session.url)}
-
-      {:error, error} ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Payment failed: #{error.message}")
-         |> push_navigate(to: ~p"/")}
-    end
-  end
-
-  defp create_checkout_session do
-    Stripe.Session.create(%{
-      payment_method_types: ["card"],
-      line_items: [
-        %{
-          price_data: %{
-            currency: "usd",
-            product_data: %{
-              name: "Guitar and Bass Exchange Promotion"
-            },
-            unit_amount: 2000
-          },
-          quantity: 1
-        }
-      ],
-      mode: "payment",
-      success_url: url(~p"/checkout/success"),
-      cancel_url: url(~p"/checkout/cancel")
-    })
   end
 
   # Updated process_upload_results to handle {:ok, nil} cases

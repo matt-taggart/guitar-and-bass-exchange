@@ -17,7 +17,6 @@ defmodule GuitarAndBassExchange.Post do
     field :shipping, :boolean, default: false
     field :shipping_cost, :float
     field :price, :float
-    field :primary_photo_id, :binary_id
 
     field :status, Ecto.Enum,
       values: [:draft, :completed],
@@ -30,9 +29,9 @@ defmodule GuitarAndBassExchange.Post do
       on_replace: :delete_if_exists,
       on_delete: :delete_all
 
-    has_one :primary_photo, GuitarAndBassExchange.Photo,
-      foreign_key: :id,
-      references: :primary_photo_id
+    belongs_to :primary_photo, GuitarAndBassExchange.Photo,
+      foreign_key: :primary_photo_id,
+      references: :id
 
     belongs_to :user, GuitarAndBassExchange.Accounts.User
 

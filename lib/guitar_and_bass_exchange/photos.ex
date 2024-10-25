@@ -15,7 +15,7 @@ defmodule GuitarAndBassExchange.Photo do
   @doc false
   def changeset(photo, attrs) do
     photo
-    |> cast(attrs, [:url])
-    |> validate_required([:url])
+    |> cast(attrs, [:url, :post_id])
+    |> validate_required([:url, :post_id])
   end
 end
