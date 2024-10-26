@@ -3,6 +3,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   alias GuitarAndBassExchange.Post
   alias GuitarAndBassExchange.Photo
   alias GuitarAndBassExchangeWeb.Plugs.FetchGeocodeData
+  alias GuitarAndBassExchangeWeb.StripeHandler
   require Logger
   require ExAws.S3
 
@@ -473,20 +474,20 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                       <p class="text-gray-600 mb-6">
                         Promote your listing to reach more potential buyers and sell faster. Choose your promotion amount - the higher the amount, the better the visibility.
                       </p>
-                      <!-- Promotion Tiers -->
                       <div class="grid gap-4 mb-8">
                         <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
                           <div class="flex items-center h-5">
                             <input
                               type="radio"
                               name="promotion-tier"
+                              value="5.00"
+                              checked={@promotion_amount == "5.00"}
+                              phx-click="set_promotion_amount"
                               class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
                           </div>
                           <div class="ml-3">
-                            <span class="block text-sm font-medium text-gray-900">
-                              Basic Promotion
-                            </span>
+                            <span class="block text-sm font-medium text-gray-900">Basic Promotion</span>
                             <span class="block text-sm text-gray-500">
                               $5.00 - Top of search results for 24 hours
                             </span>
@@ -499,13 +500,14 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                             <input
                               type="radio"
                               name="promotion-tier"
+                              value="10.00"
+                              checked={@promotion_amount == "10.00"}
+                              phx-click="set_promotion_amount"
                               class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
                           </div>
                           <div class="ml-3">
-                            <span class="block text-sm font-medium text-gray-900">
-                              Premium Promotion
-                            </span>
+                            <span class="block text-sm font-medium text-gray-900">Premium Promotion</span>
                             <span class="block text-sm text-gray-500">
                               $10.00 - Featured listing for 3 days
                             </span>
@@ -518,14 +520,15 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                             <input
                               type="radio"
                               name="promotion-tier"
+                              value="custom"
+                              checked={@promotion_amount == "custom"}
+                              phx-click="set_promotion_amount"
                               class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
                           </div>
                           <div class="ml-3">
                             <span class="block text-sm font-medium text-gray-900">Custom Amount</span>
-                            <span class="block text-sm text-gray-500">
-                              Enter your own promotion amount
-                            </span>
+                            <span class="block text-sm text-gray-500">Enter your own promotion amount</span>
                           </div>
                           <div class="ml-auto">
                             <.input
@@ -535,6 +538,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                               step="0.01"
                               placeholder="0.00"
                               class="w-24 text-right"
+                              phx-blur="set_custom_amount"
+                              disabled={@promotion_amount != "custom"}
                             />
                           </div>
                         </label>
@@ -543,6 +548,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                       <div class="flex flex-col sm:flex-row gap-4">
                         <button
                           type="submit"
+                          disabled={@checkout_form[:promotion_amount].value == nil} 
                           phx-click="promote_listing"
                           class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200"
                         >
@@ -575,6 +581,12 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                   <% end %>
                 </div>
               <% end %>
+              <div class="mt-4">
+                <div id="card-element">
+                  <!-- Stripe Elements will insert the card element here -->
+                </div>
+                <div id="card-errors" role="alert"></div>
+              </div>
             </div>
         <% end %>
       </div>
@@ -636,6 +648,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         socket
         |> assign(:form, to_form(changeset, as: "post"))
         |> assign(:checkout_form, to_form(changeset, as: "checkout"))
+        |> assign(:promotion_amount, "5.00") 
         |> assign(:current_user, current_user)
         |> assign(:current_step, current_step)
         |> assign(:primary_photo, 0)
@@ -858,6 +871,41 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
+  def handle_event("set_promotion_amount", %{"value" => amount}, socket) do
+    case amount do
+      "custom" ->
+        {:noreply, assign(socket, :promotion_amount, "custom")}
+      
+      amount ->
+        checkout_form = 
+          socket.assigns.checkout_form.source
+          |> Post.changeset(%{promotion_amount: String.to_float(amount)})
+          |> to_form()
+
+        {:noreply, 
+         socket
+         |> assign(:promotion_amount, amount)
+         |> assign(:checkout_form, checkout_form)}
+    end
+  end
+
+  def handle_event("set_custom_amount", %{"value" => amount}, socket) when amount != "" do
+    {amount_float, _} = Float.parse(amount)
+    
+    checkout_form = 
+      socket.assigns.checkout_form.source
+      |> Post.changeset(%{promotion_amount: amount_float})
+      |> to_form()
+
+    {:noreply, 
+     socket
+     |> assign(:checkout_form, checkout_form)}
+  end
+
+  def handle_event("set_custom_amount", _params, socket) do
+    {:noreply, socket}
+  end
+
   # Updated process_upload_results to handle {:ok, nil} cases
   defp process_upload_results(upload_results) do
     Enum.reduce_while(upload_results, {:ok, []}, fn
@@ -874,13 +922,19 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end)
   end
 
-  @impl true
-  def handle_event("checkout", _params, socket) do
-    case create_checkout_session() do
-      {:ok, session} ->
+  def handle_event("promote_listing", _params, socket) do
+    # Get the promotion amount from the form
+    promotion_amount = socket.assigns.checkout_form.promotion_amount.value
+    IO.puts("promotion_amount: #{promotion_amount}")
+
+    case StripeHandler.create_payment_intent(promotion_amount) do
+      {:ok, payment_intent} ->
         {:noreply,
          socket
-         |> redirect(external: session.url)}
+         |> assign(:payment_intent, payment_intent)
+         |> push_event("checkout", %{
+           clientSecret: payment_intent.client_secret
+         })}
 
       {:error, error} ->
         {:noreply,
@@ -890,25 +944,11 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
-  defp create_checkout_session do
-    Stripe.Session.create(%{
-      payment_method_types: ["card"],
-      line_items: [
-        %{
-          price_data: %{
-            currency: "usd",
-            product_data: %{
-              name: "Guitar and Bass Exchange Promotion"
-            },
-            unit_amount: 2000
-          },
-          quantity: 1
-        }
-      ],
-      mode: "payment",
-      success_url: url(~p"/checkout/success"),
-      cancel_url: url(~p"/checkout/cancel")
-    })
+  defp get_promotion_amount(form) do
+    case form[:promotion_amount].value do
+      nil -> 20.00  # Default amount
+      amount -> amount
+    end
   end
 
   # Updated process_upload_results to handle {:ok, nil} cases

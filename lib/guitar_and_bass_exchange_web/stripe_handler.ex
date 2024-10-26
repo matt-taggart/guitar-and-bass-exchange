@@ -1,37 +1,22 @@
 defmodule GuitarAndBassExchangeWeb.StripeHandler do
-  use GuitarAndBassExchangeWeb, :controller
   require Logger
 
-  def create_checkout_session(conn, _params) do
-    payload = Map.get(conn.assigns, :raw_body)
-    signature = List.first(Plug.Conn.get_req_header(conn, "stripe-signature"))
+  def create_payment_intent(amount) do
+    # Convert amount to cents (Stripe expects amounts in cents)
+    amount_in_cents = trunc(amount * 100)
 
-    case Stripe.Webhook.construct_event(
-           payload,
-           signature,
-           Application.get_env(:stripe, :signing_secret)
-         ) do
-      {:ok, event} ->
-        handle_event(event)
-        send_resp(conn, 200, "")
-
-      {:error, error} ->
-        Logger.error("Webhook Error: #{inspect(error)}")
-        send_resp(conn, 400, "Webhook Error")
+    case Stripe.PaymentIntent.create(%{
+      amount: amount_in_cents,
+      currency: "usd",
+      payment_method_types: ["card"],
+      # Optional metadata
+      metadata: %{
+        type: "promotion"
+      }
+    }) do
+      {:ok, payment_intent} -> {:ok, payment_intent}
+      {:error, %Stripe.Error{} = error} -> {:error, error}
+      {:error, _} -> {:error, %{message: "An unexpected error occurred"}}
     end
   end
-
-  defp handle_event(%Stripe.Event{type: "checkout.session.completed"} = event) do
-    session = event.data.object
-    Logger.info("Payment successful! Session: #{inspect(session)}")
-
-    # Handle successful payment
-    # Update database
-    # Send emails
-    # etc.
-
-    :ok
-  end
-
-  defp handle_event(_), do: :ok
 end

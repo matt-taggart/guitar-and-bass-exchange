@@ -354,6 +354,29 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
     """
   end
 
+  def input(%{type: "radio"} = assigns) do
+    ~H"""
+    <div>
+      <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
+        <div class="relative flex items-center">
+          <input
+            type="radio"
+            id={@id}
+            name={@name}
+            value={Phoenix.HTML.Form.normalize_value("radio", @value)}
+            checked={@checked}
+            class="peer sr-only"
+            {@rest}
+          />
+          <div class="w-5 h-5 bg-white border-2 border-gray-300 rounded-full peer-checked:border-blue-600 peer-checked:border-[5px] transition-all"></div>
+        </div>
+        <%= @label %>
+      </label>
+      <.error :for={msg <- @errors}><%= msg %></.error>
+    </div>
+    """
+  end
+
   def input(%{variant: "country_select"} = assigns) do
     ~H"""
     <div>

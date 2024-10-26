@@ -43,7 +43,7 @@ defmodule GuitarAndBassExchangeWeb.Router do
 
   scope "/api", GuitarAndBassExchangeWeb do
     pipe_through :api
-    post "/webhook", StripeHandler, :create_checkout_session
+    post "/webhook", StripeWebhookController, :webhook
   end
 
   # Other scopes may use custom stacks.

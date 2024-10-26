@@ -63,7 +63,7 @@ defmodule GuitarAndBassExchange.MixProject do
       {:timex, "~> 3.7"},
       {:httpoison, "~> 1.8"},
       {:countries, "~> 1.6"},
-      {:stripity_stripe, "~> 2.13.0"}
+      {:stripity_stripe, "~> 3.2.0"}
     ]
   end
 
