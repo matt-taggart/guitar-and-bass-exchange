@@ -480,9 +480,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                             <input
                               type="radio"
                               name="promotion-tier"
-                              value="5.00"
-                              checked={@promotion_amount == "5.00"}
-                              phx-click="set_promotion_amount"
+                              value="basic"
+                              checked={@promotion_type == "basic"}
+                              phx-click="set_promotion_type"
                               class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
                           </div>
@@ -500,9 +500,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                             <input
                               type="radio"
                               name="promotion-tier"
-                              value="10.00"
-                              checked={@promotion_amount == "10.00"}
-                              phx-click="set_promotion_amount"
+                              value="premium"
+                              checked={@promotion_type == "premium"}
+                              phx-click="set_promotion_type"
                               class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
                           </div>
@@ -521,8 +521,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                               type="radio"
                               name="promotion-tier"
                               value="custom"
-                              checked={@promotion_amount == "custom"}
-                              phx-click="set_promotion_amount"
+                              checked={@promotion_type == "custom"}
+                              phx-click="set_promotion_type"
                               class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
                           </div>
@@ -539,18 +539,19 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                               placeholder="0.00"
                               class="w-24 text-right"
                               phx-blur="set_custom_amount"
-                              disabled={@promotion_amount != "custom"}
+                              disabled={@promotion_type != "custom"}
                             />
                           </div>
                         </label>
                       </div>
+
                       <!-- Action Buttons -->
                       <div class="flex flex-col sm:flex-row gap-4">
                         <button
                           type="submit"
-                          disabled={@checkout_form[:promotion_amount].value == nil} 
+                          disabled={is_promote_disabled?(@promotion_type, @checkout_form[:promotion_amount].value)}
                           phx-click="promote_listing"
-                          class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200"
+                          class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
                         >
                           Promote Listing
                         </button>
@@ -648,7 +649,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         socket
         |> assign(:form, to_form(changeset, as: "post"))
         |> assign(:checkout_form, to_form(changeset, as: "checkout"))
-        |> assign(:promotion_amount, "5.00") 
+        |> assign(:promotion_type, "basic")
+        |> assign(:promotion_amount, "5.00")
         |> assign(:current_user, current_user)
         |> assign(:current_step, current_step)
         |> assign(:primary_photo, 0)
@@ -871,30 +873,48 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
-  def handle_event("set_promotion_amount", %{"value" => amount}, socket) do
-    case amount do
-      "custom" ->
-        {:noreply, assign(socket, :promotion_amount, "custom")}
-      
-      amount ->
+  def handle_event("set_promotion_type", %{"value" => type}, socket) do
+    amount = get_default_amount_for_type(type)
+    
+    checkout_form = 
+      if amount do
+        socket.assigns.checkout_form.source
+        |> Post.changeset(%{promotion_amount: String.to_float(amount)})
+        |> to_form()
+      else
+        # Clear the amount for custom type
+        socket.assigns.checkout_form.source
+        |> Post.changeset(%{promotion_amount: nil})
+        |> to_form()
+      end
+
+    {:noreply, 
+     socket
+     |> assign(:promotion_type, type)
+     |> assign(:checkout_form, checkout_form)}
+  end
+
+  def handle_event("set_custom_amount", %{"value" => amount}, socket) when amount != "" do
+    case Float.parse(amount) do
+      {amount_float, _} when amount_float > 0 ->
         checkout_form = 
           socket.assigns.checkout_form.source
-          |> Post.changeset(%{promotion_amount: String.to_float(amount)})
+          |> Post.changeset(%{promotion_amount: amount_float})
           |> to_form()
 
         {:noreply, 
          socket
-         |> assign(:promotion_amount, amount)
          |> assign(:checkout_form, checkout_form)}
+      
+      _ ->
+        {:noreply, socket}
     end
   end
 
-  def handle_event("set_custom_amount", %{"value" => amount}, socket) when amount != "" do
-    {amount_float, _} = Float.parse(amount)
-    
+  def handle_event("set_custom_amount", _params, socket) do
     checkout_form = 
       socket.assigns.checkout_form.source
-      |> Post.changeset(%{promotion_amount: amount_float})
+      |> Post.changeset(%{promotion_amount: nil})
       |> to_form()
 
     {:noreply, 
@@ -902,8 +922,30 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
      |> assign(:checkout_form, checkout_form)}
   end
 
-  def handle_event("set_custom_amount", _params, socket) do
-    {:noreply, socket}
+  def handle_event("promote_listing", _params, socket) do
+    promotion_amount = socket.assigns.checkout_form[:promotion_amount].value
+
+    if promotion_amount && promotion_amount > 0 do
+      case StripeHandler.create_payment_intent(promotion_amount) do
+        {:ok, payment_intent} ->
+          {:noreply,
+           socket
+           |> assign(:payment_intent, payment_intent)
+           |> push_event("checkout", %{
+             clientSecret: payment_intent.client_secret
+           })}
+
+        {:error, error} ->
+          {:noreply,
+           socket
+           |> put_flash(:error, "Payment failed: #{error.message}")
+           |> push_navigate(to: ~p"/")}
+      end
+    else
+      {:noreply,
+       socket
+       |> put_flash(:error, "Please enter a valid promotion amount")}
+    end
   end
 
   # Updated process_upload_results to handle {:ok, nil} cases
@@ -965,5 +1007,21 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         Logger.error("Unexpected upload result: #{inspect(unexpected)}")
         {:halt, {:error, :unexpected_result}}
     end)
+  end
+
+  defp is_promote_disabled?(promotion_type, promotion_amount) do
+    case promotion_type do
+      "custom" -> promotion_amount == nil || promotion_amount <= 0
+      _ -> false
+    end
+  end
+
+  defp get_default_amount_for_type(type) do
+    case type do
+      "basic" -> "5.00"
+      "premium" -> "10.00"
+      "custom" -> nil
+      _ -> "5.00"
+    end
   end
 end
