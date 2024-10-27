@@ -5,7 +5,7 @@ defmodule GuitarAndBassExchangeWeb.StripeHandler do
     # Convert amount to cents (Stripe expects amounts in cents)
     amount_in_cents = trunc(amount * 100)
 
-    case Stripe.PaymentIntent.create(%{
+    params = %{
       amount: amount_in_cents,
       currency: "usd",
       payment_method_types: ["card"],
@@ -13,10 +13,16 @@ defmodule GuitarAndBassExchangeWeb.StripeHandler do
       metadata: %{
         type: "promotion"
       }
-    }) do
-      {:ok, payment_intent} -> {:ok, payment_intent}
-      {:error, %Stripe.Error{} = error} -> {:error, error}
-      {:error, _} -> {:error, %{message: "An unexpected error occurred"}}
+    }
+
+    case Stripe.PaymentIntent.create(params) do
+      {:ok, intent} -> 
+        # Explicitly access the client_secret field
+        {:ok, %{client_secret: intent.client_secret}}
+      {:error, %Stripe.Error{} = error} -> 
+        {:error, error}
+      {:error, _} -> 
+        {:error, %{message: "An unexpected error occurred"}}
     end
   end
 end

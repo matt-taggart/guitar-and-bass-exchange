@@ -135,3 +135,11 @@ config :ex_aws, :s3,
     "#{System.get_env("SPACES_NAME")}.#{System.get_env("SPACES_REGION")}.digitaloceanspaces.com",
   # Ensure no trailing slash
   region: System.get_env("SPACES_REGION")
+
+# Stripe configuration
+config :stripity_stripe,
+  api_key: System.get_env("STRIPE_API_KEY"),
+  signing_secret: System.get_env("STRIPE_SIGNING_SECRET")
+
+config :guitar_and_bass_exchange,
+  stripe_publishable_key: System.get_env("STRIPE_PUBLISHABLE_KEY")

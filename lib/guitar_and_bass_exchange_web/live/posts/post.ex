@@ -474,94 +474,37 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                       <p class="text-gray-600 mb-6">
                         Promote your listing to reach more potential buyers and sell faster. Choose your promotion amount - the higher the amount, the better the visibility.
                       </p>
-                      <div class="grid gap-4 mb-8">
-                        <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
-                          <div class="flex items-center h-5">
-                            <input
-                              type="radio"
-                              name="promotion-tier"
-                              value="basic"
-                              checked={@promotion_type == "basic"}
-                              phx-click="set_promotion_type"
-                              class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                            />
-                          </div>
-                          <div class="ml-3">
-                            <span class="block text-sm font-medium text-gray-900">Basic Promotion</span>
-                            <span class="block text-sm text-gray-500">
-                              $5.00 - Top of search results for 24 hours
-                            </span>
-                          </div>
-                          <span class="ml-auto font-medium text-gray-900">$5</span>
-                        </label>
-
-                        <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
-                          <div class="flex items-center h-5">
-                            <input
-                              type="radio"
-                              name="promotion-tier"
-                              value="premium"
-                              checked={@promotion_type == "premium"}
-                              phx-click="set_promotion_type"
-                              class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                            />
-                          </div>
-                          <div class="ml-3">
-                            <span class="block text-sm font-medium text-gray-900">Premium Promotion</span>
-                            <span class="block text-sm text-gray-500">
-                              $10.00 - Featured listing for 3 days
-                            </span>
-                          </div>
-                          <span class="ml-auto font-medium text-gray-900">$10</span>
-                        </label>
-
-                        <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
-                          <div class="flex items-center h-5">
-                            <input
-                              type="radio"
-                              name="promotion-tier"
-                              value="custom"
-                              checked={@promotion_type == "custom"}
-                              phx-click="set_promotion_type"
-                              class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                            />
-                          </div>
-                          <div class="ml-3">
-                            <span class="block text-sm font-medium text-gray-900">Custom Amount</span>
-                            <span class="block text-sm text-gray-500">Enter your own promotion amount</span>
-                          </div>
-                          <div class="ml-auto">
-                            <.input
-                              type="number"
-                              field={@checkout_form[:promotion_amount]}
-                              min="0"
-                              step="0.01"
-                              placeholder="0.00"
-                              class="w-24 text-right"
-                              phx-blur="set_custom_amount"
-                              disabled={@promotion_type != "custom"}
-                            />
-                          </div>
-                        </label>
-                      </div>
-
-                      <!-- Action Buttons -->
-                      <div class="flex flex-col sm:flex-row gap-4">
-                        <button
-                          type="submit"
-                          disabled={is_promote_disabled?(@promotion_type, @checkout_form[:promotion_amount].value)}
-                          phx-click="promote_listing"
-                          class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      <div class="grid gap-4">
+                        <form 
+                          id="payment-form" 
+                          class="contents" 
+                          phx-submit="prevent_default"
+                          onsubmit="event.preventDefault();"
                         >
-                          Promote Listing
-                        </button>
-                        <button
-                          type="button"
-                          phx-click="publish_without_promotion"
-                          class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50 transition duration-150 focus:ring-4 focus:ring-gray-200 border border-gray-200"
-                        >
-                          Publish Without Promotion
-                        </button>
+                          <div class="">
+                            <div id="card-element" class="min-h-[150px] bg-white p-4 rounded-lg shadow hidden">
+                              <!-- Stripe Elements will insert the card element here -->
+                            </div>
+                            <div id="card-errors" role="alert" class="mt-2 text-red-600 text-sm"></div>
+                          </div>
+                          <div class="flex flex-col sm:flex-row gap-4">
+                            <button
+                              type="submit"
+                              disabled={is_promote_disabled?(@promotion_type, @checkout_form[:promotion_amount].value)}
+                              phx-click="promote_listing"
+                              class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
+                              Pay and Promote
+                            </button>
+                            <button
+                              type="button"
+                              phx-click="publish_without_promotion"
+                              class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50 transition duration-150 focus:ring-4 focus:ring-gray-200 border border-gray-200"
+                            >
+                              Publish Without Promotion
+                            </button>
+                          </div>
+                        </form>
                       </div>
                     </div>
                   </div>
@@ -582,12 +525,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                   <% end %>
                 </div>
               <% end %>
-              <div class="mt-4">
-                <div id="card-element">
-                  <!-- Stripe Elements will insert the card element here -->
-                </div>
-                <div id="card-errors" role="alert"></div>
-              </div>
             </div>
         <% end %>
       </div>
@@ -874,23 +811,22 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   def handle_event("set_promotion_type", %{"value" => type}, socket) do
-    amount = get_default_amount_for_type(type)
+    {amount, amount_float} = case type do
+      "basic" -> {"5.00", 5.00}
+      "premium" -> {"10.00", 10.00}
+      "custom" -> {nil, nil}
+      _ -> {"5.00", 5.00}
+    end
     
     checkout_form = 
-      if amount do
-        socket.assigns.checkout_form.source
-        |> Post.changeset(%{promotion_amount: String.to_float(amount)})
-        |> to_form()
-      else
-        # Clear the amount for custom type
-        socket.assigns.checkout_form.source
-        |> Post.changeset(%{promotion_amount: nil})
-        |> to_form()
-      end
+      socket.assigns.checkout_form.source
+      |> Post.changeset(%{promotion_amount: amount_float})
+      |> to_form()
 
     {:noreply, 
      socket
      |> assign(:promotion_type, type)
+     |> assign(:promotion_amount, amount)
      |> assign(:checkout_form, checkout_form)}
   end
 
@@ -922,32 +858,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
      |> assign(:checkout_form, checkout_form)}
   end
 
-  def handle_event("promote_listing", _params, socket) do
-    promotion_amount = socket.assigns.checkout_form[:promotion_amount].value
-
-    if promotion_amount && promotion_amount > 0 do
-      case StripeHandler.create_payment_intent(promotion_amount) do
-        {:ok, payment_intent} ->
-          {:noreply,
-           socket
-           |> assign(:payment_intent, payment_intent)
-           |> push_event("checkout", %{
-             clientSecret: payment_intent.client_secret
-           })}
-
-        {:error, error} ->
-          {:noreply,
-           socket
-           |> put_flash(:error, "Payment failed: #{error.message}")
-           |> push_navigate(to: ~p"/")}
-      end
-    else
-      {:noreply,
-       socket
-       |> put_flash(:error, "Please enter a valid promotion amount")}
-    end
-  end
-
   # Updated process_upload_results to handle {:ok, nil} cases
   defp process_upload_results(upload_results) do
     Enum.reduce_while(upload_results, {:ok, []}, fn
@@ -964,25 +874,53 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end)
   end
 
-  def handle_event("promote_listing", _params, socket) do
-    # Get the promotion amount from the form
-    promotion_amount = socket.assigns.checkout_form.promotion_amount.value
-    IO.puts("promotion_amount: #{promotion_amount}")
+  def handle_event("prevent_default", _params, socket) do
+    {:noreply, socket}
+  end
 
-    case StripeHandler.create_payment_intent(promotion_amount) do
-      {:ok, payment_intent} ->
-        {:noreply,
-         socket
-         |> assign(:payment_intent, payment_intent)
-         |> push_event("checkout", %{
-           clientSecret: payment_intent.client_secret
-         })}
+  def handle_event("promote_listing", params, socket) do
+    # Log the incoming params for debugging
+    Logger.debug("Promote listing params: #{inspect(params)}")
 
-      {:error, error} ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Payment failed: #{error.message}")
-         |> push_navigate(to: ~p"/")}
+    promotion_amount = 
+      case socket.assigns.promotion_type do
+        "basic" -> 5.00
+        "premium" -> 10.00
+        "custom" -> 
+          # For custom amount, try to get the value from the form
+          case socket.assigns.checkout_form.params["promotion_amount"] do
+            nil -> nil
+            amount_str ->
+              case Float.parse(amount_str) do
+                {amount, _} -> amount
+                :error -> nil
+              end
+          end
+        _ -> nil
+      end
+
+    Logger.info("promotion_amount: #{inspect(promotion_amount)}")
+
+    if promotion_amount && promotion_amount > 0 do
+      case StripeHandler.create_payment_intent(promotion_amount) do
+        {:ok, %{client_secret: client_secret}} ->
+          {:noreply,
+           socket
+           |> assign(:payment_intent_secret, client_secret)
+           |> push_event("checkout", %{
+             clientSecret: client_secret
+           })}
+
+        {:error, error} ->
+          {:noreply,
+           socket
+           |> put_flash(:error, "Payment failed: #{error.message}")
+           |> push_navigate(to: ~p"/")}
+      end
+    else
+      {:noreply,
+       socket
+       |> put_flash(:error, "Please enter a valid promotion amount")}
     end
   end
 

@@ -51,43 +51,51 @@ window.liveSocket = liveSocket;
 // Initialize Stripe
 const stripe = Stripe(window.ENV.stripePublishableKey);
 let elements;
-let card;
 let paymentElement;
 
 // Listen for the custom event from LiveView
-window.addEventListener("phx:begin-payment", (e) => {
+window.addEventListener("phx:checkout", (e) => {
   const { clientSecret } = e.detail;
 
-  // Create elements instance if it doesn't exist
-  if (!elements) {
-    elements = stripe.elements({ clientSecret });
-  }
+  // Clear any existing elements
+  const cardElement = document.querySelector("#card-element");
+  cardElement.innerHTML = "";
 
-  // Create and mount the payment element if it doesn't exist
-  if (!paymentElement) {
-    paymentElement = elements.create("payment");
-    paymentElement.mount("#card-element");
-
-    // Show the card element container
-    document.querySelector("#card-element").classList.remove("hidden");
-  }
-
-  // Handle the payment
-  stripe
-    .confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/checkout/success`,
+  // Create elements instance
+  elements = stripe.elements({
+    clientSecret,
+    appearance: {
+      theme: "stripe",
+      variables: {
+        colorPrimary: "#0070f3",
       },
-    })
-    .then(function (result) {
-      if (result.error) {
-        // Handle error
-        const errorDiv = document.getElementById("card-errors");
-        errorDiv.textContent = result.error.message;
-      } else {
-        // Payment successful
-        // The page will redirect to your return_url
-      }
-    });
+    },
+  });
+
+  // Create and mount the payment element
+  paymentElement = elements.create("payment");
+  paymentElement.mount("#card-element");
+  document.querySelector("#card-element").classList.remove("hidden");
+
+  // Handle form submission
+  const form = document.querySelector("#payment-form");
+  if (form) {
+    form.addEventListener("submit", handleSubmit);
+  }
 });
+
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  const { error } = await stripe.confirmPayment({
+    elements,
+    confirmParams: {
+      return_url: `${window.location.origin}/checkout/success`,
+    },
+  });
+
+  if (error) {
+    const errorDiv = document.getElementById("card-errors");
+    errorDiv.textContent = error.message;
+  }
+}

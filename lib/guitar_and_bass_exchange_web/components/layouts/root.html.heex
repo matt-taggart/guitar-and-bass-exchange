@@ -13,9 +13,9 @@
         stripePublishableKey: "<%= Application.get_env(:guitar_and_bass_exchange, :stripe_publishable_key) %>",
       }
     </script>
+    <script src="https://js.stripe.com/v3/"></script>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
-    <script src="https://js.stripe.com/v3/"></script>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.17.1/cdn/themes/light.css"
