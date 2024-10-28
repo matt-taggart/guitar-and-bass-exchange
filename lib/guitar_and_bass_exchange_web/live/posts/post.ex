@@ -475,22 +475,31 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                         Promote your listing to reach more potential buyers and sell faster. Choose your promotion amount - the higher the amount, the better the visibility.
                       </p>
                       <div class="grid gap-4">
-                        <form 
-                          id="payment-form" 
-                          class="contents" 
+                        <form
+                          id="payment-form"
+                          class="contents"
                           phx-submit="prevent_default"
                           onsubmit="event.preventDefault();"
                         >
                           <div class="">
-                            <div id="card-element" class="min-h-[150px] bg-white p-4 rounded-lg shadow hidden">
+                            <div
+                              id="card-element"
+                              class="min-h-[150px] bg-white p-4 rounded-lg shadow hidden"
+                            >
                               <!-- Stripe Elements will insert the card element here -->
                             </div>
-                            <div id="card-errors" role="alert" class="mt-2 text-red-600 text-sm"></div>
+                            <div id="card-errors" role="alert" class="mt-2 text-red-600 text-sm">
+                            </div>
                           </div>
                           <div class="flex flex-col sm:flex-row gap-4">
                             <button
                               type="submit"
-                              disabled={is_promote_disabled?(@promotion_type, @checkout_form[:promotion_amount].value)}
+                              disabled={
+                                is_promote_disabled?(
+                                  @promotion_type,
+                                  @checkout_form[:promotion_amount].value
+                                )
+                              }
                               phx-click="promote_listing"
                               class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
                             >
@@ -811,19 +820,20 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   def handle_event("set_promotion_type", %{"value" => type}, socket) do
-    {amount, amount_float} = case type do
-      "basic" -> {"5.00", 5.00}
-      "premium" -> {"10.00", 10.00}
-      "custom" -> {nil, nil}
-      _ -> {"5.00", 5.00}
-    end
-    
-    checkout_form = 
+    {amount, amount_float} =
+      case type do
+        "basic" -> {"5.00", 5.00}
+        "premium" -> {"10.00", 10.00}
+        "custom" -> {nil, nil}
+        _ -> {"5.00", 5.00}
+      end
+
+    checkout_form =
       socket.assigns.checkout_form.source
       |> Post.changeset(%{promotion_amount: amount_float})
       |> to_form()
 
-    {:noreply, 
+    {:noreply,
      socket
      |> assign(:promotion_type, type)
      |> assign(:promotion_amount, amount)
@@ -833,27 +843,27 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   def handle_event("set_custom_amount", %{"value" => amount}, socket) when amount != "" do
     case Float.parse(amount) do
       {amount_float, _} when amount_float > 0 ->
-        checkout_form = 
+        checkout_form =
           socket.assigns.checkout_form.source
           |> Post.changeset(%{promotion_amount: amount_float})
           |> to_form()
 
-        {:noreply, 
+        {:noreply,
          socket
          |> assign(:checkout_form, checkout_form)}
-      
+
       _ ->
         {:noreply, socket}
     end
   end
 
   def handle_event("set_custom_amount", _params, socket) do
-    checkout_form = 
+    checkout_form =
       socket.assigns.checkout_form.source
       |> Post.changeset(%{promotion_amount: nil})
       |> to_form()
 
-    {:noreply, 
+    {:noreply,
      socket
      |> assign(:checkout_form, checkout_form)}
   end
@@ -882,21 +892,29 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     # Log the incoming params for debugging
     Logger.debug("Promote listing params: #{inspect(params)}")
 
-    promotion_amount = 
+    promotion_amount =
       case socket.assigns.promotion_type do
-        "basic" -> 5.00
-        "premium" -> 10.00
-        "custom" -> 
+        "basic" ->
+          5.00
+
+        "premium" ->
+          10.00
+
+        "custom" ->
           # For custom amount, try to get the value from the form
           case socket.assigns.checkout_form.params["promotion_amount"] do
-            nil -> nil
+            nil ->
+              nil
+
             amount_str ->
               case Float.parse(amount_str) do
                 {amount, _} -> amount
                 :error -> nil
               end
           end
-        _ -> nil
+
+        _ ->
+          nil
       end
 
     Logger.info("promotion_amount: #{inspect(promotion_amount)}")
@@ -926,7 +944,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
   defp get_promotion_amount(form) do
     case form[:promotion_amount].value do
-      nil -> 20.00  # Default amount
+      # Default amount
+      nil -> 20.00
       amount -> amount
     end
   end
