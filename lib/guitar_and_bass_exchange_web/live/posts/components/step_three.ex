@@ -7,13 +7,22 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
   attr :preview_entry, :any, default: nil
   attr :promotion_type, :string, required: true
   attr :checkout_form, :map, required: true
+  attr :is_promoting, :boolean, required: true
+  attr :is_loading_stripe, :boolean, required: true
 
   def render(assigns) do
     ~H"""
-    <div class="space-y-8"><%!-- Removed max-w-4xl here since it's handled by parent --%>
+    <div class="space-y-8">
+      <%!-- Removed max-w-4xl here since it's handled by parent --%>
       <.progress_summary />
       <.instrument_preview_card form={@form} photos={@photos} />
-      <.promotion_card promotion_type={@promotion_type} checkout_form={@checkout_form} /></div>
+      <.promotion_card
+        promotion_type={@promotion_type}
+        checkout_form={@checkout_form}
+        is_promoting={@is_promoting}
+        is_loading_stripe={@is_loading_stripe}
+      />
+    </div>
     """
   end
 
@@ -186,21 +195,21 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
             </p>
 
             <div class="grid gap-4">
-              <form
-                id="payment-form"
-                class="contents"
-                phx-submit="prevent_default"
-                onsubmit="event.preventDefault();"
-              >
-                <div class="">
+              <div class="contents">
+                <div id="stripe-checkout" phx-hook="StripeCheckout">
                   <div id="card-element" class="min-h-[150px] bg-white p-4 rounded-lg shadow hidden">
                     <!-- Stripe Elements will insert the card element here -->
                   </div>
                   <div id="card-errors" role="alert" class="mt-2 text-red-600 text-sm"></div>
                 </div>
 
-                <.promotion_buttons checkout_form={@checkout_form} promotion_type={@promotion_type} />
-              </form>
+                <.promotion_buttons
+                  checkout_form={@checkout_form}
+                  promotion_type={@promotion_type}
+                  is_promoting={@is_promoting}
+                  is_loading_stripe={@is_loading_stripe}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -209,21 +218,53 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
     """
   end
 
+  # Move the attr declarations before the function that uses them
+  attr :checkout_form, :map, required: true
+  attr :promotion_type, :string, required: true
+  attr :is_promoting, :boolean, required: true
+  attr :is_loading_stripe, :boolean, required: true
+
   defp promotion_buttons(assigns) do
     ~H"""
     <div class="flex flex-col sm:flex-row gap-4">
       <button
-        type="submit"
-        disabled={is_promote_disabled?(@promotion_type, @checkout_form[:promotion_amount].value)}
+        type="button"
+        disabled={@is_promoting || @is_loading_stripe}
         phx-click="promote_listing"
         class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
-        Pay and Promote
+        <%= if @is_loading_stripe do %>
+          <div class="flex items-center justify-center">
+            <div class="animate-spin mr-2 h-4 w-4 text-white">
+              <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                >
+                </circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                >
+                </path>
+              </svg>
+            </div>
+            Processing...
+          </div>
+        <% else %>
+          Pay and Promote
+        <% end %>
       </button>
       <button
         type="button"
+        disabled={@is_promoting || @is_loading_stripe}
         phx-click="publish_without_promotion"
-        class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50 transition duration-150 focus:ring-4 focus:ring-gray-200 border border-gray-200"
+        class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50 transition duration-150 focus:ring-4 focus:ring-gray-200 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Publish Without Promotion
       </button>

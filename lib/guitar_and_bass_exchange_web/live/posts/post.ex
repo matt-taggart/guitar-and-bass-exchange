@@ -50,6 +50,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 preview_entry={@preview_entry}
                 promotion_type={@promotion_type}
                 checkout_form={@checkout_form}
+                is_promoting={@is_promoting}
+                is_loading_stripe={@is_loading_stripe}
               />
           <% end %>
         </div>
@@ -150,6 +152,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
+  def handle_event("prevent_default", _params, socket) do
+    {:noreply, socket}
+  end
+
   # Private functions for handling step submissions
 
   defp handle_step_one_submission(socket, post_params) do
@@ -242,6 +248,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   defp handle_promotion(socket) do
+    socket = assign(socket, :is_loading_stripe, true)
     promotion_amount = Helpers.get_default_promotion_amount(socket.assigns.promotion_type)
 
     if Helpers.is_valid_promotion_amount?(socket.assigns.promotion_type, promotion_amount) do
@@ -250,16 +257,24 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
           {:ok,
            socket
            |> assign(:payment_intent_secret, client_secret)
+           |> assign(:is_loading_stripe, false)
+           |> assign(:is_promoting, true)
            |> push_event("checkout", %{clientSecret: client_secret})}
 
         {:error, error} ->
           {:error,
            socket
+           |> assign(:is_loading_stripe, false)
+           |> assign(:is_promoting, false)
            |> put_flash(:error, "Payment failed: #{error.message}")
            |> push_navigate(to: ~p"/")}
       end
     else
-      {:error, socket |> put_flash(:error, "Please enter a valid promotion amount")}
+      {:error,
+       socket
+       |> assign(:is_loading_stripe, false)
+       |> assign(:is_promoting, false)
+       |> put_flash(:error, "Please enter a valid promotion amount")}
     end
   end
 
@@ -283,5 +298,20 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
          |> assign(form: to_form(changeset))
          |> put_flash(:error, "Failed to publish post")}
     end
+  end
+
+  def handle_event("payment_succeeded", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:is_promoting, false)
+     |> put_flash(:info, "Payment successful!")
+     |> push_navigate(to: ~p"/instruments")}
+  end
+
+  def handle_event("payment_failed", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:is_promoting, false)
+     |> put_flash(:error, "Payment failed. Please try again.")}
   end
 end
