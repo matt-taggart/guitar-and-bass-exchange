@@ -267,7 +267,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
 
     with {:ok, content} <- File.read(src_path),
          {:ok, _response} <- upload_to_s3(content, bucket, dest_path) do
-      {:ok, "https://#{host}/#{dest_path}"}
+      url = "https://#{host}/#{dest_path}"
+      # Return URL in {:ok, url} format
+      {:ok, url}
     else
       error ->
         Logger.error("Upload failed: #{inspect(error)}")
@@ -288,6 +290,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     Enum.reduce_while(upload_results, {:ok, []}, fn
       {:ok, url}, {:ok, acc} ->
         {:cont, {:ok, [url | acc]}}
+
+      result, {:ok, acc} when is_binary(result) ->
+        # This handles the case where the result is directly a URL string
+        {:cont, {:ok, [result | acc]}}
 
       {:error, _reason}, _acc ->
         {:halt, {:error, :upload_failed}}
