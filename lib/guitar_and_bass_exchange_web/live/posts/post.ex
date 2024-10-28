@@ -170,19 +170,19 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
     case Helpers.validate_step(post_params, current_step, draft_post) do
       {:ok, changeset} ->
-        save_step_one(socket, changeset, draft_post)
+        save_step_one(socket, post_params, draft_post)
 
       {:error, changeset} ->
         {:error, assign(socket, form: to_form(changeset, as: "post"))}
     end
   end
 
-  defp save_step_one(socket, changeset, draft_post) do
+  defp save_step_one(socket, params, draft_post) do
     result =
       if draft_post.id do
-        Post.Query.update_post(changeset)
+        Post.Query.update_post(Post.changeset(draft_post, params))
       else
-        Post.Query.create_post(changeset)
+        Post.Query.create_post(params)
       end
 
     case result do
