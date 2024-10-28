@@ -46,7 +46,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
     email = Phoenix.Flash.get(socket.assigns.flash, :email)
     form = to_form(%{"email" => email}, as: "user")
 
-    geocode_data = FetchGeocodeData.fetch_geocode_data()
+    geocode_data = FetchGeocodeData.fetch_geocode_data(session)
 
     {:ok, assign(socket, form: form, geocode_data: geocode_data), temporary_assigns: [form: form]}
   end
