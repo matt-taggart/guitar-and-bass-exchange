@@ -10,7 +10,7 @@ defmodule GuitarAndBassExchangeWeb.Plugs.FetchGeocodeData do
     case get_session(conn, :geocode_data) do
       nil ->
         # If not cached, fetch and store in the session
-        geocode_data = fetch_and_cache_geocode_data(conn)
+        geocode_data = fetch_and_cache_geocode_data()
         put_session(conn, :geocode_data, geocode_data)
         assign(conn, :geocode_data, geocode_data)
 
@@ -20,7 +20,7 @@ defmodule GuitarAndBassExchangeWeb.Plugs.FetchGeocodeData do
     end
   end
 
-  defp fetch_and_cache_geocode_data(_conn) do
+  def fetch_and_cache_geocode_data() do
     case Geocoding.geocode_ip() do
       {:ok, data} ->
         %{
@@ -35,10 +35,10 @@ defmodule GuitarAndBassExchangeWeb.Plugs.FetchGeocodeData do
     end
   end
 
-  def fetch_geocode_data(session, socket) do
+  def fetch_geocode_data(session) do
     case Map.get(session, "geocode_data") do
       nil ->
-        fetch_and_cache_geocode_data(socket)
+        fetch_and_cache_geocode_data()
 
       geocode_data ->
         geocode_data
