@@ -64,7 +64,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
       <div class="relative aspect-video bg-gray-100">
         <%= if length(@photos) > 0 do %>
           <img
-            src={List.first(@photos).url}
+            src={Enum.find(@photos, &(&1.id == &1.post.primary_photo_id)).url}
             alt="Primary instrument photo"
             class="w-full h-full object-cover"
           />
@@ -102,7 +102,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
     <div class="p-6 border-b border-gray-200">
       <h3 class="text-lg font-semibold text-gray-900 mb-4">Photos</h3>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <%= for photo <- @photos do %>
+        <%= for photo <- Enum.filter(@photos, &(&1.id != &1.post.primary_photo_id)) do %>
           <div class="relative group rounded-lg overflow-hidden bg-gray-100 aspect-square">
             <img
               src={photo.url}
