@@ -7,20 +7,23 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
   attr :preview_entry, :any, default: nil
   attr :promotion_type, :string, required: true
   attr :checkout_form, :map, required: true
-  attr :is_promoting, :boolean, required: true
   attr :is_loading_stripe, :boolean, required: true
+  attr :stripe_opened, :boolean, required: true
+  attr :stripe_form_complete, :boolean, required: true
+  attr :payment_processing, :boolean, required: true
 
   def render(assigns) do
     ~H"""
     <div class="space-y-8">
-      <%!-- Removed max-w-4xl here since it's handled by parent --%>
       <.progress_summary />
       <.instrument_preview_card form={@form} photos={@photos} />
       <.promotion_card
         promotion_type={@promotion_type}
         checkout_form={@checkout_form}
-        is_promoting={@is_promoting}
+        stripe_opened={@stripe_opened}
         is_loading_stripe={@is_loading_stripe}
+        stripe_form_complete={@stripe_form_complete}
+        payment_processing={@payment_processing}
       />
     </div>
     """
@@ -205,8 +208,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                 <.promotion_buttons
                   checkout_form={@checkout_form}
                   promotion_type={@promotion_type}
-                  is_promoting={@is_promoting}
                   is_loading_stripe={@is_loading_stripe}
+                  stripe_opened={@stripe_opened}
+                  stripe_form_complete={@stripe_form_complete}
+                  payment_processing={@payment_processing}
                 />
               </div>
             </div>
@@ -217,51 +222,43 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
     """
   end
 
-  # Move the attr declarations before the function that uses them
-  attr :checkout_form, :map, required: true
-  attr :promotion_type, :string, required: true
-  attr :is_promoting, :boolean, required: true
-  attr :is_loading_stripe, :boolean, required: true
-
   defp promotion_buttons(assigns) do
     ~H"""
     <div class="flex flex-col sm:flex-row gap-4">
       <button
         type="button"
-        disabled={@is_promoting || @is_loading_stripe}
-        phx-click="promote_listing"
-        class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        data-promote-button
+        disabled={@is_loading_stripe || (@stripe_opened && !@stripe_form_complete)}
+        phx-click={if @stripe_opened, do: nil, else: "promote_listing"}
+        onclick={if @stripe_opened, do: "handleStripeSubmit()"}
+        class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed relative"
       >
-        <%= if @is_loading_stripe do %>
-          <div class="flex items-center justify-center">
-            <div class="animate-spin mr-2 h-4 w-4 text-white">
-              <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                >
-                </circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                >
-                </path>
-              </svg>
-            </div>
-            Processing...
+        <%= if @stripe_opened, do: "Complete Payment", else: "Pay and Promote" %>
+
+        <%= if @payment_processing do %>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <svg
+              class="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+              </circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              >
+              </path>
+            </svg>
           </div>
-        <% else %>
-          Pay and Promote
         <% end %>
       </button>
+
       <button
         type="button"
-        disabled={@is_promoting || @is_loading_stripe}
+        disabled={@is_loading_stripe}
         phx-click="publish_without_promotion"
         class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50 transition duration-150 focus:ring-4 focus:ring-gray-200 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
@@ -269,12 +266,5 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
       </button>
     </div>
     """
-  end
-
-  defp is_promote_disabled?(promotion_type, promotion_amount) do
-    case promotion_type do
-      "custom" -> promotion_amount == nil || promotion_amount <= 0
-      _ -> false
-    end
   end
 end

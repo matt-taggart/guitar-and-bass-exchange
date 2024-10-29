@@ -44,10 +44,29 @@ Hooks.StripeCheckout = {
       paymentElement = elements.create("payment");
       paymentElement.mount("#card-element");
       cardElement.classList.remove("hidden");
+
+      // Get the button and disable initially
+      const button = document.querySelector("[data-promote-button]");
+      button.disabled = true;
+
+      // Enable/disable button based on form completion
+      paymentElement.on("change", (event) => {
+        if (event.complete) {
+          button.disabled = false;
+          this.pushEvent("stripe_form_complete", {});
+        } else {
+          button.disabled = true;
+          this.pushEvent("stripe_form_incomplete", {});
+        }
+      });
     });
 
     // Handle form submission
     window.handleStripeSubmit = async () => {
+      const button = document.querySelector("[data-promote-button]");
+      button.disabled = true;
+      this.pushEvent("payment_processing", {}); // Start loading state
+
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -58,6 +77,8 @@ Hooks.StripeCheckout = {
       if (error) {
         const errorDiv = document.getElementById("card-errors");
         errorDiv.textContent = error.message;
+        button.disabled = false;
+        this.pushEvent("payment_failed", {}); // Remove loading state
       }
     };
   },

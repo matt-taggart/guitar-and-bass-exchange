@@ -54,7 +54,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
       preview_entry: socket.assigns.preview_entry,
       promotion_type: socket.assigns.promotion_type,
       checkout_form: socket.assigns.checkout_form,
-      is_promoting: socket.assigns.is_promoting
+      stripe_opened: socket.assigns.stripe_opened
     }
   end
 
@@ -372,8 +372,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     |> assign(:preview_entry, nil)
     |> assign(:preview_url, nil)
     |> assign(:show_preview, false)
-    |> assign(:is_promoting, false)
+    |> assign(:stripe_form_complete, false)
     |> assign(:is_loading_stripe, false)
+    |> assign(:stripe_opened, false)
+    |> assign(:payment_processing, false)
     |> assign(:geocode_data, geocode_data)
     |> assign(:show_progress, false)
     |> assign(:total_progress, 0)

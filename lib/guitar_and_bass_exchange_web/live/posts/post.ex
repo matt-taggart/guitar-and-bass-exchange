@@ -50,8 +50,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 preview_entry={@preview_entry}
                 promotion_type={@promotion_type}
                 checkout_form={@checkout_form}
-                is_promoting={@is_promoting}
                 is_loading_stripe={@is_loading_stripe}
+                stripe_opened={@stripe_opened}
+                stripe_form_complete={@stripe_form_complete}
+                payment_processing={@payment_processing}
               />
           <% end %>
         </div>
@@ -140,9 +142,20 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
   def handle_event("promote_listing", _params, socket) do
     case handle_promotion(socket) do
-      {:ok, updated_socket} -> {:noreply, updated_socket}
-      {:error, updated_socket} -> {:noreply, updated_socket}
+      {:ok, updated_socket} ->
+        {:noreply, assign(updated_socket, stripe_opened: true)}
+
+      {:error, updated_socket} ->
+        {:noreply, updated_socket}
     end
+  end
+
+  def handle_event("stripe_form_complete", _params, socket) do
+    {:noreply, assign(socket, stripe_form_complete: true)}
+  end
+
+  def handle_event("stripe_form_incomplete", _params, socket) do
+    {:noreply, assign(socket, stripe_form_complete: false)}
   end
 
   def handle_event("publish_without_promotion", _params, socket) do
@@ -258,14 +271,14 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
            socket
            |> assign(:payment_intent_secret, client_secret)
            |> assign(:is_loading_stripe, false)
-           |> assign(:is_promoting, true)
+           |> assign(:stripe_opened, true)
            |> push_event("checkout", %{clientSecret: client_secret})}
 
         {:error, error} ->
           {:error,
            socket
            |> assign(:is_loading_stripe, false)
-           |> assign(:is_promoting, false)
+           |> assign(:stripe_opened, false)
            |> put_flash(:error, "Payment failed: #{error.message}")
            |> push_navigate(to: ~p"/")}
       end
@@ -273,7 +286,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
       {:error,
        socket
        |> assign(:is_loading_stripe, false)
-       |> assign(:is_promoting, false)
+       |> assign(:stripe_opened, false)
        |> put_flash(:error, "Please enter a valid promotion amount")}
     end
   end
@@ -303,7 +316,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   def handle_event("payment_succeeded", _params, socket) do
     {:noreply,
      socket
-     |> assign(:is_promoting, false)
      |> put_flash(:info, "Payment successful!")
      |> push_navigate(to: ~p"/instruments")}
   end
@@ -311,7 +323,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   def handle_event("payment_failed", _params, socket) do
     {:noreply,
      socket
-     |> assign(:is_promoting, false)
      |> put_flash(:error, "Payment failed. Please try again.")}
   end
 end
