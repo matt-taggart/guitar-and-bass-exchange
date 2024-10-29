@@ -127,7 +127,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
 
   defp details_grid(assigns) do
     ~H"""
-    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-24">
       <!-- Basic Info -->
       <div class="space-y-4">
         <h3 class="text-lg font-semibold text-gray-900">Basic Information</h3>
@@ -153,11 +153,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
           <% end %>
         </dl>
       </div>
-      <!-- Description -->
-      <div class="md:col-span-2 space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900">Description</h3>
-        <p class="text-gray-600 whitespace-pre-wrap"><%= @form[:description].value %></p>
-      </div>
+    </div>
+    <div class="p-6 md:col-span-2 space-y-4">
+      <h3 class="text-lg font-semibold text-gray-900">Description</h3>
+      <p class="text-gray-600 whitespace-pre-wrap"><%= @form[:description].value %></p>
     </div>
     """
   end
