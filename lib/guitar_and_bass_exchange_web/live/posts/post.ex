@@ -171,8 +171,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:noreply, assign(socket, stripe_form_complete: true)}
   end
 
-  def handle_event("stripe_form_in_progress", _params, socket) do
-    {:noreply, assign(socket, stripe_form_in_progress: true)}
+  def handle_event("stripe_form_incomplete", _params, socket) do
+    {:noreply, assign(socket, stripe_form_complete: false)}
   end
 
   def handle_event("publish_without_promotion", _params, socket) do

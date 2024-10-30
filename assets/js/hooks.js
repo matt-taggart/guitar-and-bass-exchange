@@ -50,7 +50,7 @@ Hooks.StripeCheckout = {
         if (event.complete) {
           this.pushEvent("stripe_form_complete", {});
         } else {
-          this.pushEvent("stripe_form_in_progress", {});
+          this.pushEvent("stripe_form_incomplete", {});
         }
       });
     });
@@ -69,7 +69,6 @@ Hooks.StripeCheckout = {
       if (error) {
         const errorDiv = document.getElementById("card-errors");
         errorDiv.textContent = error.message;
-        button.disabled = false;
         this.pushEvent("payment_failed", {}); // Remove loading state
       }
     };

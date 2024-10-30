@@ -289,9 +289,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                 <div
                   id="stripe-checkout-card"
                   phx-hook="StripeCheckout"
-                  class={[
-                    "min-h-[150px] bg-white p-4 rounded-lg shadow hidden"
-                  ]}
+                  class="min-h-[150px] bg-white p-4 rounded-lg shadow hidden"
                 >
                   <!-- Stripe Elements will insert the card element here -->
                 </div>
