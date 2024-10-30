@@ -220,9 +220,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                 </div>
                 <div class="ml-3">
                   <span class="block text-sm font-medium text-gray-900">Basic Promotion</span>
-                  <span class="block text-sm text-gray-500">
-                    $5.00 - Top of search results for 24 hours
-                  </span>
                 </div>
                 <span class="ml-auto font-medium text-gray-900">$5</span>
               </label>
@@ -241,9 +238,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                 </div>
                 <div class="ml-3">
                   <span class="block text-sm font-medium text-gray-900">Premium Promotion</span>
-                  <span class="block text-sm text-gray-500">
-                    $10.00 - Featured listing for 3 days
-                  </span>
                 </div>
                 <span class="ml-auto font-medium text-gray-900">$10</span>
               </label>
@@ -295,7 +289,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                 <div
                   id="stripe-checkout-card"
                   phx-hook="StripeCheckout"
-                  class="min-h-[150px] bg-white p-4 rounded-lg shadow hidden"
+                  class={[
+                    "min-h-[150px] bg-white p-4 rounded-lg shadow hidden"
+                  ]}
                 >
                   <!-- Stripe Elements will insert the card element here -->
                 </div>
@@ -343,32 +339,21 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
     <div class="flex flex-col sm:flex-row gap-4">
       <button
         type="button"
-        disabled={@payment_processing}
-        phx-click="promote_listing"
+        disabled={@payment_processing || (@payment_intent_id && !@stripe_form_complete)}
+        phx-click={if @payment_intent_id, do: "handle_payment", else: "promote_listing"}
         class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed relative"
       >
-        <%= if @payment_processing do %>
-          Processing...
-        <% else %>
-          Pay $<%= format_amount(@promotion_amount) %> and Promote
+        <%= cond do %>
+          <% @payment_processing -> %>
+            Processing...
+          <% @payment_intent_id -> %>
+            Complete Payment
+          <% true -> %>
+            Pay $<%= format_amount(@promotion_amount) %> and Promote
         <% end %>
         <%= if @payment_processing do %>
           <div class="absolute inset-0 flex items-center justify-center">
-            <svg
-              class="animate-spin h-5 w-5 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-              </circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              >
-              </path>
-            </svg>
+            <!-- spinner SVG -->
           </div>
         <% end %>
       </button>

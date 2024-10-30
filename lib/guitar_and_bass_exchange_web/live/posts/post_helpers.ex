@@ -180,7 +180,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     case type do
       "basic" -> amount == 5.00
       "premium" -> amount == 10.00
-      "custom" -> amount != nil && amount > 0
+      "custom" -> is_number(amount) && amount >= 1.00
       _ -> false
     end
   end

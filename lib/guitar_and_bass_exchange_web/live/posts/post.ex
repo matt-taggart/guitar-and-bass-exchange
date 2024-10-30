@@ -142,7 +142,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   def handle_event("promote_listing", _params, socket) do
-    promotion_amount = Helpers.get_default_promotion_amount(socket.assigns.promotion_type)
+    promotion_amount = socket.assigns.promotion_amount
 
     if Helpers.is_valid_promotion_amount?(socket.assigns.promotion_type, promotion_amount) do
       case StripeHandler.create_payment_intent(promotion_amount) do
