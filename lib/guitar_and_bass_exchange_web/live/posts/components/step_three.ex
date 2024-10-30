@@ -6,6 +6,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
   attr :preview_url, :string, default: nil
   attr :preview_entry, :any, default: nil
   attr :promotion_type, :string, required: true
+  attr :promotion_amount, :float, required: true
   attr :checkout_form, :map, required: true
   attr :stripe_form_complete, :boolean, required: true
   attr :stripe_form_in_progress, :boolean, required: true
@@ -19,6 +20,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
       <.instrument_preview_card form={@form} photos={@photos} />
       <.promotion_card
         promotion_type={@promotion_type}
+        promotion_amount={@promotion_amount}
         checkout_form={@checkout_form}
         stripe_form_complete={@stripe_form_complete}
         stripe_form_in_progress={@stripe_form_in_progress}
@@ -191,11 +193,88 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
             </div>
           </div>
           <div class="flex-1">
-            <h2 class="text-xl font-bold text-gray-900 mb-2">Boost Your Listing's Visibility</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">
+              Boost Your Listing's Visibility
+            </h2>
             <p class="text-gray-600 mb-6">
               Promote your listing to reach more potential buyers and sell faster. Choose your promotion amount - the higher the amount, the better the visibility.
             </p>
+            <div class="grid gap-4 mb-8">
+              <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
+                <div class="flex items-center h-5">
+                  <input
+                    type="radio"
+                    name="promotion_type"
+                    value="basic"
+                    checked={@promotion_type == "basic"}
+                    phx-click="set_promotion_type"
+                    phx-value-type="basic"
+                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                </div>
+                <div class="ml-3">
+                  <span class="block text-sm font-medium text-gray-900">Basic Promotion</span>
+                  <span class="block text-sm text-gray-500">
+                    $5.00 - Top of search results for 24 hours
+                  </span>
+                </div>
+                <span class="ml-auto font-medium text-gray-900">$5</span>
+              </label>
 
+              <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
+                <div class="flex items-center h-5">
+                  <input
+                    type="radio"
+                    name="promotion_type"
+                    value="premium"
+                    checked={@promotion_type == "premium"}
+                    phx-click="set_promotion_type"
+                    phx-value-type="premium"
+                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                </div>
+                <div class="ml-3">
+                  <span class="block text-sm font-medium text-gray-900">Premium Promotion</span>
+                  <span class="block text-sm text-gray-500">
+                    $10.00 - Featured listing for 3 days
+                  </span>
+                </div>
+                <span class="ml-auto font-medium text-gray-900">$10</span>
+              </label>
+
+              <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
+                <div class="flex items-center h-5">
+                  <input
+                    type="radio"
+                    name="promotion_type"
+                    value="custom"
+                    checked={@promotion_type == "custom"}
+                    phx-click="set_promotion_type"
+                    phx-value-type="custom"
+                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                </div>
+                <div class="ml-3">
+                  <span class="block text-sm font-medium text-gray-900">Custom Amount</span>
+                  <span class="block text-sm text-gray-500">Enter your own promotion amount</span>
+                </div>
+                <div class="ml-auto">
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={
+                      if @promotion_type == "custom",
+                        do: :erlang.float_to_binary(@promotion_amount, decimals: 2)
+                    }
+                    placeholder="0.00"
+                    class="w-24 text-right rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    phx-blur="set_custom_amount"
+                    disabled={@promotion_type != "custom"}
+                  />
+                </div>
+              </label>
+            </div>
             <div class="grid gap-4">
               <div class="contents">
                 <div
@@ -210,6 +289,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                 <.promotion_buttons
                   checkout_form={@checkout_form}
                   promotion_type={@promotion_type}
+                  promotion_amount={@promotion_amount}
                   stripe_form_complete={@stripe_form_complete}
                   stripe_form_in_progress={@stripe_form_in_progress}
                   payment_processing={@payment_processing}
@@ -247,11 +327,15 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
     <div class="flex flex-col sm:flex-row gap-4">
       <button
         type="button"
-        disabled={}
+        disabled={is_nil(@promotion_amount) || @promotion_amount <= 0 || @payment_processing}
         phx-click="promote_listing"
         class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed relative"
       >
-        <%= get_button_copy(@payment_intent_id, @stripe_form_complete, @payment_processing) %>
+        <%= if @payment_processing do %>
+          Processing...
+        <% else %>
+          Pay $<%= format_amount(@promotion_amount) %> and Promote
+        <% end %>
         <%= if @payment_processing do %>
           <div class="absolute inset-0 flex items-center justify-center">
             <svg
@@ -283,4 +367,20 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
     </div>
     """
   end
+
+  # Add this helper function to handle nil values
+  defp format_amount(nil), do: "0.00"
+
+  defp format_amount(amount) when is_float(amount) do
+    :erlang.float_to_binary(amount, decimals: 2)
+  end
+
+  defp format_amount(amount) when is_binary(amount) do
+    case Float.parse(amount) do
+      {float, _} -> format_amount(float)
+      :error -> "0.00"
+    end
+  end
+
+  defp format_amount(_), do: "0.00"
 end

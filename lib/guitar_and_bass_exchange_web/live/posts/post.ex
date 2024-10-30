@@ -54,6 +54,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 stripe_form_in_progress={@stripe_form_in_progress}
                 payment_processing={@payment_processing}
                 payment_intent_id={@payment_intent_id}
+                promotion_amount={@promotion_amount}
               />
           <% end %>
         </div>
@@ -309,5 +310,32 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:noreply,
      socket
      |> put_flash(:error, "Payment failed. Please try again.")}
+  end
+
+  def handle_event("set_promotion_type", %{"type" => type}, socket) do
+    promotion_amount =
+      case type do
+        "basic" -> 5.00
+        "premium" -> 10.00
+        "custom" -> socket.assigns.promotion_amount
+      end
+
+    {:noreply,
+     socket
+     |> assign(:promotion_type, type)
+     |> assign(:promotion_amount, promotion_amount)}
+  end
+
+  def handle_event("set_custom_amount", %{"value" => value}, socket) do
+    case Float.parse(value) do
+      {amount, _} when amount > 0 ->
+        {:noreply,
+         socket
+         |> assign(:promotion_type, "custom")
+         |> assign(:promotion_amount, amount)}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 end

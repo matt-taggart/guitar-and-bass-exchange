@@ -325,7 +325,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     |> assign(:form, to_form(changeset, as: "post"))
     |> assign(:checkout_form, to_form(changeset, as: "checkout"))
     |> assign(:promotion_type, "basic")
-    |> assign(:promotion_amount, "5.00")
+    |> assign(:promotion_amount, 5.00)
     |> assign(:current_user, current_user)
     |> assign(:current_step, current_step)
     |> assign(:primary_photo, 0)
@@ -344,6 +344,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     |> assign(:payment_processing, false)
     |> assign(:stripe_form_complete, false)
     |> assign(:stripe_form_in_progress, false)
+    |> assign(:promotion_amount, nil)
     |> allow_upload(:photos,
       accept: ~w(.jpg .jpeg .png .webp),
       max_entries: 8,
