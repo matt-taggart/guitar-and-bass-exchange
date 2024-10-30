@@ -194,12 +194,14 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
 
             <div class="grid gap-4">
               <div class="contents">
-                <div id="stripe-checkout-card" phx-hook="StripeCheckout" class="hidden">
-                  <div class="min-h-[150px] bg-white p-4 rounded-lg shadow">
-                    <!-- Stripe Elements will insert the card element here -->
-                  </div>
-                  <div id="card-errors" role="alert" class="mt-2 text-red-600 text-sm"></div>
+                <div
+                  id="stripe-checkout-card"
+                  phx-hook="StripeCheckout"
+                  class="min-h-[150px] bg-white p-4 rounded-lg shadow hidden"
+                >
+                  <!-- Stripe Elements will insert the card element here -->
                 </div>
+                <div id="card-errors" role="alert" class="mt-2 text-red-600 text-sm"></div>
 
                 <.promotion_buttons
                   checkout_form={@checkout_form}
