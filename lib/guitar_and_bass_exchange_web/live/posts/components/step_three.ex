@@ -8,7 +8,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
   attr :promotion_type, :string, required: true
   attr :checkout_form, :map, required: true
   attr :stripe_form_complete, :boolean, required: true
+  attr :stripe_form_in_progress, :boolean, required: true
   attr :payment_processing, :boolean, required: true
+  attr :payment_intent_id, :string, default: nil
 
   def render(assigns) do
     ~H"""
@@ -19,7 +21,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
         promotion_type={@promotion_type}
         checkout_form={@checkout_form}
         stripe_form_complete={@stripe_form_complete}
+        stripe_form_in_progress={@stripe_form_in_progress}
         payment_processing={@payment_processing}
+        payment_intent_id={@payment_intent_id}
       />
     </div>
     """
@@ -207,7 +211,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                   checkout_form={@checkout_form}
                   promotion_type={@promotion_type}
                   stripe_form_complete={@stripe_form_complete}
+                  stripe_form_in_progress={@stripe_form_in_progress}
                   payment_processing={@payment_processing}
+                  payment_intent_id={@payment_intent_id}
                 />
               </div>
             </div>
@@ -218,17 +224,34 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
     """
   end
 
+  defp get_button_copy(payment_intent_id, stripe_form_complete, payment_processing) do
+    case {payment_intent_id, stripe_form_complete, payment_processing} do
+      {nil, false, false} -> "Pay and Promote"
+      {_, false, false} -> "Complete Promotion"
+      {_, _, true} -> "Processing..."
+      _ -> "Pay and Promote"
+    end
+  end
+
+  defp is_button_disabled?(payment_intent_id, stripe_form_complete, payment_processing) do
+    case {payment_intent_id, stripe_form_complete, payment_processing} do
+      {true, false, false} -> "Pay and Promote"
+      {true, true, false} -> "Complete Promotion"
+      {_, _, true} -> "Processing..."
+      _ -> "Pay and Promote"
+    end
+  end
+
   defp promotion_buttons(assigns) do
     ~H"""
     <div class="flex flex-col sm:flex-row gap-4">
       <button
         type="button"
-        data-promote-button
-        disabled={false}
+        disabled={}
         phx-click="promote_listing"
         class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed relative"
       >
-        Pay and Promote
+        <%= get_button_copy(@payment_intent_id, @stripe_form_complete, @payment_processing) %>
         <%= if @payment_processing do %>
           <div class="absolute inset-0 flex items-center justify-center">
             <svg

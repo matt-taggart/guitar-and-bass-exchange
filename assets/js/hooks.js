@@ -45,18 +45,12 @@ Hooks.StripeCheckout = {
       paymentElement.mount("#stripe-checkout-card");
       cardElement.classList.remove("hidden");
 
-      // Get the button and disable initially
-      const button = document.querySelector("[data-promote-button]");
-      button.disabled = true;
-
       // Enable/disable button based on form completion
       paymentElement.on("change", (event) => {
         if (event.complete) {
-          button.disabled = false;
           this.pushEvent("stripe_form_complete", {});
         } else {
-          button.disabled = true;
-          this.pushEvent("stripe_form_incomplete", {});
+          this.pushEvent("stripe_form_in_progress", {});
         }
       });
     });

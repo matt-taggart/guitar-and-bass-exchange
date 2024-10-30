@@ -51,7 +51,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 promotion_type={@promotion_type}
                 checkout_form={@checkout_form}
                 stripe_form_complete={@stripe_form_complete}
+                stripe_form_in_progress={@stripe_form_in_progress}
                 payment_processing={@payment_processing}
+                payment_intent_id={@payment_intent_id}
               />
           <% end %>
         </div>
@@ -139,12 +141,28 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   def handle_event("promote_listing", _params, socket) do
-    case handle_promotion(socket) do
-      {:ok, updated_socket} ->
-        {:noreply, updated_socket}
+    promotion_amount = Helpers.get_default_promotion_amount(socket.assigns.promotion_type)
 
-      {:error, updated_socket} ->
-        {:noreply, updated_socket}
+    if Helpers.is_valid_promotion_amount?(socket.assigns.promotion_type, promotion_amount) do
+      case StripeHandler.create_payment_intent(promotion_amount) do
+        {:ok, %{client_secret: client_secret, id: id, amount: amount}} ->
+          {:noreply,
+           socket
+           |> assign(:payment_intent_secret, client_secret)
+           |> assign(:payment_intent_id, id)
+           |> assign(:payment_intent_amount, amount)
+           |> push_event("checkout", %{clientSecret: client_secret})}
+
+        {:error, error} ->
+          {:error,
+           socket
+           |> put_flash(:error, "Payment failed: #{error.message}")
+           |> push_navigate(to: ~p"/")}
+      end
+    else
+      {:error,
+       socket
+       |> put_flash(:error, "Please enter a valid promotion amount")}
     end
   end
 
@@ -152,8 +170,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:noreply, assign(socket, stripe_form_complete: true)}
   end
 
-  def handle_event("stripe_form_incomplete", _params, socket) do
-    {:noreply, assign(socket, stripe_form_complete: false)}
+  def handle_event("stripe_form_in_progress", _params, socket) do
+    {:noreply, assign(socket, stripe_form_in_progress: true)}
   end
 
   def handle_event("publish_without_promotion", _params, socket) do
@@ -255,32 +273,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
          |> assign(:form, to_form(changeset, as: "post"))
          |> assign(:show_progress, false)
          |> put_flash(:error, "Failed to update post")}
-    end
-  end
-
-  defp handle_promotion(socket) do
-    promotion_amount = Helpers.get_default_promotion_amount(socket.assigns.promotion_type)
-
-    if Helpers.is_valid_promotion_amount?(socket.assigns.promotion_type, promotion_amount) do
-      case StripeHandler.create_payment_intent(promotion_amount) do
-        {:ok, %{client_secret: client_secret, id: id, amount: amount}} ->
-          {:ok,
-           socket
-           |> assign(:payment_intent_secret, client_secret)
-           |> assign(:payment_intent_id, id)
-           |> assign(:payment_intent_amount, amount)
-           |> push_event("checkout", %{clientSecret: client_secret})}
-
-        {:error, error} ->
-          {:error,
-           socket
-           |> put_flash(:error, "Payment failed: #{error.message}")
-           |> push_navigate(to: ~p"/")}
-      end
-    else
-      {:error,
-       socket
-       |> put_flash(:error, "Please enter a valid promotion amount")}
     end
   end
 
