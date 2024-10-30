@@ -57,8 +57,6 @@ Hooks.StripeCheckout = {
 
     // Handle form submission
     window.handleStripeSubmit = async () => {
-      const button = document.querySelector("[data-promote-button]");
-      button.disabled = true;
       this.pushEvent("payment_processing", {}); // Start loading state
 
       const { error } = await stripe.confirmPayment({
