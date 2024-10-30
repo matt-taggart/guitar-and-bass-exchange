@@ -22,43 +22,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
   end
 
   @doc """
-  Prepares assigns for Step One component.
-  """
-  def step_one_assigns(socket) do
-    %{
-      form: socket.assigns.form,
-      uploads: socket.assigns.uploads
-    }
-  end
-
-  @doc """
-  Prepares assigns for Step Two component.
-  """
-  def step_two_assigns(socket) do
-    %{
-      uploads: socket.assigns.uploads,
-      show_progress: socket.assigns.show_progress,
-      primary_photo: socket.assigns.primary_photo,
-      total_progress: socket.assigns.total_progress
-    }
-  end
-
-  @doc """
-  Prepares assigns for Step Three component.
-  """
-  def step_three_assigns(socket) do
-    %{
-      form: socket.assigns.form,
-      photos: socket.assigns.photos,
-      preview_url: socket.assigns.preview_url,
-      preview_entry: socket.assigns.preview_entry,
-      promotion_type: socket.assigns.promotion_type,
-      checkout_form: socket.assigns.checkout_form,
-      stripe_opened: socket.assigns.stripe_opened
-    }
-  end
-
-  @doc """
   Validates a step based on current parameters
   """
   def validate_step(params, current_step, existing_post) do
@@ -372,13 +335,14 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     |> assign(:preview_entry, nil)
     |> assign(:preview_url, nil)
     |> assign(:show_preview, false)
-    |> assign(:stripe_form_complete, false)
-    |> assign(:is_loading_stripe, false)
-    |> assign(:stripe_opened, false)
-    |> assign(:payment_processing, false)
     |> assign(:geocode_data, geocode_data)
     |> assign(:show_progress, false)
     |> assign(:total_progress, 0)
+    |> assign(:payment_intent_secret, nil)
+    |> assign(:payment_intent_id, nil)
+    |> assign(:payment_intent_amount, nil)
+    |> assign(:payment_processing, false)
+    |> assign(:stripe_form_complete, false)
     |> allow_upload(:photos,
       accept: ~w(.jpg .jpeg .png .webp),
       max_entries: 8,

@@ -50,8 +50,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 preview_entry={@preview_entry}
                 promotion_type={@promotion_type}
                 checkout_form={@checkout_form}
-                is_loading_stripe={@is_loading_stripe}
-                stripe_opened={@stripe_opened}
                 stripe_form_complete={@stripe_form_complete}
                 payment_processing={@payment_processing}
               />
@@ -143,7 +141,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   def handle_event("promote_listing", _params, socket) do
     case handle_promotion(socket) do
       {:ok, updated_socket} ->
-        {:noreply, assign(updated_socket, stripe_opened: true)}
+        {:noreply, updated_socket}
 
       {:error, updated_socket} ->
         {:noreply, updated_socket}
@@ -261,7 +259,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   defp handle_promotion(socket) do
-    socket = assign(socket, :is_loading_stripe, true)
     promotion_amount = Helpers.get_default_promotion_amount(socket.assigns.promotion_type)
 
     if Helpers.is_valid_promotion_amount?(socket.assigns.promotion_type, promotion_amount) do
@@ -270,23 +267,19 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
           {:ok,
            socket
            |> assign(:payment_intent_secret, client_secret)
-           |> assign(:is_loading_stripe, false)
-           |> assign(:stripe_opened, true)
+           |> assign(:payment_intent_id, id)
+           |> assign(:payment_intent_amount, amount)
            |> push_event("checkout", %{clientSecret: client_secret})}
 
         {:error, error} ->
           {:error,
            socket
-           |> assign(:is_loading_stripe, false)
-           |> assign(:stripe_opened, false)
            |> put_flash(:error, "Payment failed: #{error.message}")
            |> push_navigate(to: ~p"/")}
       end
     else
       {:error,
        socket
-       |> assign(:is_loading_stripe, false)
-       |> assign(:stripe_opened, false)
        |> put_flash(:error, "Please enter a valid promotion amount")}
     end
   end

@@ -7,8 +7,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
   attr :preview_entry, :any, default: nil
   attr :promotion_type, :string, required: true
   attr :checkout_form, :map, required: true
-  attr :is_loading_stripe, :boolean, required: true
-  attr :stripe_opened, :boolean, required: true
   attr :stripe_form_complete, :boolean, required: true
   attr :payment_processing, :boolean, required: true
 
@@ -20,8 +18,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
       <.promotion_card
         promotion_type={@promotion_type}
         checkout_form={@checkout_form}
-        stripe_opened={@stripe_opened}
-        is_loading_stripe={@is_loading_stripe}
         stripe_form_complete={@stripe_form_complete}
         payment_processing={@payment_processing}
       />
@@ -208,8 +204,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                 <.promotion_buttons
                   checkout_form={@checkout_form}
                   promotion_type={@promotion_type}
-                  is_loading_stripe={@is_loading_stripe}
-                  stripe_opened={@stripe_opened}
                   stripe_form_complete={@stripe_form_complete}
                   payment_processing={@payment_processing}
                 />
@@ -228,13 +222,11 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
       <button
         type="button"
         data-promote-button
-        disabled={@is_loading_stripe || (@stripe_opened && !@stripe_form_complete)}
-        phx-click={if @stripe_opened, do: nil, else: "promote_listing"}
-        onclick={if @stripe_opened, do: "handleStripeSubmit()"}
+        disabled={false}
+        phx-click="promote_listing"
         class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed relative"
       >
-        <%= if @stripe_opened, do: "Complete Payment", else: "Pay and Promote" %>
-
+        Pay and Promote
         <%= if @payment_processing do %>
           <div class="absolute inset-0 flex items-center justify-center">
             <svg
@@ -258,7 +250,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
 
       <button
         type="button"
-        disabled={@is_loading_stripe}
         phx-click="publish_without_promotion"
         class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50 transition duration-150 focus:ring-4 focus:ring-gray-200 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
