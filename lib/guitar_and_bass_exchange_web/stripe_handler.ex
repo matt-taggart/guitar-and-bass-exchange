@@ -16,12 +16,13 @@ defmodule GuitarAndBassExchangeWeb.StripeHandler do
     }
 
     case Stripe.PaymentIntent.create(params) do
-      {:ok, intent} -> 
-        # Explicitly access the client_secret field
-        {:ok, %{client_secret: intent.client_secret}}
-      {:error, %Stripe.Error{} = error} -> 
+      {:ok, intent} ->
+        {:ok, intent}
+
+      {:error, %Stripe.Error{} = error} ->
         {:error, error}
-      {:error, _} -> 
+
+      {:error, _} ->
         {:error, %{message: "An unexpected error occurred"}}
     end
   end

@@ -266,7 +266,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
     if Helpers.is_valid_promotion_amount?(socket.assigns.promotion_type, promotion_amount) do
       case StripeHandler.create_payment_intent(promotion_amount) do
-        {:ok, %{client_secret: client_secret}} ->
+        {:ok, %{client_secret: client_secret, id: id, amount: amount}} ->
           {:ok,
            socket
            |> assign(:payment_intent_secret, client_secret)

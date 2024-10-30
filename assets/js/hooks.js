@@ -26,7 +26,7 @@ Hooks.StripeCheckout = {
 
     this.handleEvent("checkout", ({ clientSecret }) => {
       // Clear any existing elements
-      const cardElement = document.querySelector("#card-element");
+      const cardElement = document.querySelector("#stripe-checkout-card");
       cardElement.innerHTML = "";
 
       // Create elements instance
@@ -42,7 +42,7 @@ Hooks.StripeCheckout = {
 
       // Create and mount the payment element
       paymentElement = elements.create("payment");
-      paymentElement.mount("#card-element");
+      paymentElement.mount("#stripe-checkout-card");
       cardElement.classList.remove("hidden");
 
       // Get the button and disable initially
