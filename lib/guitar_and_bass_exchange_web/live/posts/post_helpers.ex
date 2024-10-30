@@ -344,7 +344,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     |> assign(:payment_processing, false)
     |> assign(:stripe_form_complete, false)
     |> assign(:stripe_form_in_progress, false)
-    |> assign(:promotion_amount, nil)
     |> allow_upload(:photos,
       accept: ~w(.jpg .jpeg .png .webp),
       max_entries: 8,

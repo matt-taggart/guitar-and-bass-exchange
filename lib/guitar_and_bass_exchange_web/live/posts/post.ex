@@ -317,7 +317,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
       case type do
         "basic" -> 5.00
         "premium" -> 10.00
-        "custom" -> socket.assigns.promotion_amount
+        "custom" -> 1.00
+        _ -> 5.00
       end
 
     {:noreply,
@@ -336,6 +337,39 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
 
       _ ->
         {:noreply, socket}
+    end
+  end
+
+  def handle_event("validate_promotion_amount", %{"value" => value}, socket) do
+    case Float.parse(value) do
+      {amount, _} ->
+        {:noreply,
+         socket
+         |> assign(:promotion_amount, amount)}
+
+      :error ->
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("set_custom_amount", %{"value" => value}, socket) do
+    case Float.parse(value) do
+      {amount, _} ->
+        if amount >= 1.00 do
+          {:noreply,
+           socket
+           |> assign(:promotion_amount, amount)}
+        else
+          {:noreply,
+           socket
+           |> assign(:promotion_amount, 1.00)
+           |> put_flash(:error, "Minimum promotion amount is $1.00")}
+        end
+
+      :error ->
+        {:noreply,
+         socket
+         |> assign(:promotion_amount, 1.00)}
     end
   end
 end

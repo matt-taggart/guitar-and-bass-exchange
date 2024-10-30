@@ -1,6 +1,8 @@
 defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
   use Phoenix.Component
 
+  @min_promotion_amount 1.00
+
   attr :form, :map, required: true
   attr :photos, :list, required: true
   attr :preview_url, :string, default: nil
@@ -12,8 +14,11 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
   attr :stripe_form_in_progress, :boolean, required: true
   attr :payment_processing, :boolean, required: true
   attr :payment_intent_id, :string, default: nil
+  attr :min_promotion_amount, :float, default: 1.00
 
   def render(assigns) do
+    assigns = assign(assigns, :min_promotion_amount, @min_promotion_amount)
+
     ~H"""
     <div class="space-y-8">
       <.progress_summary />
@@ -26,6 +31,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
         stripe_form_in_progress={@stripe_form_in_progress}
         payment_processing={@payment_processing}
         payment_intent_id={@payment_intent_id}
+        min_promotion_amount={@min_promotion_amount}
       />
     </div>
     """
@@ -197,7 +203,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
               Boost Your Listing's Visibility
             </h2>
             <p class="text-gray-600 mb-6">
-              Promote your listing to reach more potential buyers and sell faster. Choose your promotion amount - the higher the amount, the better the visibility.
+              Want to sell faster? Promote your instrument to stand out in our Featured section. Your promotion amount determines your visibility – higher amounts mean better placement on our homepage. For fairness, we randomly rotate listings that share the same promotion level. The more you promote, the more potential buyers will see your instrument.
             </p>
             <div class="grid gap-4 mb-8">
               <label class="relative flex items-start p-4 cursor-pointer bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors">
@@ -256,22 +262,31 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                 </div>
                 <div class="ml-3">
                   <span class="block text-sm font-medium text-gray-900">Custom Amount</span>
-                  <span class="block text-sm text-gray-500">Enter your own promotion amount</span>
+                  <span class="block text-sm text-gray-500">
+                    Enter your own promotion amount (minimum $1.00)
+                  </span>
                 </div>
                 <div class="ml-auto">
                   <input
                     type="number"
-                    min="0.01"
+                    min={@min_promotion_amount}
                     step="0.01"
                     value={
                       if @promotion_type == "custom",
-                        do: :erlang.float_to_binary(@promotion_amount, decimals: 2)
+                        do: format_amount(@promotion_amount),
+                        else: format_amount(@min_promotion_amount)
                     }
-                    placeholder="0.00"
+                    placeholder="1.00"
                     class="w-24 text-right rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     phx-blur="set_custom_amount"
+                    phx-change="validate_promotion_amount"
                     disabled={@promotion_type != "custom"}
                   />
+                  <%= if @promotion_type == "custom" && @promotion_amount < @min_promotion_amount do %>
+                    <div class="text-red-500 text-sm mt-1">
+                      Minimum promotion amount is $<%= format_amount(@min_promotion_amount) %>
+                    </div>
+                  <% end %>
                 </div>
               </label>
             </div>
@@ -294,6 +309,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
                   stripe_form_in_progress={@stripe_form_in_progress}
                   payment_processing={@payment_processing}
                   payment_intent_id={@payment_intent_id}
+                  min_promotion_amount={@min_promotion_amount}
                 />
               </div>
             </div>
@@ -327,7 +343,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
     <div class="flex flex-col sm:flex-row gap-4">
       <button
         type="button"
-        disabled={is_nil(@promotion_amount) || @promotion_amount <= 0 || @payment_processing}
+        disabled={@payment_processing}
         phx-click="promote_listing"
         class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed relative"
       >
@@ -360,7 +376,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
       <button
         type="button"
         phx-click="publish_without_promotion"
-        class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50 transition duration-150 focus:ring-4 focus:ring-gray-200 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50 transition duration-150 focus:ring-4 focus:ring-gray-200 border border-gray-200"
       >
         Publish Without Promotion
       </button>
