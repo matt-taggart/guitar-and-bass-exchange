@@ -368,7 +368,8 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
             class="peer sr-only"
             {@rest}
           />
-          <div class="w-5 h-5 bg-white border-2 border-gray-300 rounded-full peer-checked:border-blue-600 peer-checked:border-[5px] transition-all"></div>
+          <div class="w-5 h-5 bg-white border-2 border-gray-300 rounded-full peer-checked:border-blue-600 peer-checked:border-[5px] transition-all">
+          </div>
         </div>
         <%= @label %>
       </label>
@@ -429,13 +430,6 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
     """
   end
 
-  defp get_field_length(assigns) do
-    case assigns.value do
-      nil -> 0
-      value -> String.length(to_string(value))
-    end
-  end
-
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
@@ -456,6 +450,13 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
     """
+  end
+
+  defp get_field_length(assigns) do
+    case assigns.value do
+      nil -> 0
+      value -> String.length(to_string(value))
+    end
   end
 
   @doc """

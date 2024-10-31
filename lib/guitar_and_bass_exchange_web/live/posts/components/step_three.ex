@@ -316,24 +316,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
     """
   end
 
-  defp get_button_copy(payment_intent_id, stripe_form_complete, payment_processing) do
-    case {payment_intent_id, stripe_form_complete, payment_processing} do
-      {nil, false, false} -> "Pay and Promote"
-      {_, false, false} -> "Complete Promotion"
-      {_, _, true} -> "Processing..."
-      _ -> "Pay and Promote"
-    end
-  end
-
-  defp is_button_disabled?(payment_intent_id, stripe_form_complete, payment_processing) do
-    case {payment_intent_id, stripe_form_complete, payment_processing} do
-      {true, false, false} -> "Pay and Promote"
-      {true, true, false} -> "Complete Promotion"
-      {_, _, true} -> "Processing..."
-      _ -> "Pay and Promote"
-    end
-  end
-
   defp promotion_buttons(assigns) do
     ~H"""
     <div class="flex flex-col sm:flex-row gap-4">

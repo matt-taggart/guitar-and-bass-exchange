@@ -1,6 +1,6 @@
 defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   use GuitarAndBassExchangeWeb, :live_view
-  alias GuitarAndBassExchange.{Post, Photo}
+  alias GuitarAndBassExchange.{Post, Photo, Checkout}
   alias GuitarAndBassExchangeWeb.UserPostInstrument.{Components, Helpers}
   alias GuitarAndBassExchangeWeb.StripeHandler
   require Logger
@@ -186,6 +186,137 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:noreply, socket}
   end
 
+  def handle_event(
+        "payment_succeeded",
+        %{
+          "payment_intent_id" => payment_intent_id,
+          "payment_status" => status,
+          "amount" => amount
+        },
+        socket
+      ) do
+    # Handle successful payment
+    case handle_successful_payment(socket, payment_intent_id, status, amount) do
+      {:ok, updated_socket} ->
+        {:noreply,
+         updated_socket
+         |> put_flash(:info, "Payment successful!")
+         |> assign(:payment_processing, false)}
+
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Payment processed but failed to update: #{reason}")
+         |> assign(:payment_processing, false)}
+    end
+  end
+
+  def handle_event("payment_failed", %{"error" => error_message}, socket) do
+    {:noreply,
+     socket
+     |> put_flash(:error, "Payment failed: #{error_message}")
+     |> assign(:payment_processing, false)}
+  end
+
+  def handle_event("set_promotion_type", %{"type" => type}, socket) do
+    promotion_amount =
+      case type do
+        "basic" -> 5.00
+        "premium" -> 10.00
+        "custom" -> 1.00
+        _ -> 5.00
+      end
+
+    {:noreply,
+     socket
+     |> assign(:promotion_type, type)
+     |> assign(:promotion_amount, promotion_amount)}
+  end
+
+  def handle_event("set_custom_amount", %{"value" => value}, socket) do
+    case Float.parse(value) do
+      {amount, _} ->
+        if amount >= 1.00 do
+          {:noreply,
+           socket
+           |> assign(:promotion_type, "custom")
+           |> assign(:promotion_amount, amount)}
+        else
+          {:noreply,
+           socket
+           |> assign(:promotion_amount, 1.00)
+           |> assign(:promotion_type, "custom")
+           |> put_flash(:error, "Minimum promotion amount is $1.00")}
+        end
+
+      :error ->
+        {:noreply,
+         socket
+         |> assign(:promotion_amount, 1.00)
+         |> assign(:promotion_type, "custom")}
+    end
+  end
+
+  def handle_event("validate_promotion_amount", %{"value" => value}, socket) do
+    case Float.parse(value) do
+      {amount, _} ->
+        {:noreply,
+         socket
+         |> assign(:promotion_amount, amount)}
+
+      :error ->
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("payment_processing", _params, socket) do
+    {:noreply, assign(socket, payment_processing: true)}
+  end
+
+  # Helper function to handle successful payment
+  defp handle_successful_payment(socket, payment_intent_id, status, amount) do
+    try do
+      post = socket.assigns.form.source.data
+      current_time = DateTime.utc_now()
+
+      # Start a transaction to ensure both updates succeed or fail together
+      Ecto.Multi.new()
+      |> Ecto.Multi.update(
+        :post,
+        Post.changeset(post, %{
+          status: :completed,
+          featured: true,
+          published_at: current_time
+        })
+      )
+      |> Ecto.Multi.insert(:checkout, fn %{post: updated_post} ->
+        Checkout.changeset(%Checkout{}, %{
+          featured: true,
+          # Convert from cents if needed
+          promotion_amount: amount / 100,
+          payment_intent_id: payment_intent_id,
+          payment_status: status,
+          published_at: current_time,
+          post_id: updated_post.id
+        })
+      end)
+      |> GuitarAndBassExchange.Repo.transaction()
+      |> case do
+        {:ok, %{post: updated_post, checkout: _checkout}} ->
+          {:ok, assign(socket, :form, to_form(Post.changeset(updated_post, %{})))}
+
+        {:error, :post, changeset, _} ->
+          {:error, "Failed to update post: #{inspect(changeset.errors)}"}
+
+        {:error, :checkout, changeset, _} ->
+          {:error, "Failed to create checkout: #{inspect(changeset.errors)}"}
+      end
+    rescue
+      e ->
+        {:error, Exception.message(e)}
+    end
+  end
+
   # Private functions for handling step submissions
 
   defp handle_step_one_submission(socket, post_params) do
@@ -199,7 +330,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
       |> Map.put("current_step", current_step + 1)
 
     case Helpers.validate_step(post_params, current_step, draft_post) do
-      {:ok, changeset} ->
+      {:ok, _} ->
         save_step_one(socket, post_params, draft_post)
 
       {:error, changeset} ->
@@ -289,7 +420,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         {:ok,
          socket
          |> put_flash(:info, "Post published successfully!")
-         |> push_navigate(to: ~p"/instruments")}
+         |> push_navigate(to: ~p"/posts")}
 
       {:error, changeset} ->
         {:error,
@@ -297,142 +428,5 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
          |> assign(form: to_form(changeset))
          |> put_flash(:error, "Failed to publish post")}
     end
-  end
-
-  def handle_event(
-        "payment_succeeded",
-        %{
-          "payment_intent_id" => payment_intent_id,
-          "payment_status" => status,
-          "amount" => amount
-        },
-        socket
-      ) do
-    # Handle successful payment
-    case handle_successful_payment(socket, payment_intent_id, status, amount) do
-      {:ok, updated_socket} ->
-        {:noreply,
-         updated_socket
-         |> put_flash(:info, "Payment successful!")
-         |> assign(:payment_processing, false)}
-
-      {:error, reason} ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Payment processed but failed to update: #{reason}")
-         |> assign(:payment_processing, false)}
-    end
-  end
-
-  def handle_event("payment_failed", %{"error" => error_message}, socket) do
-    {:noreply,
-     socket
-     |> put_flash(:error, "Payment failed: #{error_message}")
-     |> assign(:payment_processing, false)}
-  end
-
-  # Helper function to handle successful payment
-  defp handle_successful_payment(socket, payment_intent_id, status, amount) do
-    # Here you can:
-    # 1. Update your database
-    # 2. Send confirmation emails
-    # 3. Update the post status
-    # 4. Any other business logic
-
-    try do
-      # Example implementation:
-      post = socket.assigns.form.source.data
-
-      # Update post with payment information
-      changeset =
-        post
-        |> Post.changeset(%{
-          status: "published",
-          featured: true,
-          promotion_amount: amount,
-          payment_intent_id: payment_intent_id,
-          payment_status: status,
-          published_at: DateTime.utc_now()
-        })
-
-      case Post.Query.update_post(changeset) do
-        {:ok, updated_post} ->
-          # Maybe send confirmation email
-          # GuitarAndBassExchange.Emails.send_payment_confirmation(updated_post)
-
-          {:ok, assign(socket, :form, to_form(Post.changeset(updated_post, %{})))}
-
-        {:error, changeset} ->
-          {:error, "Failed to update post: #{inspect(changeset.errors)}"}
-      end
-    rescue
-      e ->
-        {:error, Exception.message(e)}
-    end
-  end
-
-  def handle_event("set_promotion_type", %{"type" => type}, socket) do
-    promotion_amount =
-      case type do
-        "basic" -> 5.00
-        "premium" -> 10.00
-        "custom" -> 1.00
-        _ -> 5.00
-      end
-
-    {:noreply,
-     socket
-     |> assign(:promotion_type, type)
-     |> assign(:promotion_amount, promotion_amount)}
-  end
-
-  def handle_event("set_custom_amount", %{"value" => value}, socket) do
-    case Float.parse(value) do
-      {amount, _} when amount > 0 ->
-        {:noreply,
-         socket
-         |> assign(:promotion_type, "custom")
-         |> assign(:promotion_amount, amount)}
-
-      _ ->
-        {:noreply, socket}
-    end
-  end
-
-  def handle_event("validate_promotion_amount", %{"value" => value}, socket) do
-    case Float.parse(value) do
-      {amount, _} ->
-        {:noreply,
-         socket
-         |> assign(:promotion_amount, amount)}
-
-      :error ->
-        {:noreply, socket}
-    end
-  end
-
-  def handle_event("set_custom_amount", %{"value" => value}, socket) do
-    case Float.parse(value) do
-      {amount, _} ->
-        if amount >= 1.00 do
-          {:noreply,
-           socket
-           |> assign(:promotion_amount, amount)}
-        else
-          {:noreply,
-           socket
-           |> assign(:promotion_amount, 1.00)
-           |> put_flash(:error, "Minimum promotion amount is $1.00")}
-        end
-
-      :error ->
-        {:noreply,
-         socket
-         |> assign(:promotion_amount, 1.00)}
-    end
-  end
-
-  def handle_event("payment_processing", _params, socket) do
-    {:noreply, assign(socket, payment_processing: true)}
   end
 end

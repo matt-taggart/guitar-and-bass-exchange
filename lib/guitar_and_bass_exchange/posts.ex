@@ -35,6 +35,9 @@ defmodule GuitarAndBassExchange.Post do
 
     belongs_to :user, GuitarAndBassExchange.Accounts.User
 
+    field :published_at, :utc_datetime
+    has_one :checkout, GuitarAndBassExchange.Checkout
+
     timestamps()
   end
 
@@ -58,7 +61,8 @@ defmodule GuitarAndBassExchange.Post do
       :status,
       :user_id,
       :current_step,
-      :featured
+      :featured,
+      :published_at
     ])
     |> validate_required([:user_id])
     |> validate_required_for_step()

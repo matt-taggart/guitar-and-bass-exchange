@@ -4,8 +4,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
   # Add these imports
   import Phoenix.Component
   import Phoenix.LiveView
-  import Ecto.Changeset
-  import Phoenix.HTML.Form
 
   alias GuitarAndBassExchange.{Post, Photo}
   alias GuitarAndBassExchangeWeb.Plugs.FetchGeocodeData
@@ -102,64 +100,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
   end
 
   # Additional validation helpers
-
-  # Validates shipping cost when shipping is enabled
-  defp validate_shipping_cost(changeset) do
-    if Ecto.Changeset.get_field(changeset, :shipping) do
-      shipping_cost = Ecto.Changeset.get_field(changeset, :shipping_cost)
-
-      if shipping_cost && shipping_cost > 0 do
-        changeset
-      else
-        Ecto.Changeset.add_error(
-          changeset,
-          :shipping_cost,
-          "must be greater than 0 when shipping is enabled"
-        )
-      end
-    else
-      changeset
-    end
-  end
-
-  # Validates price is within acceptable range
-  defp validate_price(changeset) do
-    price = Ecto.Changeset.get_field(changeset, :price)
-
-    cond do
-      price == nil ->
-        Ecto.Changeset.add_error(changeset, :price, "can't be blank")
-
-      price <= 0 ->
-        Ecto.Changeset.add_error(changeset, :price, "must be greater than 0")
-
-      price > 1_000_000 ->
-        Ecto.Changeset.add_error(changeset, :price, "must be less than $1,000,000")
-
-      true ->
-        changeset
-    end
-  end
-
-  # Validates year is within acceptable range
-  defp validate_year(changeset) do
-    year = Ecto.Changeset.get_field(changeset, :year)
-    current_year = DateTime.utc_now().year
-
-    cond do
-      year == nil ->
-        Ecto.Changeset.add_error(changeset, :year, "can't be blank")
-
-      year < 1900 ->
-        Ecto.Changeset.add_error(changeset, :year, "must be after 1900")
-
-      year > current_year ->
-        Ecto.Changeset.add_error(changeset, :year, "can't be in the future")
-
-      true ->
-        changeset
-    end
-  end
 
   @doc """
   Gets the default promotion amount for a promotion type

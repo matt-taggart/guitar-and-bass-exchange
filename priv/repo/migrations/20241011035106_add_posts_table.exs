@@ -19,12 +19,15 @@ defmodule GuitarAndBassExchange.Repo.Migrations.CreatePosts do
       add :status, :string, default: "draft"
       add :current_step, :integer, default: 1
       add :featured, :boolean, default: false
+      add :published_at, :utc_datetime
       add :user_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create index(:posts, [:user_id])
     create index(:posts, [:status])
+    create index(:posts, [:featured])
+    create index(:posts, [:published_at])
   end
 end
