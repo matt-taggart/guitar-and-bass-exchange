@@ -299,17 +299,76 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     end
   end
 
-  def handle_event("payment_succeeded", _params, socket) do
-    {:noreply,
-     socket
-     |> put_flash(:info, "Payment successful!")
-     |> push_navigate(to: ~p"/instruments")}
+  def handle_event(
+        "payment_succeeded",
+        %{
+          "payment_intent_id" => payment_intent_id,
+          "payment_status" => status,
+          "amount" => amount
+        },
+        socket
+      ) do
+    # Handle successful payment
+    case handle_successful_payment(socket, payment_intent_id, status, amount) do
+      {:ok, updated_socket} ->
+        {:noreply,
+         updated_socket
+         |> put_flash(:info, "Payment successful!")
+         |> assign(:payment_processing, false)}
+
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Payment processed but failed to update: #{reason}")
+         |> assign(:payment_processing, false)}
+    end
   end
 
-  def handle_event("payment_failed", _params, socket) do
+  def handle_event("payment_failed", %{"error" => error_message}, socket) do
     {:noreply,
      socket
-     |> put_flash(:error, "Payment failed. Please try again.")}
+     |> put_flash(:error, "Payment failed: #{error_message}")
+     |> assign(:payment_processing, false)}
+  end
+
+  # Helper function to handle successful payment
+  defp handle_successful_payment(socket, payment_intent_id, status, amount) do
+    # Here you can:
+    # 1. Update your database
+    # 2. Send confirmation emails
+    # 3. Update the post status
+    # 4. Any other business logic
+
+    try do
+      # Example implementation:
+      post = socket.assigns.form.source.data
+
+      # Update post with payment information
+      changeset =
+        post
+        |> Post.changeset(%{
+          status: "published",
+          featured: true,
+          promotion_amount: amount,
+          payment_intent_id: payment_intent_id,
+          payment_status: status,
+          published_at: DateTime.utc_now()
+        })
+
+      case Post.Query.update_post(changeset) do
+        {:ok, updated_post} ->
+          # Maybe send confirmation email
+          # GuitarAndBassExchange.Emails.send_payment_confirmation(updated_post)
+
+          {:ok, assign(socket, :form, to_form(Post.changeset(updated_post, %{})))}
+
+        {:error, changeset} ->
+          {:error, "Failed to update post: #{inspect(changeset.errors)}"}
+      end
+    rescue
+      e ->
+        {:error, Exception.message(e)}
+    end
   end
 
   def handle_event("set_promotion_type", %{"type" => type}, socket) do
@@ -371,5 +430,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
          socket
          |> assign(:promotion_amount, 1.00)}
     end
+  end
+
+  def handle_event("payment_processing", _params, socket) do
+    {:noreply, assign(socket, payment_processing: true)}
   end
 end

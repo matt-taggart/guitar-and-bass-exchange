@@ -286,14 +286,16 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
             </div>
             <div class="grid gap-4">
               <div class="contents">
-                <div
-                  id="stripe-checkout-card"
-                  phx-hook="StripeCheckout"
-                  class="min-h-[150px] bg-white p-4 rounded-lg shadow hidden"
-                >
-                  <!-- Stripe Elements will insert the card element here -->
+                <div id="stripe-container" phx-update="ignore">
+                  <div
+                    id="stripe-checkout-card"
+                    phx-hook="StripeCheckout"
+                    class="min-h-[150px] bg-white p-4 rounded-lg shadow hidden"
+                  >
+                    <!-- Stripe Elements will insert the card element here -->
+                  </div>
+                  <div id="card-errors" role="alert" class="mt-2 text-red-600 text-sm"></div>
                 </div>
-                <div id="card-errors" role="alert" class="mt-2 text-red-600 text-sm"></div>
 
                 <.promotion_buttons
                   checkout_form={@checkout_form}
@@ -338,6 +340,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepThree do
       <button
         type="button"
         disabled={@payment_processing || (@payment_intent_id && !@stripe_form_complete)}
+        id="handle_stripe_submit"
+        phx-hook="HandleStripeSubmit"
         phx-click={if @payment_intent_id, do: "handle_payment", else: "promote_listing"}
         class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed relative"
       >

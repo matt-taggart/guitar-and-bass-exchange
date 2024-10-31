@@ -21,57 +21,85 @@ Hooks.ImagePreview = {
 Hooks.StripeCheckout = {
   mounted() {
     const stripe = Stripe(window.ENV.stripePublishableKey);
-    let elements;
-    let paymentElement;
+
+    // Store elements and paymentElement on the hook instance
+    this.elements = null;
+    this.paymentElement = null;
 
     this.handleEvent("checkout", ({ clientSecret }) => {
-      // Clear any existing elements
       const cardElement = document.querySelector("#stripe-checkout-card");
+      if (!cardElement) return;
+
       cardElement.innerHTML = "";
 
-      // Create elements instance
-      elements = stripe.elements({
+      // Create new elements instance
+      this.elements = stripe.elements({
         clientSecret,
         appearance: {
           theme: "stripe",
-          variables: {
-            colorPrimary: "#0070f3",
-          },
         },
       });
 
-      // Create and mount the payment element
-      paymentElement = elements.create("payment");
-      paymentElement.mount("#stripe-checkout-card");
+      // Create and mount payment element
+      this.paymentElement = this.elements.create("payment");
+      this.paymentElement.mount("#stripe-checkout-card");
       cardElement.classList.remove("hidden");
 
-      // Enable/disable button based on form completion
-      paymentElement.on("change", (event) => {
+      // Add change handler
+      this.paymentElement.on("change", (event) => {
         if (event.complete) {
           this.pushEvent("stripe_form_complete", {});
         } else {
           this.pushEvent("stripe_form_incomplete", {});
         }
       });
+
+      // Handle form submission
+      window.handleStripeSubmit = async () => {
+        try {
+          this.pushEvent("payment_processing", {});
+
+          const { error, paymentIntent } = await stripe.confirmPayment({
+            elements: this.elements,
+            redirect: "if_required", // This prevents automatic redirect
+            confirmParams: {
+              return_url: `${window.location.origin}/checkout/success`, // Only used if 3D Secure is required
+            },
+          });
+
+          if (error) {
+            const errorDiv = document.getElementById("card-errors");
+            errorDiv.textContent = error.message;
+            this.pushEvent("payment_failed", { error: error.message });
+          } else if (paymentIntent) {
+            // Payment successful
+            this.pushEvent("payment_succeeded", {
+              payment_intent_id: paymentIntent.id,
+              payment_status: paymentIntent.status,
+              amount: paymentIntent.amount,
+            });
+          }
+        } catch (err) {
+          console.error("Payment failed:", err);
+          this.pushEvent("payment_failed", { error: err.message });
+        }
+      };
+
+      // Add unmounted callback
+      return () => {
+        if (this.paymentElement) {
+          this.paymentElement.destroy();
+        }
+      };
     });
+  },
+};
 
-    // Handle form submission
-    window.handleStripeSubmit = async () => {
-      this.pushEvent("payment_processing", {}); // Start loading state
-
-      const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
-        },
-      });
-
-      if (error) {
-        const errorDiv = document.getElementById("card-errors");
-        errorDiv.textContent = error.message;
-        this.pushEvent("payment_failed", {}); // Remove loading state
-      }
-    };
+Hooks.HandleStripeSubmit = {
+  mounted() {
+    this.handleEvent("handle_stripe_submit", () => {
+      window.handleStripeSubmit();
+    });
   },
 };
 
