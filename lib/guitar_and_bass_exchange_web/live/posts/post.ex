@@ -200,8 +200,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
       {:ok, updated_socket} ->
         {:noreply,
          updated_socket
-         |> put_flash(:info, "Payment successful!")
-         |> assign(:payment_processing, false)}
+         |> put_flash(:info, "Post published successfully!")
+         |> assign(:payment_processing, false)
+         |> push_navigate(to: ~p"/users/#{socket.assigns.current_user.id}/posts")}
 
       {:error, reason} ->
         {:noreply,
@@ -411,16 +412,18 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   defp publish_post(socket) do
     post = socket.assigns.form.source.data
 
+    current_time = DateTime.utc_now()
+
     changeset =
       post
-      |> Post.changeset(%{status: "published", published_at: DateTime.utc_now()})
+      |> Post.changeset(%{status: :completed, featured: false, published_at: current_time})
 
     case Post.Query.update_post(changeset) do
       {:ok, _updated_post} ->
         {:ok,
          socket
          |> put_flash(:info, "Post published successfully!")
-         |> push_navigate(to: ~p"/posts")}
+         |> push_navigate(to: ~p"/users/#{socket.assigns.current_user.id}/posts")}
 
       {:error, changeset} ->
         {:error,

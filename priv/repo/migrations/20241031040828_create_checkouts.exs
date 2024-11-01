@@ -17,7 +17,6 @@ defmodule GuitarAndBassExchange.Repo.Migrations.CreateCheckouts do
       timestamps(type: :utc_datetime)
     end
 
-    create index(:checkouts, [:post_id])
     create index(:checkouts, [:user_id])
     create index(:checkouts, [:status])
     create index(:checkouts, [:payment_status])
