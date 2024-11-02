@@ -90,6 +90,8 @@ Hooks.StripeCheckout = {
         if (this.paymentElement) {
           this.paymentElement.destroy();
         }
+
+        delete window.handleStripeSubmit;
       };
     });
   },

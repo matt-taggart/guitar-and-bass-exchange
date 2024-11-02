@@ -186,6 +186,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     {:noreply, socket}
   end
 
+  def handle_event("handle_payment", _params, socket) do
+    {:noreply, socket |> push_event("handle_stripe_submit", %{})}
+  end
+
   def handle_event(
         "payment_succeeded",
         %{
@@ -198,10 +202,12 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     # Handle successful payment
     case handle_successful_payment(socket, payment_intent_id, status, amount) do
       {:ok, updated_socket} ->
+        IO.inspect(updated_socket)
+
         {:noreply,
          updated_socket
-         |> put_flash(:info, "Post published successfully!")
          |> assign(:payment_processing, false)
+         |> put_flash(:info, "Post published successfully!")
          |> push_navigate(to: ~p"/users/#{socket.assigns.current_user.id}/posts")}
 
       {:error, reason} ->
