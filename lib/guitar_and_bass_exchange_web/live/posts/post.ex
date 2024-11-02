@@ -1,5 +1,6 @@
 defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   use GuitarAndBassExchangeWeb, :live_view
+
   alias GuitarAndBassExchange.{Post, Photo, Checkout}
   alias GuitarAndBassExchangeWeb.UserPostInstrument.{Components, Helpers}
   alias GuitarAndBassExchangeWeb.StripeHandler
@@ -8,6 +9,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   @impl true
   def render(assigns) do
     ~H"""
+    <.flash_group flash={@flash} /> <%!-- Add this line --%>
     <.navbar current_user={@current_user} geocode_data={@geocode_data} />
     <main class="flex flex-col items-center my-16 mx-8">
       <div class="w-full max-w-6xl mx-auto">
@@ -202,8 +204,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     # Handle successful payment
     case handle_successful_payment(socket, payment_intent_id, status, amount) do
       {:ok, updated_socket} ->
-        IO.inspect(updated_socket)
-
         {:noreply,
          updated_socket
          |> assign(:payment_processing, false)
@@ -438,4 +438,19 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
          |> put_flash(:error, "Failed to publish post")}
     end
   end
+
+  defp format_amount(nil), do: "0.00"
+
+  defp format_amount(amount) when is_float(amount) do
+    :erlang.float_to_binary(amount, decimals: 2)
+  end
+
+  defp format_amount(amount) when is_binary(amount) do
+    case Float.parse(amount) do
+      {float, _} -> format_amount(float)
+      :error -> "0.00"
+    end
+  end
+
+  defp format_amount(_), do: "0.00"
 end

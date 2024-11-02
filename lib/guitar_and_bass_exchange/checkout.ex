@@ -1,3 +1,4 @@
+# In checkout.ex
 defmodule GuitarAndBassExchange.Checkout do
   use Ecto.Schema
   import Ecto.Changeset
@@ -16,7 +17,6 @@ defmodule GuitarAndBassExchange.Checkout do
     timestamps(type: :utc_datetime)
   end
 
-  @doc false
   def changeset(checkout, attrs) do
     checkout
     |> cast(attrs, [
@@ -35,6 +35,17 @@ defmodule GuitarAndBassExchange.Checkout do
       :published_at,
       :post_id
     ])
-    |> foreign_key_constraint(:post_id)
+    |> foreign_key_constraint(:post_id,
+      name: "checkouts_post_id_fkey",
+      message: "Post does not exist"
+    )
+    |> unique_constraint(:post_id,
+      name: "checkouts_post_id_index",
+      message: "Checkout already exists for this post"
+    )
+    |> unique_constraint(:payment_intent_id,
+      name: "checkouts_payment_intent_id_index",
+      message: "Payment intent already processed"
+    )
   end
 end
