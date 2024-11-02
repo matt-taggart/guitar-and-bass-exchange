@@ -8,14 +8,14 @@ defmodule GuitarAndBassExchange.Post.Query do
     Post
     |> where([p], p.user_id == ^user_id)
     |> Repo.all()
-    |> Repo.preload(:photos)
+    |> Repo.preload(:primary_photo)
   end
 
   def list_featured_posts() do
     Post
     |> where([p], p.featured == true)
     |> Repo.all()
-    |> Repo.preload(:photos)
+    |> Repo.preload(:primary_photo)
   end
 
   def get_draft_post_for_user(user_id) do

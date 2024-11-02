@@ -9,7 +9,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.flash_group flash={@flash} /> <%!-- Add this line --%>
+    <.flash_group id="checkout-flash-message" flash={@flash} />
     <.navbar current_user={@current_user} geocode_data={@geocode_data} />
     <main class="flex flex-col items-center my-16 mx-8">
       <div class="w-full max-w-6xl mx-auto">
