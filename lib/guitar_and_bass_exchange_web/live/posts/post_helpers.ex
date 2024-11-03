@@ -255,8 +255,8 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
   @doc """
   Prepares socket assigns for mounting the LiveView.
   """
-  def prepare_initial_assigns(socket, current_user, session) do
-    draft_post = get_draft_post(current_user)
+  def prepare_initial_assigns(socket, current_user, post_id, session) do
+    draft_post = get_draft_post(current_user, post_id)
     {changeset, current_step} = get_initial_changeset(draft_post, current_user)
     photos = get_photos_for_step(draft_post, current_step)
     geocode_data = fetch_geocode_data(session)
@@ -293,8 +293,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     )
   end
 
-  defp get_draft_post(current_user) do
-    Post.Query.get_draft_post_for_user(current_user.id)
+  defp get_draft_post(current_user, nil), do: nil
+
+  defp get_draft_post(current_user, post_id) do
+    Post.Query.get_draft_post_for_user(current_user.id, post_id)
   end
 
   defp get_initial_changeset(draft_post, current_user) do

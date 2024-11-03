@@ -12,7 +12,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
         <div class="w-full max-w-5xl">
           <div class="flex justify-between">
             <h1 class="text-3xl mb-8 text-gray-800">My Posts</h1>
-            <.link navigate={~p"/users/#{@current_user.id}/post/new"}>
+            <.link navigate={~p"/users/#{@current_user.id}/posts/new"}>
               <button class="w-40 h-8 flex items-center justify-center text-xs text-white font-medium bg-blue-700 hover:bg-blue-800 rounded-lg whitespace-nowrap">
                 Create New Post
               </button>
@@ -96,8 +96,15 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
                           <td class="py-4 whitespace-nowrap text-sm text-gray-800">
                             <div class="relative w-full pt-[95%] bg-gray-100">
                               <img
-                                src={post.primary_photo.url}
-                                alt="Guitar"
+                                src={
+                                  if post.primary_photo && post.primary_photo.url do
+                                    post.primary_photo.url
+                                  else
+                                    # or whatever default image path you want
+                                    "/images/default-placeholder.png"
+                                  end
+                                }
+                                alt="Photo of Instrument"
                                 class="absolute inset-0 w-full h-full object-cover"
                               />
                             </div>
@@ -155,7 +162,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
             You haven't posted any instruments yet. Create a post to showcase your musical equipment to our extensive network of buyers. Our streamlined process helps you reach a broader audience, potentially accelerating your sale and maximizing your instrument's value.
           </div>
           <div class="flex">
-            <.link href={~p"/users/#{@current_user.id}/post/new"}>
+            <.link href={~p"/users/#{@current_user.id}/posts/new"}>
               <button
                 type="button"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

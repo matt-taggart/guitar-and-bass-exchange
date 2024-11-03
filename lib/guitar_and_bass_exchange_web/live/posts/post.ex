@@ -69,11 +69,18 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   @impl true
+  def mount(%{"post_id" => post_id}, session, socket) do
+    current_user = socket.assigns.current_user
+
+    {:ok, Helpers.prepare_initial_assigns(socket, current_user, post_id, session)}
+  end
+
+  @impl true
   def mount(_params, session, socket) do
     current_user = socket.assigns.current_user
 
     if current_user do
-      {:ok, Helpers.prepare_initial_assigns(socket, current_user, session)}
+      {:ok, Helpers.prepare_initial_assigns(socket, current_user, nil, session)}
     else
       {:ok, socket}
     end
