@@ -29,6 +29,16 @@ defmodule GuitarAndBassExchange.Post.Query do
     |> Repo.preload(:primary_photo)
   end
 
+  def get_post_for_user(user_id, post_id) do
+    Post
+    |> where([p], p.user_id == ^user_id and p.status == :completed and p.id == ^post_id)
+    |> order_by([p], desc: p.updated_at)
+    |> limit(1)
+    |> Repo.one()
+    |> Repo.preload(:photos)
+    |> Repo.preload(:primary_photo)
+  end
+
   def update_post(%Ecto.Changeset{} = changeset) do
     changeset
     |> Repo.update()

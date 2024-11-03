@@ -96,7 +96,7 @@ defmodule GuitarAndBassExchangeWeb.Router do
       live "/users/:user_id/posts", UserGetPostsLive, :show
       live "/users/:user_id/posts/new", UserPostInstrumentLive, :new
       live "/users/:user_id/posts/:post_id/edit", UserPostInstrumentLive, :edit
-      get "/users/:user_id/posts/:id", PageController, :show
+      live "/users/:user_id/posts/:post_id", UserGetPostLive, :show
     end
   end
 
