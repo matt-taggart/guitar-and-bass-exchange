@@ -445,19 +445,4 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
          |> put_flash(:error, "Failed to publish post")}
     end
   end
-
-  defp format_amount(nil), do: "0.00"
-
-  defp format_amount(amount) when is_float(amount) do
-    :erlang.float_to_binary(amount, decimals: 2)
-  end
-
-  defp format_amount(amount) when is_binary(amount) do
-    case Float.parse(amount) do
-      {float, _} -> format_amount(float)
-      :error -> "0.00"
-    end
-  end
-
-  defp format_amount(_), do: "0.00"
 end

@@ -100,8 +100,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
                                   if post.primary_photo && post.primary_photo.url do
                                     post.primary_photo.url
                                   else
-                                    # or whatever default image path you want
-                                    "/images/default-placeholder.png"
+                                    ~p"/images/guitar_placeholder.jpeg"
                                   end
                                 }
                                 alt="Photo of Instrument"
@@ -182,8 +181,6 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
     geocode_data = FetchGeocodeData.fetch_geocode_data(session)
 
     posts = Post.Query.list_posts_for_user(socket.assigns.current_user.id)
-
-    IO.inspect(posts)
 
     {:ok, assign(socket, geocode_data: geocode_data, posts: posts)}
   end

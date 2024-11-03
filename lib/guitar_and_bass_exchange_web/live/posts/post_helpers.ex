@@ -293,7 +293,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     )
   end
 
-  defp get_draft_post(current_user, nil), do: nil
+  defp get_draft_post(_current_user, nil), do: nil
 
   defp get_draft_post(current_user, post_id) do
     Post.Query.get_draft_post_for_user(current_user.id, post_id)
