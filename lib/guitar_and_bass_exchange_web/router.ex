@@ -47,7 +47,7 @@ defmodule GuitarAndBassExchangeWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", GuitarAndBassExchangeWeb do
+  # scope "/api", GuitarAndBassExchangeWeb dousers
   #   pipe_through :api
   # end
 
@@ -95,6 +95,7 @@ defmodule GuitarAndBassExchangeWeb.Router do
       live "/rooms/:id", ChatLive.Root, :show
       live "/users/:user_id/posts", UserGetPostsLive, :show
       live "/users/:user_id/post/new", UserPostInstrumentLive, :new
+      live "/users/:user_id/post/edit", UserPostInstrumentLive, :edit
       get "/users/:user_id/posts/:id", PageController, :show
     end
   end

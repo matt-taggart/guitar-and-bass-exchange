@@ -10,7 +10,14 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
     <main class="flex flex-col items-center my-16 mx-8">
       <%= if length(@posts) > 0  do %>
         <div class="w-full max-w-5xl">
-          <h1 class="text-3xl font-bold mb-8">Your Posts</h1>
+          <div class="flex justify-between">
+            <h1 class="text-3xl mb-8 text-gray-800">My Posts</h1>
+            <.link navigate={~p"/users/#{@current_user.id}/post/new"}>
+              <button class="w-40 h-8 flex items-center justify-center text-xs text-white font-medium bg-blue-700 hover:bg-blue-800 rounded-lg whitespace-nowrap">
+                Create New Post
+              </button>
+            </.link>
+          </div>
           <div class="flex flex-col">
             <div class="-m-1.5 overflow-x-auto">
               <div class="p-1.5 min-w-full inline-block align-middle">
@@ -69,7 +76,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
                           <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-800">
                             <%= if post.status == :completed do %>
                               <sl-badge variant="success" pill>
-                                Completed
+                                Active
                               </sl-badge>
                             <% else %>
                               <sl-badge variant="warning" pill>
@@ -103,6 +110,15 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
                                   class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                                 >
                                   View
+                                </button>
+                              </.link>
+                            <% else %>
+                              <.link navigate={~p"/users/#{@current_user.id}/posts/#{post.id}/edit"}>
+                                <button
+                                  type="button"
+                                  class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                  Edit
                                 </button>
                               </.link>
                             <% end %>
