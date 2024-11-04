@@ -278,7 +278,7 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-               range search select tel text textarea time url week)
+             range search select tel text textarea time url week trix)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -424,6 +424,31 @@ defmodule GuitarAndBassExchangeWeb.CoreComponents do
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
       <div class="text-sm text-gray-500 text-right mt-1">
         <span><%= @current_length %></span>/<%= @maxlength %>
+      </div>
+      <.error :for={msg <- @errors}><%= msg %></.error>
+    </div>
+    """
+  end
+
+  def input(%{type: "trix"} = assigns) do
+    ~H"""
+    <div>
+      <.label for={@id}><%= @label %></.label>
+      <div phx-update="ignore" id={"#{@id}-wysiwyg"} class="mt-2">
+        <input
+          type="hidden"
+          id={@id}
+          name={@name}
+          value={Phoenix.HTML.Form.normalize_value("hidden", @value)}
+          {@rest}
+        />
+        <trix-editor
+          input={@id}
+          id="trix-editor"
+          class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 min-h-[12rem] prose max-w-none"
+          phx-hook="Trix"
+        >
+        </trix-editor>
       </div>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>

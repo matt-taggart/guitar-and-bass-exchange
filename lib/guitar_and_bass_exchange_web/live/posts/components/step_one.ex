@@ -37,8 +37,13 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepOne do
             label="Number of Strings"
             required
           />
-
-          <.input type="textarea" field={@form[:description]} label="Description" required />
+          <.input
+            id="trix-input"
+            type="trix"
+            field={@form[:description]}
+            label="Description"
+            required
+          />
           <.input
             type="select"
             options={condition_options()}
