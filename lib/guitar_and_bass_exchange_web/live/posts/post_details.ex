@@ -110,7 +110,6 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostLive do
   def mount(%{"post_id" => post_id}, session, socket) do
     geocode_data = FetchGeocodeData.fetch_geocode_data(session)
     post = Post.Query.get_post_for_user(socket.assigns.current_user.id, post_id)
-    IO.inspect(post)
 
     {:ok, assign(socket, post: post, geocode_data: geocode_data)}
   end

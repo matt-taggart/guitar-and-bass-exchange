@@ -341,7 +341,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     post_params =
       post_params
       |> Map.put("user_id", user.id)
-      |> Map.put("current_step", current_step + 1)
+      |> Map.put("current_step", 2)
 
     case Helpers.validate_step(post_params, current_step, draft_post) do
       {:ok, _} ->
@@ -396,7 +396,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     changeset =
       post
       |> Post.changeset(%{
-        current_step: post.current_step + 1,
+        current_step: 3,
         primary_photo_id: primary_photo.id
       })
 

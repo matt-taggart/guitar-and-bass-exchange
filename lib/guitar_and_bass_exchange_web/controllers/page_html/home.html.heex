@@ -126,34 +126,34 @@
     <h2 class="text-2xl font-semibold text-brand mb-7">Featured Instruments</h2>
     <ul class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <%= for post <- @posts do %>
-        <li class="bg-white shadow-md rounded-lg overflow-hidden transform transition hover:scale-105">
-          <a href="/" class="block">
-            <!-- Image Section -->
-            <div class="relative w-full pt-[75%] bg-gray-100">
-              <img
-                src="https://placehold.co/600x400"
-                alt="Guitar"
-                class="absolute inset-0 w-full h-full object-cover"
-              />
-            </div>
-            <!-- Content Section -->
-            <div class="p-4">
-              <h3 class="text-xl font-semibold text-gray-800 truncate mb-2">
-                <%= post.title %>
-              </h3>
-              <div class="text-lg text-blue-600 font-bold mb-4">
-                $<%= :erlang.float_to_binary(post.price, decimals: 2) %>
-              </div>
-              <div class="flex items-center text-gray-500 text-sm">
-                <sl-icon name="geo-alt-fill" class="mr-1"></sl-icon>
-                <div><%= @geocode_data.city %>, <%= @geocode_data.state %></div>
-                <div class="ml-4 w-px h-4 bg-gray-400"></div>
-                <sl-icon name="heart-fill" class="ml-4 mr-1 mt-0.5"></sl-icon>
-                10
-              </div>
-            </div>
-          </a>
-        </li>
+          <.link href={~p"/users/#{@current_user.id}/posts/#{post.id}"} class="block">
+            <li class="bg-white shadow-md rounded-lg overflow-hidden transform transition hover:scale-105">
+                <!-- Image Section -->
+                <div class="relative w-full pt-[75%] bg-gray-100">
+                  <img
+                    src={if post.primary_photo do post.primary_photo.url else "https://placehold.co/600x400" end}
+                    alt="Guitar"
+                    class="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+                <!-- Content Section -->
+                <div class="p-4">
+                  <h3 class="text-xl font-semibold text-gray-800 truncate mb-2">
+                    <%= post.title %>
+                  </h3>
+                  <div class="text-lg text-blue-600 font-bold mb-4">
+                    $<%= :erlang.float_to_binary(post.price, decimals: 2) %>
+                  </div>
+                  <div class="flex items-center text-gray-500 text-sm">
+                    <sl-icon name="geo-alt-fill" class="mr-1"></sl-icon>
+                    <div><%= @geocode_data.city %>, <%= @geocode_data.state %></div>
+                    <div class="ml-4 w-px h-4 bg-gray-400"></div>
+                    <sl-icon name="heart-fill" class="ml-4 mr-1 mt-0.5"></sl-icon>
+                    10
+                  </div>
+                </div>
+            </li>
+        </.link>
       <% end %>
     </ul>
   </main>

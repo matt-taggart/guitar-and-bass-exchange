@@ -15,6 +15,7 @@ defmodule GuitarAndBassExchange.Post.Query do
     Post
     |> where([p], p.featured == true)
     |> Repo.all()
+    |> Repo.preload(:photos)
     |> Repo.preload(:primary_photo)
   end
 
