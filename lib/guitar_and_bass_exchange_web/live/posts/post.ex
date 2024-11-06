@@ -129,7 +129,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   end
 
   def handle_event("remove_photo", %{"ref" => ref}, socket) do
-    {:noreply, cancel_upload(socket, :photos, ref)}
+    {:noreply, cancel_upload(socket, :photos, ref) |> assign(primary_photo: 0)}
   end
 
   def handle_event("set_primary_photo", %{"primary" => index}, socket) do
