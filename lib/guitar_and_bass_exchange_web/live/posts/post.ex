@@ -43,6 +43,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
                 show_progress={@show_progress}
                 primary_photo={@primary_photo}
                 total_progress={@total_progress}
+                show_preview={@show_preview}
+                preview_entry={@preview_entry}
+                preview_url={@preview_url}
               />
             <% 3 -> %>
               <Components.StepThree.render
@@ -62,9 +65,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
         </div>
       </div>
     </main>
-    <%= if @show_preview do %>
-      <Components.PreviewModal.render preview_entry={@preview_entry} preview_url={@preview_url} />
-    <% end %>
     """
   end
 

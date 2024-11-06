@@ -1,11 +1,15 @@
 defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepTwo do
   use Phoenix.Component
   import GuitarAndBassExchangeWeb.CoreComponents
+  alias GuitarAndBassExchangeWeb.UserPostInstrument.Components
 
   attr :uploads, :map, required: true
   attr :show_progress, :boolean, required: true
   attr :primary_photo, :integer, default: 0
   attr :total_progress, :integer, default: 0
+  attr :show_preview, :boolean, default: false
+  attr :preview_entry, :map, required: true
+  attr :preview_url, :string, required: true
 
   def render(assigns) do
     ~H"""
@@ -26,6 +30,9 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepTwo do
             uploads={@uploads}
             primary_photo={@primary_photo}
             show_progress={@show_progress}
+            show_preview={@show_preview}
+            preview_entry={@preview_entry}
+            preview_url={@preview_url}
           />
           <!-- Progress Bar -->
           <.progress_bar :if={@show_progress} total_progress={@total_progress} />
@@ -96,7 +103,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepTwo do
       length(@uploads.photos.entries) > 0 && "mb-5"
     ]}>
       <%= for {entry, index} <- Enum.with_index(@uploads.photos.entries) do %>
-        <div class="flex flex-col gap-1 relative">
+        <div class="flex flex-col gap-1 relative" id={"photo-#{entry.ref}"}>
           <div class="relative cursor-pointer" phx-click="show_preview" phx-value-ref={entry.ref}>
             <figure class="aspect-square overflow-hidden rounded-lg">
               <.live_img_preview entry={entry} class="w-full h-full object-cover" />
@@ -119,6 +126,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Components.StepTwo do
         <%= for err <- upload_errors(@uploads.photos, entry) do %>
           <p class="alert alert-danger"><%= error_to_string(err) %></p>
         <% end %>
+      <% end %>
+
+      <%= if @show_preview do %>
+        <Components.PreviewModal.render preview_entry={@preview_entry} preview_url={@preview_url} />
       <% end %>
     </div>
     """

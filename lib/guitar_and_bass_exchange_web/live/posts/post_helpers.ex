@@ -287,7 +287,6 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     |> allow_upload(:photos,
       accept: ~w(.jpg .jpeg .png .webp),
       max_entries: 8,
-      temporary_assigns: [photos: []],
       presign_upload: &presign_upload/0,
       progress: &handle_progress/3
     )
