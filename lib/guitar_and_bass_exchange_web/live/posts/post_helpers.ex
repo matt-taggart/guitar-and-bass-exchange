@@ -255,9 +255,31 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
   @doc """
   Prepares socket assigns for mounting the LiveView.
   """
-  def prepare_initial_assigns(socket, current_user, post_id, session) do
+  def prepare_initial_assigns(socket, current_user, post_id, is_editing, session) do
     draft_post = get_draft_post(current_user, post_id)
-    {changeset, current_step} = get_initial_changeset(draft_post, current_user)
+
+    existing_post =
+      if is_editing, do: get_completed_post_for_user(current_user, post_id), else: nil
+
+    current_step =
+      cond do
+        draft_post -> draft_post.current_step
+        existing_post -> 1
+        true -> 1
+      end
+
+    {changeset, step} =
+      cond do
+        draft_post ->
+          {Post.changeset(draft_post, %{}), draft_post.current_step}
+
+        existing_post ->
+          {Post.changeset(existing_post, existing_post |> Map.from_struct()), current_step}
+
+        true ->
+          {Post.changeset(%Post{user_id: current_user.id}, %{}), current_step}
+      end
+
     photos = get_photos_for_step(draft_post, current_step)
     geocode_data = fetch_geocode_data(session)
 
@@ -298,12 +320,10 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrument.Helpers do
     Post.Query.get_draft_post_for_user(current_user.id, post_id)
   end
 
-  defp get_initial_changeset(draft_post, current_user) do
-    if draft_post do
-      {Post.changeset(draft_post, %{}), draft_post.current_step}
-    else
-      {Post.changeset(%Post{user_id: current_user.id}, %{}), 1}
-    end
+  defp get_completed_post_for_user(_current_user, nil), do: nil
+
+  defp get_completed_post_for_user(current_user, post_id) do
+    Post.Query.get_completed_post_for_user(current_user.id, post_id)
   end
 
   defp get_photos_for_step(draft_post, current_step) do

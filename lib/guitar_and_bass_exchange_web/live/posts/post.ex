@@ -72,7 +72,18 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
   def mount(%{"post_id" => post_id}, session, socket) do
     current_user = socket.assigns.current_user
 
-    {:ok, Helpers.prepare_initial_assigns(socket, current_user, post_id, session)}
+    action = socket.assigns.live_action
+
+    socket =
+      Helpers.prepare_initial_assigns(
+        socket,
+        current_user,
+        post_id,
+        action,
+        session
+      )
+
+    {:ok, socket}
   end
 
   @impl true
@@ -80,7 +91,7 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     current_user = socket.assigns.current_user
 
     if current_user do
-      {:ok, Helpers.prepare_initial_assigns(socket, current_user, nil, session)}
+      {:ok, Helpers.prepare_initial_assigns(socket, current_user, nil, false, session)}
     else
       {:ok, socket}
     end
@@ -403,7 +414,11 @@ defmodule GuitarAndBassExchangeWeb.UserPostInstrumentLive do
     case Post.Query.update_post(changeset) do
       {:ok, updated_post} ->
         updated_post = GuitarAndBassExchange.Repo.preload(updated_post, [:photos, :primary_photo])
-        photos = Photo.Query.list_photos_for_post(updated_post.id)
+
+        photos =
+          Photo.Query.list_photos_for_post(updated_post.id)
+          # Convert Photo structs to maps
+          |> Enum.map(&Map.from_struct/1)
 
         {:ok,
          socket

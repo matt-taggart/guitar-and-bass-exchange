@@ -43,7 +43,15 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostLive do
         </div>
         <!-- Right Column - Details -->
         <div>
-          <h1 class="text-3xl font-bold text-gray-900"><%= @post.title %></h1>
+          <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-900"><%= @post.title %></h1>
+            <.link
+              navigate={~p"/users/#{@current_user.id}/posts/#{@post.id}/edit"}
+              class="text-blue-600 text-lg hover:underline"
+            >
+              edit post
+            </.link>
+          </div>
 
           <div class="text-2xl text-gray-500 mt-2 mb-7">
             $<%= :erlang.float_to_binary(@post.price || 0.0, decimals: 2) %>

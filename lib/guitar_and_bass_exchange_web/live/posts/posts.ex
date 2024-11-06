@@ -119,12 +119,12 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostsLive do
                                 </button>
                               </.link>
                             <% else %>
-                              <.link navigate={~p"/users/#{@current_user.id}/posts/#{post.id}/edit"}>
+                              <.link navigate={~p"/users/#{@current_user.id}/posts/#{post.id}/draft"}>
                                 <button
                                   type="button"
                                   class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                                 >
-                                  Edit
+                                  Finish Draft
                                 </button>
                               </.link>
                             <% end %>
