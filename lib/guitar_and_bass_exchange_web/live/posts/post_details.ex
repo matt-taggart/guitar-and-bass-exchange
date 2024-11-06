@@ -2,6 +2,7 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostLive do
   use GuitarAndBassExchangeWeb, :live_view
   alias GuitarAndBassExchangeWeb.Plugs.FetchGeocodeData
   alias GuitarAndBassExchange.Post
+  alias GuitarAndBassExchangeWeb.UserPostInstrument.Components.PreviewModal
 
   def render(assigns) do
     ~H"""
@@ -94,6 +95,13 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostLive do
           </div>
         </div>
       </div>
+      <%= if @show_preview do %>
+        <PreviewModal.render
+          preview_entry={nil}
+          preview_url={@preview_url}
+          show_preview={@show_preview}
+        />
+      <% end %>
     </div>
     """
   end
@@ -111,6 +119,15 @@ defmodule GuitarAndBassExchangeWeb.UserGetPostLive do
     geocode_data = FetchGeocodeData.fetch_geocode_data(session)
     post = Post.Query.get_post_for_user(socket.assigns.current_user.id, post_id)
 
-    {:ok, assign(socket, post: post, geocode_data: geocode_data)}
+    {:ok,
+     assign(socket, post: post, geocode_data: geocode_data, show_preview: false, preview_url: nil)}
+  end
+
+  def handle_event("show_stored_preview", %{"url" => url}, socket) do
+    {:noreply, assign(socket, show_preview: true, preview_url: url)}
+  end
+
+  def handle_event("hide_preview", _params, socket) do
+    {:noreply, assign(socket, show_preview: false, preview_url: nil)}
   end
 end

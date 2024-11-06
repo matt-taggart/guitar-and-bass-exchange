@@ -25,7 +25,6 @@ defmodule GuitarAndBassExchange.Post.Query do
     |> order_by([p], desc: p.updated_at)
     |> limit(1)
     |> Repo.one()
-    # Add this line to preload photos
     |> Repo.preload(:photos)
     |> Repo.preload(:primary_photo)
   end
