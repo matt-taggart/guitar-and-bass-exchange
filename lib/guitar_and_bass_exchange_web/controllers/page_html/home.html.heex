@@ -126,7 +126,7 @@
     <h2 class="text-2xl font-semibold text-brand mb-7">Featured Instruments</h2>
     <ul class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <%= for post <- @posts do %>
-          <.link href={~p"/users/#{@current_user.id}/posts/#{post.id}"} class="block">
+          <.link href={~p"/users/#{post.user_id}/posts/#{post.id}"} class="block">
             <li class="bg-white shadow-md rounded-lg overflow-hidden transform transition hover:scale-105">
                 <!-- Image Section -->
                 <div class="relative w-full pt-[75%] bg-gray-100">
