@@ -50,8 +50,6 @@ Here are some screenshots from the application:
 
 ![image](https://github.com/user-attachments/assets/2abd8b01-cb88-4bf7-a384-d1b8ea37303d)
 
-![image](https://github.com/user-attachments/assets/4445d3ab-d524-4d4c-9ded-8140b17cae33)
-
 ## Learn more about Phoenix here:
 
   * Official website: https://www.phoenixframework.org/
